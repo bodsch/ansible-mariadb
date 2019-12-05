@@ -37,7 +37,7 @@
       "SELECT Host FROM mysql.user WHERE User = '{{ mariadb_root_username }}' ORDER BY (Host='localhost') ASC"
   register: mysql_root_hosts
   changed_when: false
-  check_mode: no
+  check_mode: false
   when: (
     mariadb_install_packages | bool or
     mariadb_root_password_update)
@@ -60,7 +60,7 @@
       'SELECT Host FROM mysql.user WHERE User = ""'
   register: mariadb_anonymous_hosts
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: remove anonymous mariadb users.
   mysql_user:

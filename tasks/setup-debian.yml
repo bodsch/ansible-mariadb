@@ -7,7 +7,7 @@
 
 - name: Update apt cache if mariadb is not yet installed.
   package:
-    update_cache: yes
+    update_cache: true
   when: mariadb_installed.stat.exists == false
 
 - name: Determine required python libraries.

@@ -5,10 +5,9 @@
     path: /etc/systemd/system/multi-user.target.wants/mariadb.service
   register: mariadb_installed
 
-
-#- name: Determine required python libraries.
-#  set_fact:
-#    __mysql_python_package: "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
+# - name: Determine required python libraries.
+#   set_fact:
+#     __mysql_python_package: "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
 
 - name: Ensure mariadb Python libraries are installed.
   package:

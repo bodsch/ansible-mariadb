@@ -1,0 +1,69 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+lint:
+  name: yamllint
+  options:
+    config-file: molecule/default/yaml-lint.yml
+
+platforms:
+
+  - name: stretch
+    image: paulfantom/debian-molecule:9
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    capabilities:
+      - SYS_ADMIN
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+#    - name: buster
+#      image: paulfantom/debian-molecule:10
+#      docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+#      capabilities:
+#        - SYS_ADMIN
+#      volumes:
+#        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+#   - name: centos7
+#     image: paulfantom/centos-molecule:7
+#     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+#     capabilities:
+#       - SYS_ADMIN
+#     volumes:
+#       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    create: create.yml
+    prepare: prepare.yml
+    converge: playbook.yml
+    destroy: destroy.yml
+
+scenario:
+  name: default
+  test_sequence:
+    - lint
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    # - idempotence
+    # - side_effect
+    - verify
+    - destroy
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
+    enabled: true

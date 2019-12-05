@@ -10,12 +10,12 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-      - all
+        - all
     - name: Debian
       versions:
-      - all
+        - all
     - name: Archlinux
       versions:
-      - all
+        - all
   galaxy_tags:
     - database

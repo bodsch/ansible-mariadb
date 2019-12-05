@@ -2,30 +2,30 @@
 
 - block:
 
-  - name: create monitoring database
-    mysql_db:
-      name: monitoring
-      collation: 'utf8_general_ci'
-      encoding: 'utf8'
-      state: present
+    - name: create monitoring database
+      mysql_db:
+        name: monitoring
+        collation: 'utf8_general_ci'
+        encoding: 'utf8'
+        state: present
 
-  - name: create monitoring user
-    mysql_user:
-      name: monitoring
-      host: localhost
-      password: monitoring
-      priv: '*.*:USAGE'
-      state: present
-      append_privs: no
-      encrypted: no
-    no_log: true
+    - name: create monitoring user
+      mysql_user:
+        name: monitoring
+        host: localhost
+        password: monitoring
+        priv: '*.*:USAGE'
+        state: present
+        append_privs: false
+        encrypted: false
+      no_log: true
 
-  - name: create my.cnf file with password credentials
-    template:
-      src: monitoring-my.cnf.j2
-      dest: /usr/local/etc/.my.cnf
-      owner: '{{ mariadb_monitoring_user }}'
-      mode: 0644
+    - name: create my.cnf file with password credentials
+      template:
+        src: monitoring-my.cnf.j2
+        dest: /usr/local/etc/.my.cnf
+        owner: '{{ mariadb_monitoring_user }}'
+        mode: 0644
   when: (
     (mariadb_monitoring_user  is defined and mariadb_monitoring_user     != "") and
     (mariadb_monitoring       is defined and mariadb_monitoring     == true))

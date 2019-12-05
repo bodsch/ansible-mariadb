@@ -1,4 +1,5 @@
 ---
+
 mariadb_log_file_group: adm
 
 __mariadb_daemon: mariadb
