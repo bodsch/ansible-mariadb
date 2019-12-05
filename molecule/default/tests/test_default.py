@@ -8,9 +8,25 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 @pytest.fixture()
+def AnsibleVars(host):
+    all_vars = host.ansible.get_variables()
+    return all_vars
+
+
+@pytest.fixture()
 def AnsibleDefaults():
     with open("../../defaults/main.yml", 'r') as stream:
         return yaml.load(stream)
+
+
+def test_installation_directory(host, AnsibleVars):
+    dir = host.file(AnsibleVars['mariadb_datadir'])
+    # result = host.ansible('debug','var=kafka_final_path')
+    # dir = host.file(result['kafka_final_path'])
+    assert dir.exists
+    assert dir.is_directory
+    assert dir.user == AnsibleVars['mariadb_log_file_group']
+    assert dir.group == AnsibleVars['mariadb_log_file_group']
 
 
 @pytest.mark.parametrize("dirs", [
