@@ -3,7 +3,7 @@
 
 - name: Include OS-specific variables.
   include_vars:
-    file: "{{item}}"
+    file: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution | lower }}.{{ ansible_lsb.codename | lower }}.yml"
     - "{{ ansible_distribution | lower }}.{{ ansible_lsb.major_release }}.yml"

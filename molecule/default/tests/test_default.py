@@ -16,8 +16,7 @@ def AnsibleDefaults():
 @pytest.mark.parametrize("dirs", [
     "/etc/mysql",
     "/etc/mysql/conf.d",
-    "/etc/mysql/mariadb.conf.d",
-    mariadb_tmpdir
+    "/etc/mysql/mariadb.conf.d"
 ])
 def test_directories(host, dirs):
     d = host.file(dirs)

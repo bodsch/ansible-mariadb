@@ -27,5 +27,5 @@
         owner: '{{ mariadb_monitoring_user }}'
         mode: 0644
   when: (
-    (mariadb_monitoring_user  is defined and mariadb_monitoring_user     != "") and
-    (mariadb_monitoring       is defined and mariadb_monitoring     == true))
+    (mariadb_monitoring_user  is defined and mariadb_monitoring_user | length != 0) and
+    (mariadb_monitoring       is defined and mariadb_monitoring ))

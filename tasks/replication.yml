@@ -9,7 +9,7 @@
   when: >
     (mariadb_replication_role == 'master')
     and mariadb_replication_user
-    and (mariadb_replication_master != '')
+    and (mariadb_replication_master | length != 0)
 
 - name: Check slave replication status.
   mysql_replication:
@@ -20,7 +20,7 @@
   register: slave
   when: >
     mariadb_replication_role == 'slave'
-    and (mariadb_replication_master != '')
+    and (mariadb_replication_master | length != 0)
 
 - name: Check master replication status.
   mysql_replication:
@@ -30,7 +30,7 @@
   when: >
     ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
     and (mariadb_replication_role == 'slave')
-    and (mariadb_replication_master != '')
+    and (mariadb_replication_master | length != 0)
 
 - name: Configure replication on the slave.
   mysql_replication:
@@ -44,7 +44,7 @@
   when: >
     ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
     and (mariadb_replication_role == 'slave')
-    and (mariadb_replication_master != '')
+    and (mariadb_replication_master | length != 0)
     and mariadb_replication_user
 
 - name: Start replication.
@@ -53,4 +53,4 @@
   when: >
     ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
     and (mariadb_replication_role == 'slave')
-    and (mariadb_replication_master != '')
+    and (mariadb_replication_master | length != 0)

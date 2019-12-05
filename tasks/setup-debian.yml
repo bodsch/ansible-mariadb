@@ -8,7 +8,7 @@
 - name: Update apt cache if mariadb is not yet installed.
   package:
     update_cache: true
-  when: mariadb_installed.stat.exists == false
+  when: not mariadb_installed.stat.exists
 
 - name: Determine required python libraries.
   set_fact:
@@ -32,23 +32,23 @@
   service:
     name: '{{ mariadb_daemon }}'
     state: stopped
-  when: mariadb_installed.stat.exists == false
+  when: not mariadb_installed.stat.exists
 
 - name: Delete innodb log files created by apt package after initial install.
   file:
-    path: '{{ mariadb_datadir }}/{{item}}'
+    path: '{{ mariadb_datadir }}/{{ item }}'
     state: absent
   with_items:
     - "ib_logfile0"
     - "ib_logfile1"
-  when: mariadb_installed.stat.exists == false
+  when: not mariadb_installed.stat.exists
 
 - name: Check if mariadb packages were installed.
   set_fact:
-    mariadb_install_packages: '{{deb_mariadb_install_packages is defined and deb_mariadb_install_packages.changed}}'
+    mariadb_install_packages: '{{ deb_mariadb_install_packages is defined and deb_mariadb_install_packages.changed }}'
 
 - name: install mysqltuner
   package:
     name: mysqltuner
     state: present
-  when: mariadb_mysqltuner is defined and mariadb_mysqltuner == true
+  when: mariadb_mysqltuner is defined and mariadb_mysqltuner

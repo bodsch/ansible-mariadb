@@ -21,9 +21,9 @@
       owner: "{{ mariadb_user_name }}"
       mode: 0600
   when: (
-    (mariadb_user_home     is defined and mariadb_user_home     != "") and
-    (mariadb_user_name     is defined and mariadb_user_name     != "") and
-    (mariadb_user_password is defined and mariadb_user_password != ""))
+    (mariadb_user_home     is defined and mariadb_user_home     | length != 0) and
+    (mariadb_user_name     is defined and mariadb_user_name     | length != 0) and
+    (mariadb_user_password is defined and mariadb_user_password | length != 0))
 
 - name: Disallow root login remotely
   command: 'mysql -NBe "{{ item }}"'
@@ -67,7 +67,7 @@
     name: ""
     host: "{{ item }}"
     state: absent
-  with_items: "{{ mariadb_anonymous_hosts.stdout_lines|default([]) }}"
+  with_items: "{{ mariadb_anonymous_hosts.stdout_lines | default([]) }}"
 
 - name: remove mariadb test database.
   mysql_db:
