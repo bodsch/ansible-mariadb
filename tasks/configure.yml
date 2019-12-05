@@ -1,0 +1,119 @@
+---
+
+- name: create neccessary directries
+  file:
+    path: '{{item}}'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - '{{ mariadb_include_dir }}'
+    - '{{ mariadb_include_dir }}/conf.d'
+    - '{{ mariadb_include_dir }}/mariadb.conf.d'
+
+- name: update configuration file(s)
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - src:   etc/mysql/my.cnf.j2
+      dest: '{{mariadb_config_file}}'
+    - src:   etc/mysql/mariadb.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.cnf'
+    - src:   etc/mysql/my.cnf.fallback.j2
+      dest: '{{ mariadb_include_dir }}/my.cnf.fallback'
+    - src:   etc/mysql/conf.d/mysql.cnf.j2
+      dest: '{{ mariadb_include_dir }}/conf.d/mysql.cnf'
+    - src:   etc/mysql/conf.d/mysqldump.cnf.j2
+      dest: '{{ mariadb_include_dir }}/conf.d/mysqldump.cnf'
+    - src:   etc/mysql/mariadb.conf.d/50-client.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/50-client.cnf'
+    - src:   etc/mysql/mariadb.conf.d/59-client-security.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/59-client-security.cnf'
+    - src:   etc/mysql/mariadb.conf.d/50-mysql-clients.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/50-mysql-clients.cnf'
+    - src:   etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/50-mysqld_safe.cnf'
+    - src:   etc/mysql/mariadb.conf.d/50-server.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/50-server.cnf'
+    - src:   etc/mysql/mariadb.conf.d/59-server-replication.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/59-server-replication.cnf'
+    - src:   etc/mysql/mariadb.conf.d/59-server-logging.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/59-server-logging.cnf'
+    - src:   etc/mysql/mariadb.conf.d/59-server-innodb.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/59-server-innodb.cnf'
+    - src:   etc/mysql/mariadb.conf.d/59-server-finetuning.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/59-server-finetuning.cnf'
+    - src:   etc/mysql/mariadb.conf.d/59-server-security.cnf.j2
+      dest: '{{ mariadb_include_dir }}/mariadb.conf.d/59-server-security.cnf'
+  register: configuration
+  notify: restart mariadb
+
+- name: create datadir {{ mariadb_datadir }} if it does not exist
+  file:
+    path: "{{ mariadb_datadir }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode:  0755
+
+- name: "create tmpdir '{{ mariadb_tmpdir }}' if it does not exist"
+  file:
+    path: "{{ mariadb_tmpdir }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode:  0755
+  when: mariadb_tmpdir != '/tmp' and mariadb_tmpdir is defined and mariadb_tmpdir != ''
+
+- name: "create logdir '{{ mariadb_log | dirname }}' if it does not exist"
+  file:
+    path: "{{ mariadb_log | dirname }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode:  0755
+  when: mariadb_log is defined and mariadb_log != ''
+
+- block:
+  - name: create slow query log file (if configured).
+    command: "touch {{ mariadb_slow_query_log_file }}"
+    args:
+      creates: "{{ mariadb_slow_query_log_file }}"
+      warn: no
+
+  - name: set ownership on slow query log file (if configured).
+    file:
+      path: "{{ mariadb_slow_query_log_file }}"
+      state: file
+      owner: mysql
+      group: "{{ mariadb_log_file_group }}"
+      mode: 0640
+  when: mariadb_slow_query_log_enabled
+
+- block:
+  - name: Create error log file (if configured).
+    command: "touch {{ mariadb_log_error }}"
+    args:
+      creates: "{{ mariadb_log_error }}"
+      warn: yes
+
+  - name: Set ownership on error log file (if configured).
+    file:
+      path: "{{ mariadb_log_error }}"
+      state: file
+      owner: mysql
+      group: "{{ mariadb_log_file_group }}"
+      mode: 0640
+  when: mariadb_log == "" and mariadb_log_error != ""
+
+- name: Ensure mariadb is started and enabled on boot.
+  service:
+    name: '{{ mariadb_daemon }}'
+    state: started
+    enabled: '{{ mariadb_enabled_on_startup }}'
+  register: mariadb_service_configuration

@@ -1,0 +1,75 @@
+---
+
+- name: Get mariadb version.
+  command: 'mysql --version'
+  register: mariadb_cli_version
+  changed_when: false
+
+- block:
+  - name: Ensure default user {{ mariadb_user_name }} is present.
+    mysql_user:
+      name: "{{ mariadb_user_name }}"
+      host: 'localhost'
+      password: "{{ mariadb_user_password }}"
+      priv: '*.*:ALL,GRANT'
+      state: present
+
+  - name: copy user-my.cnf file with password credentials
+    template:
+      src: "user-my.cnf.j2"
+      dest: "{{ mariadb_user_home }}/.my.cnf"
+      owner: "{{ mariadb_user_name }}"
+      mode: 0600
+  when: (
+    (mariadb_user_home     is defined and mariadb_user_home     != "") and
+    (mariadb_user_name     is defined and mariadb_user_name     != "") and
+    (mariadb_user_password is defined and mariadb_user_password != ""))
+
+- name: Disallow root login remotely
+  command: 'mysql -NBe "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User='{{ mariadb_root_username }}' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+  changed_when: false
+
+- name: get list of hosts for the root user.
+  command: >
+    mysql -NBe
+      "SELECT Host FROM mysql.user WHERE User = '{{ mariadb_root_username }}' ORDER BY (Host='localhost') ASC"
+  register: mysql_root_hosts
+  changed_when: false
+  check_mode: no
+  when: (
+    mariadb_install_packages | bool or
+    mariadb_root_password_update)
+
+# Has to be after the root password assignment, for idempotency.
+- name: create .my.cnf file with root password credentials
+  template:
+    src: "root-my.cnf.j2"
+    dest: "{{ mariadb_root_home }}/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  when: (
+    mariadb_install_packages | bool or
+    mariadb_root_password_update)
+
+- name: get list of hosts for the anonymous user.
+  command: >
+    mysql -NBe
+      'SELECT Host FROM mysql.user WHERE User = ""'
+  register: mariadb_anonymous_hosts
+  changed_when: false
+  check_mode: no
+
+- name: remove anonymous mariadb users.
+  mysql_user:
+    name: ""
+    host: "{{ item }}"
+    state: absent
+  with_items: "{{ mariadb_anonymous_hosts.stdout_lines|default([]) }}"
+
+- name: remove mariadb test database.
+  mysql_db:
+    name: test
+    state: absent

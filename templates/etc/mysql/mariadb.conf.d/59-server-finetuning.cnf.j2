@@ -1,0 +1,24 @@
+{{ ansible_managed | comment(decoration='# ') }}
+
+[mysqld]
+
+# * Fine Tuning
+#
+key_buffer_size         = {{ mariadb_key_buffer_size }}
+max_allowed_packet      = {{ mariadb_max_allowed_packet }}
+thread_stack            = 192K
+thread_cache_size       = {{ mariadb_thread_cache_size }}
+# This replaces the startup script and checks MyISAM tables if needed
+# the first time they are touched
+myisam_recover_options  = BACKUP
+max_connections         = {{ mariadb_max_connections }}
+#table_cache            = 64
+#thread_concurrency     = 10
+
+{% if mariadb_skip_name_resolve is defined and  mariadb_skip_name_resolve == true %}
+# Skip reverse DNS lookup of clients
+skip-name-resolve
+{% endif %}
+
+# enable performance schema
+performance_schema      = 1

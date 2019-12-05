@@ -1,0 +1,42 @@
+---
+
+- name: Check if mariadb is already installed.
+  stat:
+    path: /etc/systemd/system/multi-user.target.wants/mariadb.service
+  register: mariadb_installed
+
+
+#- name: Determine required python libraries.
+#  set_fact:
+#    __mysql_python_package: "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
+
+- name: Ensure mariadb Python libraries are installed.
+  package:
+    name: python-mysqlclient
+    state: present
+
+- name: Ensure mariadb packages are installed.
+  package:
+    name: '{{ item }}'
+    state: present
+  with_items: "{{ mariadb_packages }}"
+  register: __mysql_install_packages
+
+- name: Ensure mariadb is stopped after initial install.
+  service:
+    name: '{{ mariadb_daemon }}'
+    state: stopped
+  when: mariadb_installed.stat.exists == false
+
+- name: Delete innodb log files created by apt package after initial install.
+  file:
+    path: '{{ mariadb_datadir }}/{{item}}'
+    state: absent
+  with_items:
+    - "ib_logfile0"
+    - "ib_logfile1"
+  when: mariadb_installed.stat.exists == false
+
+- name: Check if mariadb packages were installed.
+  set_fact:
+    mariadb_install_packages: '{{deb_mariadb_install_packages is defined and deb_mariadb_install_packages.changed}}'

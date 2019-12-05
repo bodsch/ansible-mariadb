@@ -1,0 +1,21 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: Bodo Schulz
+  description: MariaDB Server for debian (Ubuntu), RedHat (CentOS) and Arch Linux.
+  company: ""
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.2
+  platforms:
+    - name: Ubuntu
+      versions:
+      - all
+    - name: Debian
+      versions:
+      - all
+    - name: Archlinux
+      versions:
+      - all
+  galaxy_tags:
+    - database
