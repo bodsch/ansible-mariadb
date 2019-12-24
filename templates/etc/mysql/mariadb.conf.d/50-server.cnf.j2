@@ -1,0 +1,80 @@
+{{ ansible_managed | comment(decoration='# ') }}
+
+# These groups are read by MariaDB server.
+# Use it for options that only the server (but not clients) should see
+#
+# See the examples of server my.cnf files in /usr/share/mysql/
+#
+
+# this is read by the standalone daemon and embedded servers
+[server]
+
+# this is only for the mysqld standalone daemon
+[mysqld]
+
+# * Basic Settings
+#
+user                    = mysql
+pid-file                = {{ mariadb_pid_file }}
+socket                  = {{ mariadb_socket }}
+port                    = {{ mariadb_port }}
+basedir                 = /usr
+datadir                 = {{ mariadb_datadir }}
+tmpdir                  = {{ mariadb_tmpdir }}
+lc-messages-dir         = /usr/share/mysql
+skip-external-locking
+
+# Instead of skip-networking the default is now to listen only on
+# localhost which is more compatible and is not less secure.
+bind-address            = {{ mariadb_bind_address }}
+
+# * Query Cache Configuration
+#
+query_cache_type        = {{ mariadb_query_cache_type }}
+query_cache_limit       = {{ mariadb_query_cache_limit }}
+query_cache_size        = {{ mariadb_query_cache_size }}
+
+# * Character sets
+#
+# MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
+# utf8 4-byte character set. See also client.cnf
+#
+character-set-server    = {{ mariadb_character_set_server }}
+collation-server        = {{ mariadb_collation_server }}
+
+{% if mariadb_tmp_table_size is defined and  mariadb_tmp_table_size != '' %}
+# The largest size for temporary tables in memory
+# https://mariadb.com/kb/en/library/server-system-variables/#tmp_table_size
+tmp_table_size          = {{ mariadb_tmp_table_size }}
+{% endif %}
+
+{% if mariadb_max_heap_table_size is defined and  mariadb_max_heap_table_size != '' %}
+# Maximum size in bytes for user-created MEMORY tables
+# https://mariadb.com/kb/en/library/server-system-variables/#max_heap_table_size
+max_heap_table_size     = {{ mariadb_max_heap_table_size }}
+{% endif %}
+
+
+# * Unix socket authentication plugin is built-in since 10.0.22-6
+#
+# Needed so the root database user can authenticate without a password but
+# only when running as the unix root user.
+#
+# Also available for other users if required.
+# See https://mariadb.com/kb/en/unix_socket-authentication-plugin/
+
+# this is only for embedded server
+[embedded]
+
+# This group is only read by MariaDB servers, not by MySQL.
+# If you use the same .cnf file for MySQL and MariaDB,
+# you can put MariaDB-only options here
+[mariadb]
+
+# https://mariadb.com/kb/en/library/error-log/#error-messages-file
+lc_messages_dir = {{ mariadb_messages_dir }}
+
+# This group is only read by MariaDB-10.1 servers.
+# If you use the same .cnf file for MariaDB of different versions,
+# use this group for options that older servers don't understand
+[mariadb-10.1]

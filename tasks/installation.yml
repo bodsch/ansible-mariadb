@@ -1,0 +1,8 @@
+---
+
+- name: ensure mariadb packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mariadb_packages }}"
+  register: mariadb_install_packages
