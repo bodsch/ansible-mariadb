@@ -1,4 +1,5 @@
 ---
+
 - name: ensure mariadb databases are present.
   mysql_db:
     name: "{{ item.name }}"

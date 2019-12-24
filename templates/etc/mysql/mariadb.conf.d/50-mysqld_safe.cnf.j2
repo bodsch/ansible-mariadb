@@ -28,5 +28,6 @@
 # Remember to edit /etc/mysql/debian.cnf when changing the socket location.
 socket          = {{ mariadb_socket }}
 nice            = 0
-skip_log_error
-syslog
+# skip_log_error
+# syslog
+log-error = /var/log/mysql/mysql.err

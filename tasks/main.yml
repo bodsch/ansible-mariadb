@@ -1,15 +1,15 @@
 ---
 
-# Variable configuration.
-- include_tasks: variables.yml
+- name: detect available mariadb version
+  include_tasks: detect_mariadb_version.yml
 
-# Setup/install tasks.
-- include_tasks: 'setup-{{ ansible_os_family | lower }}.yml'
+- name: install mariadb
+  include_tasks: installation.yml
 
-# Configure MySQL.
 - include_tasks: configure.yml
 - include_tasks: secure-installation.yml
 - include_tasks: monitoring.yml
 - include_tasks: databases.yml
 - include_tasks: users.yml
-# - include_tasks: replication.yml
+
+# # - include_tasks: replication.yml

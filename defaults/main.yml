@@ -5,7 +5,7 @@ mariadb_user_home: ''
 mariadb_user_name: ''
 mariadb_user_password: ''
 
-mariadb_monitoring: false
+mariadb_monitoring: true
 mariadb_monitoring_user: 'nobody'
 
 mariadb_mysqltuner: true
@@ -17,28 +17,13 @@ mariadb_root_username: root
 mariadb_root_password: root
 
 # Set this to `true` to forcibly update the root password.
-mariadb_root_password_update: false
+mariadb_root_password_update: true
 mariadb_user_password_update: false
 
 mariadb_enabled_on_startup: true
 
 # update my.cnf. each time role is run? true | false
 overwrite_global_mycnf: true
-
-# The following variables have a default value depending on operating system.
-# mariadb_config_file: /etc/my.cnf
-# mariadb_config_include_dir: /etc/my.cnf.d
-
-# Pass in a comma-separated list of repos to use (e.g. "remi,epel"). Used only
-# for RedHat systems (and derivatives).
-mariadb_enablerepo: ""
-
-# Define a custom list of packages to install; if none provided, the default
-# package list from vars/[OS-family].yml will be used.
-# mariadb_packages:
-#   - mysql
-#   - mysql-server
-#   - MySQL-python
 
 # MySQL connection settings.
 mariadb_port: 3306
@@ -47,6 +32,9 @@ mariadb_skip_name_resolve: true
 mariadb_datadir: /var/lib/mysql
 mariadb_tmpdir: /tmp
 mariadb_sql_mode: ''
+
+mariadb_configure_swappiness: true
+mariadb_swappiness: 0
 
 # The following variables have a default value depending on operating system.
 # mariadb_pid_file: /var/run/mysqld/mysqld.pid

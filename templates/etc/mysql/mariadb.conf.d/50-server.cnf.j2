@@ -71,6 +71,9 @@ max_heap_table_size     = {{ mariadb_max_heap_table_size }}
 # you can put MariaDB-only options here
 [mariadb]
 
+# https://mariadb.com/kb/en/library/error-log/#error-messages-file
+lc_messages_dir = {{ mariadb_messages_dir }}
+
 # This group is only read by MariaDB-10.1 servers.
 # If you use the same .cnf file for MariaDB of different versions,
 # use this group for options that older servers don't understand

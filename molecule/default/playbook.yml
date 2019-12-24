@@ -1,7 +1,11 @@
 ---
 - hosts: all
   any_errors_fatal: false
+  gather_facts: true
   environment:
     NETRC: ''
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
   roles:
     - role: ansible-mariadb

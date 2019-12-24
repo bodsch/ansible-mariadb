@@ -12,9 +12,9 @@
     - name: create monitoring user
       mysql_user:
         name: monitoring
-        host: localhost
+        host: '%'
         password: monitoring
-        priv: '*.*:USAGE'
+        priv: 'monitoring.*:ALL'
         state: present
         append_privs: false
         encrypted: false

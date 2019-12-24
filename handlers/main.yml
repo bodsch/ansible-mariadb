@@ -1,6 +1,11 @@
 ---
+
 - name: restart mariadb
   service:
-    name: '{{ mariadb_daemon }}'
+    name: '{{ mariadb_service }}'
     state: restarted
-    sleep: 5
+  notify:
+    - sleep 5 seconds
+
+- name: sleep 5 seconds  # noqa 305
+  shell: sleep 5s

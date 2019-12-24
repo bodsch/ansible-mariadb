@@ -1,0 +1,42 @@
+---
+
+- block:
+    # ubuntu-16 provides mariadb         ("Version: 10.0.38-0ubuntu0.16.04.1")
+    # ubuntu-18 provides mariadb 10.1.43 ("Version: 1:10.1.43-0ubuntu0.18.04.1")
+    # debian-9  provides mariadb 10.1    ("Version: 10.1.41-0+deb9u1")
+    # debian-10 provides mariadb 10.3    ("Version: 1:10.3.18-0+deb10u1")
+    - name: detect available mariadb version  # noqa 301
+      shell: |
+        apt-cache show mariadb-server | grep Version | sed 's|1:||' | awk -F'[:+]' '{print $2}' | tr -d '[:space:]' | awk -F '-' '{print $1}'
+      args:
+        warn: false
+      ignore_errors: true
+      no_log: true
+      register: _detected_mariadb_version
+
+    - name: define mariadb Version
+      set_fact:
+        mariadb_version: "{{ _detected_mariadb_version.stdout }}"
+
+  when: ansible_os_family | lower == "debian"
+
+- block:
+    # centos-7 provides mariadb 5.5 m(  ("Version     : 5.5.64")
+    # centos-8 provides mariadb 10      ("Version      : 10.3.11")
+    - name: detect available mariadb version  # noqa 301
+      shell: |
+        yum info mariadb-server | grep Version | cut -d ':' -f 2 | tr -d '[:space:]'
+      args:
+        warn: false
+      no_log: true
+      register: _detected_mariadb_version
+
+    - name: define mariadb Version
+      set_fact:
+        mariadb_version: "{{ _detected_mariadb_version.stdout }}"
+
+  when: ansible_os_family | lower == "redhat"
+
+- debug:
+    msg: "mariadb version: {{ mariadb_version }}"
+  when: mariadb_version | length != 0

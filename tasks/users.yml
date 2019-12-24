@@ -1,4 +1,5 @@
 ---
+
 - name: Ensure mariadb users are present.
   mysql_user:
     name: "{{ item.name }}"
