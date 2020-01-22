@@ -51,7 +51,9 @@ _mariadb_packages:
     - mariadb
     - python-MySQL-python
 
-mariadb_packages: "{{ _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] | default(_mariadb_packages[ansible_distribution | lower] | default(_mariadb_packages['default'])) }}"
+mariadb_packages: "{{ _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_packages[ansible_distribution | lower] |
+  default(_mariadb_packages['default'])) }}"
 
 _mariadb_service:
   default: mysql
@@ -66,12 +68,32 @@ _mariadb_service:
   redhat-7: mariadb
   redhat: mysqld
 
-mariadb_service: "{{ _mariadb_service[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] | default(_mariadb_service[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] | default(_mariadb_service[ansible_distribution] | default(_mariadb_service[ansible_os_family] | default(_mariadb_service['default'])))) }}"
+mariadb_service: "{{ _mariadb_service[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_service[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_service[ansible_distribution | lower] |
+  default(_mariadb_service[ansible_os_family | lower] |
+  default(_mariadb_service['default'])))) }}"
 
 _mariadb_messages_dir:
   default: /usr/share/mysql
 
-mariadb_messages_dir: "{{ _mariadb_messages_dir[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] | default(_mariadb_messages_dir[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] | default(_mariadb_messages_dir[ansible_distribution] | default(_mariadb_messages_dir[ansible_os_family] | default(_mariadb_messages_dir['default'])))) }}"
+mariadb_messages_dir: "{{ _mariadb_messages_dir[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_messages_dir[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_messages_dir[ansible_distribution | lower] |
+  default(_mariadb_messages_dir[ansible_os_family | lower] |
+  default(_mariadb_messages_dir['default'])))) }}"
+
+_mariadb_socket:
+  default: /run/mysqld/mysqld.sock
+  debian: /run/mysqld/mysqld.sock
+  centos: /var/lib/mysql/mysql.sock
+  redhat: /var/lib/mysql/mysql.sock
+
+mariadb_socket: "{{ _mariadb_socket[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_socket[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_socket[ansible_distribution | lower] |
+  default(_mariadb_socket[ansible_os_family | lower] |
+  default(_mariadb_socket['default'])))) }}"
 
 mariadb_log_directory: /var/log/mysql
 mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
