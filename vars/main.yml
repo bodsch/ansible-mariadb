@@ -3,19 +3,9 @@
 _mariadb_packages:
   default:
     - mariadb-server
-    - mariadb-devel
-    - python2-mysql
-  alpine:
-    - mariadb
-    - py-mysqldb
-  amazon-2018:
-    - mysql-server
-    - mysql-devel
-    - MySQL-python27
-  amazon:
-    - mariadb-server
-    - mariadb-devel
-    - MySQL-python
+    - python-mysqldb
+    - python3-mysqldb
+    - libmariadb-dev
   archlinux:
     - mariadb
   redhat-7:
@@ -23,65 +13,81 @@ _mariadb_packages:
     - mariadb-server
     - MySQL-python
   centos-7:
-    - mariadb-devel
-    - mariadb-server
-    - MySQL-python
+    - python-setuptools
+    - python3-setuptools
+    - MariaDB-server
+    - MariaDB-client
+    - MariaDB-shared
+    - MariaDB-devel
+    - gcc
+    - make
+    - redhat-rpm-config
+    - python3-devel
   centos-8:
-    - mariadb-devel
-    - mariadb-server
-    - python3-PyMySQL
+    - python3-setuptools
+    - MariaDB-server
+    - MariaDB-client
+    - MariaDB-shared
+    - MariaDB-devel
+    - gcc
+    - make
+    - redhat-rpm-config
+    - python3-devel
   centos:
-    - mysql-devel
-    - mysql-server
-    - python3-PyMySQL
+    - python3-setuptools
+    - MariaDB-server
+    - MariaDB-client
+    - MariaDB-shared
+    - MariaDB-devel
+    - gcc
+    - make
+    - redhat-rpm-config
+    - python36-devel
   debian:
+    - python3-pip
+    - python3-setuptools
     - mariadb-server
     - python-mysqldb
     - python3-mysqldb
-  fedora:
+    - libmariadb-dev
+  ubuntu-16:
+    - python3-pip
+    - python3-setuptools
+    - python-setuptools
     - mariadb-server
-    - mariadb-devel
-    - python3-PyMySQL
+    - python-mysqldb
+    - python3-mysqldb
+    - libmariadb-dev
   ubuntu:
+    - python3-pip
+    - python3-setuptools
     - mariadb-server
     - python-mysqldb
     - python3-mysqldb
-  opensuse leap:
-    - libmysqlclient-devel
-    - mariadb
-    - python-MySQL-python
+    - libmariadb-dev
 
-mariadb_packages: "{{ _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_packages[ansible_distribution | lower] |
-  default(_mariadb_packages['default'])) }}"
+_mariadb_python_packages:
+  default:
+    - PyMySQL
+    - mysqlclient
+  debian:
+    - PyMySQL
+    - mysqlclient
+  centos:
+    - PyMySQL
+    - mysqlclient
 
 _mariadb_service:
   default: mysql
-  alpine: mariadb
-  amazon: mariadb
-  amazon-2018: mysqld
   archlinux: mariadb
   centos-7: mariadb
   centos-8: mariadb
   centos: mariadb
-  fedora: mariadb
   redhat-7: mariadb
   redhat: mysqld
 
-mariadb_service: "{{ _mariadb_service[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_service[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_service[ansible_distribution | lower] |
-  default(_mariadb_service[ansible_os_family | lower] |
-  default(_mariadb_service['default'])))) }}"
-
 _mariadb_messages_dir:
   default: /usr/share/mysql
-
-mariadb_messages_dir: "{{ _mariadb_messages_dir[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_messages_dir[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_messages_dir[ansible_distribution | lower] |
-  default(_mariadb_messages_dir[ansible_os_family | lower] |
-  default(_mariadb_messages_dir['default'])))) }}"
 
 _mariadb_socket:
   default: /run/mysqld/mysqld.sock
@@ -89,18 +95,38 @@ _mariadb_socket:
   centos: /var/lib/mysql/mysql.sock
   redhat: /var/lib/mysql/mysql.sock
 
-mariadb_socket: "{{ _mariadb_socket[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_socket[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_socket[ansible_distribution | lower] |
-  default(_mariadb_socket[ansible_os_family | lower] |
-  default(_mariadb_socket['default'])))) }}"
-
 mariadb_log_directory: /var/log/mysql
 mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
 mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
 
 mariadb_pid_file: /run/mysqld/mysqld.pid
-mariadb_socket: /run/mysqld/mysqld.sock
 
 mariadb_config_dir: /etc/mysql
 mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
+
+
+mariadb_packages: "{{ _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_packages[ansible_distribution | lower] |
+  default(_mariadb_packages['default'])) }}"
+
+mariadb_python_packages: "{{ _mariadb_python_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_python_packages[ansible_distribution | lower] |
+  default(_mariadb_python_packages['default'])) }}"
+
+mariadb_service: "{{ _mariadb_service[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_service[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_service[ansible_distribution | lower] |
+  default(_mariadb_service[ansible_os_family | lower] |
+  default(_mariadb_service['default'])))) }}"
+
+mariadb_messages_dir: "{{ _mariadb_messages_dir[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_messages_dir[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_messages_dir[ansible_distribution | lower] |
+  default(_mariadb_messages_dir[ansible_os_family | lower] |
+  default(_mariadb_messages_dir['default'])))) }}"
+
+mariadb_socket: "{{ _mariadb_socket[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_socket[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
+  default(_mariadb_socket[ansible_distribution | lower] |
+  default(_mariadb_socket[ansible_os_family | lower] |
+  default(_mariadb_socket['default'])))) }}"

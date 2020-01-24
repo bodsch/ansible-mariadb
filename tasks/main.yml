@@ -1,5 +1,8 @@
 ---
 
+- name: install repositories
+  include_tasks: preparations.yml
+
 - name: detect available mariadb version
   include_tasks: detect_mariadb_version.yml
 
@@ -8,8 +11,9 @@
 
 - include_tasks: configure.yml
 - include_tasks: secure-installation.yml
+
 - include_tasks: monitoring.yml
 - include_tasks: databases.yml
 - include_tasks: users.yml
 
-# # - include_tasks: replication.yml
+# - include_tasks: replication.yml

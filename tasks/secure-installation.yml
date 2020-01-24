@@ -22,7 +22,7 @@
       command: >
         mysqladmin --user=root password "{{ mariadb_root_password }}"
       changed_when: false
-      no_log: true
+      # no_log: true
 
     # Has to be after the root password assignment, for idempotency.
     - name: create .my.cnf file with root password credentials

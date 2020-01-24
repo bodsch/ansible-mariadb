@@ -1,8 +1,52 @@
 ---
 
-- name: ensure mariadb packages are installed
+- name: ensure mariadb packages are installed (debian)
+  package:
+    name: "{{ mariadb_packages }}"
+    state: present
+  # with_items: "{{ mariadb_packages }}"
+  register: mariadb_install_packages
+  when:
+    ansible_os_family | lower == 'debian'
+
+
+- name: ensure mariadb packages are installed (centos < 8)
   package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ mariadb_packages }}"
+    use: yum
+  loop:
+    "{{ mariadb_packages }}"
   register: mariadb_install_packages
+  when: (
+    ansible_os_family | lower == 'redhat' and
+    ansible_distribution_version | int < 8)
+
+- name: ensure mariadb packages are installed (centos >= 8)
+  package:
+    name: "{{ mariadb_packages }}"
+    state: present
+    use: dnf
+  register: mariadb_install_packages
+  when: (
+    ansible_os_family | lower == 'redhat' and
+    ansible_distribution_version | int >= 8)
+
+
+
+- name: ensure python bindings for mariadb are installed
+  pip:
+    executable: pip3
+    name: "{{ item }}"
+    state: present
+  loop:
+    "{{ mariadb_python_packages }}"
+  register: mariadb_install_python_packages
+
+
+- debug:
+    var: "{{ item }}"
+  when: item is defined
+  loop:
+    - mariadb_install_packages | bool
+    - mariadb_install_python_packages | bool

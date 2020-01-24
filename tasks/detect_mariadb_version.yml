@@ -7,7 +7,7 @@
     # debian-10 provides mariadb 10.3    ("Version: 1:10.3.18-0+deb10u1")
     - name: detect available mariadb version  # noqa 301
       shell: |
-        apt-cache show mariadb-server | grep Version | sed 's|1:||' | awk -F'[:+]' '{print $2}' | tr -d '[:space:]' | awk -F '-' '{print $1}'
+        apt-cache show mariadb-server | grep Version | sort | tail -n1 | sed 's|1:||' | awk -F'[:+]' '{print $2}' | tr -d '[:space:]' | awk -F '-' '{print $1}'
       args:
         warn: false
       ignore_errors: true
@@ -25,7 +25,7 @@
     # centos-8 provides mariadb 10      ("Version      : 10.3.11")
     - name: detect available mariadb version  # noqa 301
       shell: |
-        yum info mariadb-server | grep Version | cut -d ':' -f 2 | tr -d '[:space:]'
+        yum info mariadb-server | grep "^Version" | sort | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
       args:
         warn: false
       no_log: true
