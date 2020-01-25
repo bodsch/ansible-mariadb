@@ -38,7 +38,6 @@
 
   when: rootpw_updated is changed
 
-
 # This command will fail when the root password was set previously
 - name: check if root password is set
   shell: >

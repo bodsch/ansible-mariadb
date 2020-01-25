@@ -2,6 +2,19 @@
 
 - block:
 
+    - name: ensure the ansible_python_interpreter is set to python2
+      set_fact:
+        ansible_python_interpreter: python2
+
+    - name: do facts module to get latest information
+      setup:
+
+  when: (
+    ansible_os_family | lower == 'redhat' and
+    ansible_distribution_version | int < 8)
+
+- block:
+
     - name: add mariadb repository
       yum_repository:
         name: MariaDB
@@ -31,18 +44,20 @@
 
     - name: update apt cache
       apt:
-        update_cache: yes
+        update_cache: true
 
     - name: install requierements
       package:
-        name: software-properties-common
+        name: "{{ item }}"
         state: present
+      loop:
+        - software-properties-common
+        - dirmngr
 
     - name: add apt signing key
       apt_key:
         url: https://mariadb.org/mariadb_release_signing_key.asc
         state: present
-
 
     - name: add mariadb repository
       apt_repository:
@@ -61,7 +76,7 @@
 
     - name: update apt cache
       apt:
-        update_cache: yes
+        update_cache: true
 
   when: (
     mariadb_use_external_repo | bool and

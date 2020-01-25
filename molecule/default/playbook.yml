@@ -10,5 +10,5 @@
   roles:
     - role: ansible-mariadb
       vars:
-        # ansible_python_interpreter: python3
+        ansible_python_interpreter: python3
         mariadb_root_password: root_password
