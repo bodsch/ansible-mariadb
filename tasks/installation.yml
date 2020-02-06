@@ -10,16 +10,15 @@
   when:
     ansible_os_family | lower == 'debian'
 
-
 - block:
 
     - name: ensure mariadb packages are installed (centos < 8)
       package:
-        name: "{{ item }}"
+        name: "{{ mariadb_packages }}"
         state: present
         use: yum
-      loop:
-        "{{ mariadb_packages }}"
+      #loop:
+      #  "{{ mariadb_packages }}"
       register: mariadb_install_packages
       when: ansible_distribution_version | int < 8
 

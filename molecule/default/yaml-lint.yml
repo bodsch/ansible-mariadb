@@ -12,3 +12,9 @@ rules:
     max-spaces-inside: 1
   indentation:
     spaces: 2
+
+ignore: |
+  tests/
+  molecule/
+  .molecule/
+  .travis.yml

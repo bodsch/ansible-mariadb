@@ -26,33 +26,33 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
-  - name: ubuntu-16
-    image: paulfantom/ubuntu-molecule:16.04
-    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-
-  - name: ubuntu-18
-    image: paulfantom/ubuntu-molecule:18.04
-    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-
-  - name: debian-9
-    image: paulfantom/debian-molecule:9
-    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-
-  - name: debian-10
-    image: paulfantom/debian-molecule:10
-    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  # - name: ubuntu-16
+  #   image: paulfantom/ubuntu-molecule:16.04
+  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+  #   privileged: true
+  #   volumes:
+  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  #
+  # - name: ubuntu-18
+  #   image: paulfantom/ubuntu-molecule:18.04
+  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+  #   privileged: true
+  #   volumes:
+  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  #
+  # - name: debian-9
+  #   image: paulfantom/debian-molecule:9
+  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+  #   privileged: true
+  #   volumes:
+  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  #
+  # - name: debian-10
+  #   image: paulfantom/debian-molecule:10
+  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+  #   privileged: true
+  #   volumes:
+  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
 
 provisioner:
@@ -71,7 +71,7 @@ provisioner:
 scenario:
   name: default
   test_sequence:
-    - lint
+    # - lint
     - destroy
     - dependency
     - syntax

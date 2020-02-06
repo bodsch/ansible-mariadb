@@ -19,6 +19,7 @@ _mariadb_packages:
     - MariaDB-client
     - MariaDB-shared
     - MariaDB-devel
+    - MySQL-python
     - gcc
     - make
     - redhat-rpm-config
