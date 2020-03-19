@@ -19,8 +19,8 @@
       yum_repository:
         name: MariaDB
         state: present
-        description: MariaDB 10.4 CentOS repository {{ ansible_distribution_major_version }} - amd64
-        baseurl: http://yum.mariadb.org/10.4/centos{{ ansible_distribution_major_version }}-amd64
+        description: MariaDB {{ mariadb_version }} CentOS repository {{ ansible_distribution_major_version }} - amd64
+        baseurl: http://yum.mariadb.org/{{ mariadb_version }}/centos{{ ansible_distribution_major_version }}-amd64
         gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
         gpgcheck: 1
         enabled: 1
@@ -59,18 +59,17 @@
         url: https://mariadb.org/mariadb_release_signing_key.asc
         state: present
 
-    - name: add mariadb repository
+    - name: add mariadb repository for debian
       apt_repository:
-        repo: deb [arch=amd64] http://mirror.wtnet.de/mariadb/repo/10.4/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main
+        repo: deb http://mirror.netcologne.de/mariadb/repo/{{ mariadb_version }}/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main
         state: present
       when:
         ansible_distribution | lower == 'debian'
 
-    - name: add mariadb repository
+    - name: add mariadb repository for ubuntu
       apt_repository:
-        repo: deb [arch=amd64] http://mirror.wtnet.de/mariadb/repo/10.4/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main
+        repo: deb http://mirror.netcologne.de/mariadb/repo/{{ mariadb_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main
         state: present
-
       when:
         ansible_distribution | lower == 'ubuntu'
 
