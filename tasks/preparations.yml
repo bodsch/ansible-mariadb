@@ -1,7 +1,7 @@
 ---
 
 - block:
-
+    #
     - name: ensure the ansible_python_interpreter is set to python2
       set_fact:
         ansible_python_interpreter: python2
@@ -13,8 +13,9 @@
     ansible_os_family | lower == 'redhat' and
     ansible_distribution_version | int < 8)
 
-- block:
 
+- block:
+    #
     - name: add mariadb repository
       yum_repository:
         name: MariaDB
@@ -40,8 +41,9 @@
     mariadb_use_external_repo | bool and
     ansible_os_family | lower == 'redhat')
 
-- block:
 
+- block:
+    #
     - name: update apt cache
       apt:
         update_cache: true

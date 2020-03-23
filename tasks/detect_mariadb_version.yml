@@ -40,7 +40,7 @@
     # centos-8 provides mariadb 10      ("Version      : 10.3.11")
     - name: detect available mariadb version  # noqa 301
       shell: |
-        yum info mariadb-server | grep "^Version" | sort | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
+        yum info mariadb-server | grep "^Version" | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
       args:
         warn: false
       no_log: true
@@ -56,10 +56,10 @@
 - name: assert missing mariadb_version
   assert:
     that:
-      - mariadb_version | default("") | length != 0
+      - mariadb_version | default("") | string | length != 0
     msg: mariadb_version is missing
     quiet: true
 
 - debug:
     msg: "mariadb version: {{ mariadb_version }}"
-  when: mariadb_version | length != 0
+  when: mariadb_version | default("") | string | length != 0

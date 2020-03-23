@@ -12,7 +12,7 @@ _mariadb_packages:
     - mariadb-devel
     - mariadb-server
     - MySQL-python
-  centos-7:
+  centos-7-external:
     - python-setuptools
     - python3-setuptools
     - MariaDB-server
@@ -24,12 +24,32 @@ _mariadb_packages:
     - make
     - redhat-rpm-config
     - python3-devel
-  centos-8:
+  centos-8-external:
     - python3-setuptools
     - MariaDB-server
     - MariaDB-client
     - MariaDB-shared
     - MariaDB-devel
+    - gcc
+    - make
+    - redhat-rpm-config
+    - python3-devel
+  centos-7:
+    - python-setuptools
+    - python3-setuptools
+    - mariadb-server
+    - mariadb-devel
+    - MySQL-python
+    - gcc
+    - make
+    - redhat-rpm-config
+    - python3-devel
+  centos-8:
+    - python3-setuptools
+    - mariadb-server
+    - mariadb-client
+    - mariadb-shared
+    - mariadb-devel
     - gcc
     - make
     - redhat-rpm-config
@@ -106,9 +126,10 @@ mariadb_config_dir: /etc/mysql
 mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
 
 
-mariadb_packages: "{{ _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+mariadb_packages: "{{  _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version ~ '-external' if mariadb_use_external_repo else '' ] |
+  default(_mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
   default(_mariadb_packages[ansible_distribution | lower] |
-  default(_mariadb_packages['default'])) }}"
+  default(_mariadb_packages['default']))) }}"
 
 mariadb_python_packages: "{{ _mariadb_python_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
   default(_mariadb_python_packages[ansible_distribution | lower] |
