@@ -32,7 +32,6 @@
 
   when: ansible_os_family | lower == 'redhat'
 
-
 - name: ensure python bindings for mariadb are installed
   pip:
     executable: pip3
@@ -41,11 +40,3 @@
   loop:
     "{{ mariadb_python_packages }}"
   register: mariadb_install_python_packages
-
-
-- debug:
-    var: "{{ item }}"
-  when: item is defined
-  loop:
-    - mariadb_install_packages | bool
-    - mariadb_install_python_packages | bool
