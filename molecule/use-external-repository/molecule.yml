@@ -46,16 +46,11 @@ platforms:
 
 provisioner:
   name: ansible
-  ansible_args:
-    - --diff
-  #   - -vvv
   config_options:
     defaults:
       host_key_checking: False
       deprecation_warnings: True
       stdout_callback: yaml
-      # callback_whitelist: profile_tasks
-      # gather_subset: '!hardware'
     diff:
      always: True
 
