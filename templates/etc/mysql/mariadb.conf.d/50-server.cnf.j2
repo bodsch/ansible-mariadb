@@ -77,4 +77,4 @@ lc_messages_dir = {{ mariadb_messages_dir }}
 # This group is only read by MariaDB-10.1 servers.
 # If you use the same .cnf file for MariaDB of different versions,
 # use this group for options that older servers don't understand
-[mariadb-10.1]
+[mariadb-{{ mariadb_short_version }}]

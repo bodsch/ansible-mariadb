@@ -23,9 +23,15 @@
       no_log: true
       register: _detected_mariadb_version
 
+
     - name: define mariadb version
       set_fact:
         mariadb_version: "{{ _detected_mariadb_version.stdout }}"
+      when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+
+    - name: define mariadb short version
+      set_fact:
+        mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
 
   when: ansible_os_family | lower == "debian"
@@ -51,6 +57,11 @@
         mariadb_version: "{{ _detected_mariadb_version.stdout }}"
       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
 
+    - name: define mariadb short version
+      set_fact:
+        mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
+      when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+
   when: ansible_os_family | lower == "redhat"
 
 - name: assert missing mariadb_version
@@ -61,5 +72,6 @@
     quiet: true
 
 - debug:
-    msg: "mariadb version: {{ mariadb_version }}"
+    msg:
+      - "mariadb version: {{ mariadb_short_version }} - {{ mariadb_version }}"
   when: mariadb_version | default("") | string | length != 0
