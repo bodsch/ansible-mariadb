@@ -27,7 +27,6 @@
       set_fact:
         mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
-
   when: ansible_os_family | lower == "debian"
 
 - block:
@@ -54,7 +53,6 @@
       set_fact:
         mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
-
   when: ansible_os_family | lower == "redhat"
 
 - name: assert missing mariadb_version

@@ -1,7 +1,6 @@
 ---
 
 - block:
-
     - name: create monitoring database
       mysql_db:
         name: monitoring

@@ -5,7 +5,6 @@ mariadb_version: 10.4
 
 mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
 
-
 # Set this to the user ansible is logging in as - should have root
 # or sudo access
 mariadb_user_home: ''
