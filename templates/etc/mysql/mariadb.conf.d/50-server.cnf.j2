@@ -54,6 +54,10 @@ tmp_table_size          = {{ mariadb_tmp_table_size }}
 max_heap_table_size     = {{ mariadb_max_heap_table_size }}
 {% endif %}
 
+{% if mariadb_join_buffer_size is defined and  mariadb_join_buffer_size != '' %}
+# https://mariadb.com/kb/en/server-system-variables/#join_buffer_size
+join_buffer_size        = {{ mariadb_join_buffer_size }}
+{% endif %}
 
 # * Unix socket authentication plugin is built-in since 10.0.22-6
 #

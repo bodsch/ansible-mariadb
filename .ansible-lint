@@ -1,5 +1,4 @@
-
-# quiet: true
+---
 
 skip_list:
-  - 204
+  - 106

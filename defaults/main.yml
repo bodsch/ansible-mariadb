@@ -3,6 +3,9 @@
 mariadb_use_external_repo: true
 mariadb_version: 10.4
 
+mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
+
+
 # Set this to the user ansible is logging in as - should have root
 # or sudo access
 mariadb_user_home: ''
@@ -66,8 +69,9 @@ mariadb_query_cache_type: "0"
 mariadb_query_cache_size: "16M"
 mariadb_query_cache_limit: "3M"
 mariadb_max_connections: "15"
+# When making adjustments, make mariadb_tmp_table_size and mariadb_max_heap_table_size equal
 mariadb_tmp_table_size: "64M"
-mariadb_max_heap_table_size: "48M"
+mariadb_max_heap_table_size: "64M"
 mariadb_group_concat_max_len: "1024"
 mariadb_join_buffer_size: "262144"
 

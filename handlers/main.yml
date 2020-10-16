@@ -5,7 +5,8 @@
     name: '{{ mariadb_service }}'
     state: restarted
   notify:
-    - sleep 5 seconds
+    - wait 10 seconds for clean startup
 
-- name: sleep 5 seconds  # noqa 305
-  shell: sleep 5s
+- name: wait 10 seconds for clean startup
+  pause:
+    seconds: 10

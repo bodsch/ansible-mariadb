@@ -9,20 +9,21 @@
       to secure your database server!
   when: mariadb_root_password | length == 0
 
-
 - name: check for mariadb root password change
   copy:
     dest: "{{ mariadb_config_dir }}/rootpw_configured"
     content: "{{ mariadb_root_password | checksum }}"
+    owner: root
+    group: root
+    mode: 0600
   register: rootpw_updated
 
 - block:
-
     - name: set MariaDB root password for the first time (root@localhost)
       command: >
         mysqladmin --user=root password "{{ mariadb_root_password }}"
       changed_when: false
-      # no_log: true
+      no_log: true
 
     # Has to be after the root password assignment, for idempotency.
     - name: create .my.cnf file with root password credentials
@@ -35,7 +36,6 @@
       when: (
         mariadb_install_packages | bool or
         mariadb_root_password_update)
-
   when: rootpw_updated is changed
 
 # This command will fail when the root password was set previously

@@ -1,7 +1,6 @@
 ---
 
 - block:
-    #
     - name: ensure the ansible_python_interpreter is set to python2
       set_fact:
         ansible_python_interpreter: python2
@@ -13,9 +12,7 @@
     ansible_os_family | lower == 'redhat' and
     ansible_distribution_version | int < 8)
 
-
 - block:
-    #
     - name: add mariadb repository
       yum_repository:
         name: MariaDB
@@ -32,6 +29,7 @@
         section: MariaDB
         option: module_hotfixes
         value: "1"
+        mode: 0750
 
     - name: update rpm cache
       yum:
@@ -43,7 +41,6 @@
 
 
 - block:
-    #
     - name: update apt cache
       apt:
         update_cache: true
@@ -63,14 +60,14 @@
 
     - name: add mariadb repository for debian
       apt_repository:
-        repo: deb http://mirror.netcologne.de/mariadb/repo/{{ mariadb_version }}/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main
+        repo: "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main"
         state: present
       when:
         ansible_distribution | lower == 'debian'
 
     - name: add mariadb repository for ubuntu
       apt_repository:
-        repo: deb http://mirror.netcologne.de/mariadb/repo/{{ mariadb_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main
+        repo: "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
         state: present
       when:
         ansible_distribution | lower == 'ubuntu'

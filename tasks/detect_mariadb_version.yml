@@ -1,11 +1,6 @@
 ---
 
-# - name: define mariadb version
-#   set_fact:
-#     mariadb_version: ''
-
 - block:
-    #
     - name: update apt cache
       apt:
         update_cache: true
@@ -16,13 +11,12 @@
     # debian-10 provides mariadb 10.3    ("Version: 1:10.3.18-0+deb10u1")
     - name: detect available mariadb version  # noqa 301
       shell: |
-        apt-cache show mariadb-server | grep Version | sort | tail -n1 | sed 's|1:||' | awk -F'[:+]' '{print $2}' | tr -d '[:space:]' | awk -F '-' '{print $1}'
+        apt-cache show mariadb-server | egrep "^Version" | sort | tail -n1 | cut -d'-' -f1 | sed -e 's|1:||' | tr -d '[:space:]' | cut -d ':' -f2
       args:
         warn: false
       ignore_errors: true
       no_log: true
       register: _detected_mariadb_version
-
 
     - name: define mariadb version
       set_fact:
@@ -37,7 +31,6 @@
   when: ansible_os_family | lower == "debian"
 
 - block:
-    #
     - name: update rpm cache
       yum:
         update_cache: true
@@ -46,7 +39,7 @@
     # centos-8 provides mariadb 10      ("Version      : 10.3.11")
     - name: detect available mariadb version  # noqa 301
       shell: |
-        yum info mariadb-server | grep "^Version" | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
+        yum info mariadb-server | egrep "^Version" | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
       args:
         warn: false
       no_log: true

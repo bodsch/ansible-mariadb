@@ -2,23 +2,18 @@
 
 - name: ensure mariadb packages are installed (debian)
   package:
-    name: "{{ item }}"
+    name: "{{ mariadb_packages }}"
     state: present
-  loop:
-    "{{ mariadb_packages }}"
   register: mariadb_install_packages
   when:
     ansible_os_family | lower == 'debian'
 
 - block:
-
     - name: ensure mariadb packages are installed (centos < 8)
       package:
         name: "{{ mariadb_packages }}"
         state: present
         use: yum
-      #loop:
-      #  "{{ mariadb_packages }}"
       register: mariadb_install_packages
       when: ansible_distribution_version | int < 8
 
