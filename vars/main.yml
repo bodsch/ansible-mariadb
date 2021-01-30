@@ -1,5 +1,10 @@
 ---
 
+_systemd_lib_directory:
+  default: /lib/systemd/system
+  debian: /lib/systemd/system
+  redhat: /usr/lib/systemd/system
+
 _mariadb_packages:
   default:
     - libmariadb-dev
@@ -81,7 +86,6 @@ _mariadb_packages:
     - python3-pip
     - python3-setuptools
 
-
 _mariadb_python_packages:
   default:
     - mysqlclient
@@ -106,6 +110,10 @@ _mariadb_socket:
   redhat: /var/lib/mysql/mysql.sock
   centos: /var/lib/mysql/mysql.sock
   debian: /run/mysqld/mysqld.sock
+
+systemd_lib_directory: "{{
+          _systemd_lib_directory[ansible_os_family | lower] |
+  default(_systemd_lib_directory['default']) }}"
 
 mariadb_log_directory: /var/log/mysql
 mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"

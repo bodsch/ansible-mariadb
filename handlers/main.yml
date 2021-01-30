@@ -1,12 +1,16 @@
 ---
 
+- name: systemctl daemon-reload
+  systemd:
+    daemon_reload: true
+
 - name: restart mariadb
   service:
     name: '{{ mariadb_service }}'
     state: restarted
   notify:
-    - wait 10 seconds for clean startup
+    - wait 320 seconds for clean startup
 
-- name: wait 10 seconds for clean startup
+- name: wait 320 seconds for clean startup
   pause:
-    seconds: 10
+    seconds: 320
