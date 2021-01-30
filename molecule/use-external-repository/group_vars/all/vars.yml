@@ -1,0 +1,20 @@
+---
+
+# ansible_python_interpreter: python3
+
+mariadb_use_external_repo: true
+
+mariadb_bind_address: 127.0.0.1
+mariadb_root_password: root_password
+mariadb_max_connections: 20
+
+mariadb_databases:
+  - name: molecule
+    collation: utf8mb4_bin
+    encoding: utf8mb4
+
+mariadb_users:
+  - name: molecule
+    host: 127.0.0.1
+    password: icinga2
+    priv: "molecule.*:ALL"
