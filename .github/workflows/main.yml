@@ -88,7 +88,6 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRIBUTION: $(printf "${{ matrix.distribution }}" | tr -d ':')
 
   ubuntu:
     name: ubuntu
@@ -138,7 +137,6 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRIBUTION: $(printf "${{ matrix.distribution }}" | tr -d ':')
 
 #   centos:
 #     name: centos
