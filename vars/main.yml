@@ -65,13 +65,6 @@ _mariadb_python_packages:
   redhat:
     - name: mysqlclient
 
-# targens_database_oracle_pip_packages:
-#   - name: setuptools
-#     version: 34
-#   - name: cx_oracle
-#     version: 8.0
-#   - name: python-ldap
-
 _mariadb_service:
   default: mariadb
   archlinux: mariadb
@@ -100,7 +93,6 @@ mariadb_pid_file: /run/mysqld/mysqld.pid
 
 mariadb_config_dir: /etc/mysql
 mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
-
 
 mariadb_packages: "{{
           _mariadb_packages[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |

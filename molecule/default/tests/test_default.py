@@ -131,7 +131,7 @@ def test_user(host):
     assert u.exists
     assert user_name in u.groups
     assert u.shell == "/bin/false"
-    assert u.home  == "/nonexistent"
+    # assert u.home  == "/nonexistent"
 
 
 def test_listening_socket(host, get_vars):
@@ -145,7 +145,10 @@ def test_listening_socket(host, get_vars):
 
     socket_name = get_vars.get('_mariadb_socket').get(distribution)
 
+    pp.pprint(socket_name)
     socket = host.socket('{}://{}'.format('unix', socket_name))
+
+    assert socket.exists
     assert socket.is_listening
 
 
