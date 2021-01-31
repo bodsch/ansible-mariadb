@@ -136,7 +136,14 @@ def test_user(host):
 
 def test_listening_socket(host, get_vars):
 
-    socket_name = get_vars.get('_mariadb_socket').get(host.system_info.distribution)
+    distribution = host.system_info.distribution
+
+    if(distribution == 'ubuntu'):
+        distribution = 'debian'
+    elif(distribution == 'centos'):
+        distribution = 'redhat'
+
+    socket_name = get_vars.get('_mariadb_socket').get(distribution)
 
     socket = host.socket('{}://{}'.format('unix', socket_name))
     assert socket.is_listening
@@ -144,7 +151,14 @@ def test_listening_socket(host, get_vars):
 
 def test_mariadb_running_and_enabled(host, get_vars):
 
-    service_name = get_vars.get('_mariadb_service').get(host.system_info.distribution)
+    distribution = host.system_info.distribution
+
+    if(distribution == 'ubuntu'):
+        distribution = 'debian'
+    elif(distribution == 'centos'):
+        distribution = 'redhat'
+
+    service_name = get_vars.get('_mariadb_service').get(distribution)
 
     service = host.service(service_name)
     assert service.is_running
