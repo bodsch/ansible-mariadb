@@ -13,8 +13,7 @@ _mariadb_packages:
     - python3-mysqldb
   archlinux:
     - mariadb
-  redhat: []
-  centos:
+  redhat:
     - MariaDB-client
     - MariaDB-devel
     - MariaDB-server
@@ -24,15 +23,17 @@ _mariadb_packages:
     - python3-setuptools
     - python36-devel
     - redhat-rpm-config
-  centos-8:
+  redhat-8:
     - gcc
     - make
-    - mariadb-devel
+    - mariadb
+    - mariadb-common
     - mariadb-server
+    - mariadb-devel
     - python3-devel
     - python3-setuptools
     - redhat-rpm-config
-  centos-8-external:
+  redhat-8-external:
     - MariaDB-client
     - MariaDB-devel
     - MariaDB-server
@@ -58,18 +59,24 @@ _mariadb_packages:
 
 _mariadb_python_packages:
   default:
-    - mysqlclient
+    - name: mysqlclient
   debian:
-    - mysqlclient
+    - name: mysqlclient
   redhat:
-    - mysqlclient
+    - name: mysqlclient
+
+# targens_database_oracle_pip_packages:
+#   - name: setuptools
+#     version: 34
+#   - name: cx_oracle
+#     version: 8.0
+#   - name: python-ldap
 
 _mariadb_service:
-  default: mysql
+  default: mariadb
   archlinux: mariadb
-  redhat: mysqld
-  centos: mariadb
-  debian: mysql
+  redhat: mariadb
+  debian: mariadb
 
 _mariadb_messages_dir:
   default: /usr/share/mysql

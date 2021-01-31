@@ -88,6 +88,7 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
 
   ubuntu:
     name: ubuntu
@@ -137,7 +138,7 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRIBUTION: ${{ matrix.distribution.image }}
+          MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
 
   centos:
     name: centos
@@ -146,7 +147,7 @@ jobs:
       fail-fast: false
       matrix:
         distribution:
-          - image: centos:8
+          - centos:8
         python-version:
           - '3.8'
           - '3.9'
@@ -178,4 +179,4 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRIBUTION: ${{ matrix.distribution.image }}
+          MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
