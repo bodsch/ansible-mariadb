@@ -12,7 +12,7 @@ lint: |
   flake8 .
 
 platforms:
-  - name: instance
+  - name: "instance-${MOLECULE_DISTRO:-debian}-${MOLECULE_VERSION:-10}"
     image: "diodonfrost/ansible-${MOLECULE_DISTRO:-debian}:${MOLECULE_VERSION:-10}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     privileged: true

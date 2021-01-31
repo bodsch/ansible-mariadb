@@ -14,10 +14,6 @@ _mariadb_packages:
   archlinux:
     - mariadb
   redhat: []
-  redhat-7:
-    - MySQL-python
-    - mariadb-devel
-    - mariadb-server
   centos:
     - MariaDB-client
     - MariaDB-devel
@@ -27,27 +23,6 @@ _mariadb_packages:
     - make
     - python3-setuptools
     - python36-devel
-    - redhat-rpm-config
-  centos-7:
-    - MySQL-python
-    - gcc
-    - make
-    - mariadb-devel
-    - mariadb-server
-    - python-setuptools   # for python2
-    - python3-devel
-    - python3-setuptools
-    - redhat-rpm-config
-  centos-7-external:
-    - MariaDB-client
-    - MariaDB-devel
-    - MariaDB-server
-    - MariaDB-shared
-    - MySQL-python
-    - gcc
-    - make
-    - python3-devel
-    - python3-setuptools
     - redhat-rpm-config
   centos-8:
     - gcc
@@ -79,12 +54,7 @@ _mariadb_packages:
     - python3-mysqldb
     - python3-pip
     - python3-setuptools
-  ubuntu-16:
-    - libmariadb-dev
-    - mariadb-server
-    - python3-mysqldb
-    - python3-pip
-    - python3-setuptools
+
 
 _mariadb_python_packages:
   default:
@@ -126,22 +96,22 @@ mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
 
 
 mariadb_packages: "{{
-          _mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version ~ '-external' if mariadb_use_external_repo else '' ] |
-  default(_mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_packages[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
+          _mariadb_packages[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
   default(_mariadb_packages[ansible_os_family | lower] |
+  default(_mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version ~ '-external' if mariadb_use_external_repo else '' ] |
+  default(_mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
   default(_mariadb_packages[ansible_distribution | lower] |
   default(_mariadb_packages['default']))))) }}"
 
 mariadb_python_packages: "{{
-          _mariadb_python_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-  default(_mariadb_python_packages[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
+          _mariadb_python_packages[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
   default(_mariadb_python_packages[ansible_os_family | lower] |
+  default(_mariadb_python_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
   default(_mariadb_python_packages['default']))) }}"
 
 mariadb_service: "{{
-          _mariadb_service[ansible_distribution | lower ] |
-  default(_mariadb_service[ansible_os_family | lower] |
+          _mariadb_service[ansible_os_family | lower] |
+  default(_mariadb_service[ansible_distribution | lower ] |
   default(_mariadb_service['default'])) }}"
 
 mariadb_messages_dir: "{{
