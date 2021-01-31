@@ -46,10 +46,8 @@ jobs:
       fail-fast: false
       matrix:
         distribution:
-          - image: debian
-            version: "9"
-          - image: debian
-            version: "10"
+          - debian:9
+          - debian:10
         python-version:
           - '3.8'
           - '3.9'
@@ -82,7 +80,7 @@ jobs:
             sudo apt-get install apparmor-profiles
             sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-        if: ${{ startsWith(matrix.distribution.image, 'debian') }}
+        if: ${{ startsWith(matrix.distribution, 'debian') }}
 
       - name: test with tox
         run: |
@@ -90,56 +88,58 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distribution.image }}
-          MOLECULE_VERSION: ${{ matrix.distribution.version }}
+          MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
 
-#   ubuntu:
-#     name: ubuntu
-#     runs-on: ubuntu-latest
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         distribution:
-#           - image: ubuntu
-#             version: "18.04"
-#           - image: ubuntu
-#             version: "20.04"
-#         python-version:
-#           - '3.8'
-#           - '3.9'
-#         ansible-version:
-#           - '2.9'
-#           - '2.10'
-#
-#     steps:
-#       - name: check out the codebase.
-#         uses: actions/checkout@v2
-#         with:
-#           path: 'ansible-mariadb'
-#
-#       - name: set up python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: ${{ matrix.python-version }}
-#
-#       - name: install dependencies
-#         run: |
-#           python -m pip install --upgrade pip
-#
-#       - name: install test dependencies.
-#         run: pip install -r test-requirements.txt
-#
-#       - name: test with tox
-#         run: |
-#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule converge
-#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule verify
-#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule destroy
-#         env:
-#           PY_COLORS: '1'
-#           ANSIBLE_FORCE_COLOR: '1'
-#           MOLECULE_DISTRO: ${{ matrix.distribution.image }}
-#           MOLECULE_VERSION: ${{ matrix.distribution.version }}
-#
+  ubuntu:
+    name: ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution:
+          - ubuntu:18.04
+          - ubuntu:20.04
+        python-version:
+          - '3.8'
+          - '3.9'
+        ansible-version:
+          - '2.9'
+          - '2.10'
+
+    steps:
+      - name: check out the codebase.
+        uses: actions/checkout@v2
+        with:
+          path: 'ansible-mariadb'
+
+      - name: set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: install dependencies
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: install test dependencies.
+        run: pip install -r test-requirements.txt
+
+      - name: Disable AppArmor on Debian.
+        run: |
+            set -x
+            sudo apt-get install apparmor-profiles
+            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+        if: ${{ startsWith(matrix.distribution, 'debian') }}
+
+      - name: test with tox
+        run: |
+          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
+
 #   centos:
 #     name: centos
 #     runs-on: ubuntu-latest
