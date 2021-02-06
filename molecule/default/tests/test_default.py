@@ -121,7 +121,14 @@ def test_files(host, files):
     assert f.is_file
 
 
-def test_user(host):
+def test_user(host, get_vars):
+
+    distribution = host.system_info.distribution
+
+    if(distribution in ['debian', 'ubuntu']):
+        shell = '/bin/false'
+    elif(distribution in ['centos', 'redhat']):
+        shell = '/sbin/nologin'
 
     user_name = "mysql"
     u = host.user(user_name)
@@ -130,26 +137,7 @@ def test_user(host):
     assert g.exists
     assert u.exists
     assert user_name in u.groups
-    assert u.shell == "/bin/false"
-    # assert u.home  == "/nonexistent"
-
-
-def test_listening_socket(host, get_vars):
-
-    distribution = host.system_info.distribution
-
-    if(distribution == 'ubuntu'):
-        distribution = 'debian'
-    elif(distribution == 'centos'):
-        distribution = 'redhat'
-
-    socket_name = get_vars.get('_mariadb_socket').get(distribution)
-
-    pp.pprint(socket_name)
-    socket = host.socket('{}://{}'.format('unix', socket_name))
-
-    assert socket.exists
-    assert socket.is_listening
+    assert u.shell == shell
 
 
 def test_mariadb_running_and_enabled(host, get_vars):
@@ -166,3 +154,23 @@ def test_mariadb_running_and_enabled(host, get_vars):
     service = host.service(service_name)
     assert service.is_running
     assert service.is_enabled
+
+
+def test_listening_socket(host, get_vars):
+
+    for i in host.socket.get_listening_sockets():
+        pp.pprint(i)
+
+    distribution = host.system_info.distribution
+
+    if(distribution == 'ubuntu'):
+        distribution = 'debian'
+    elif(distribution == 'centos'):
+        distribution = 'redhat'
+
+    socket_name = get_vars.get('_mariadb_socket').get(distribution)
+    socket_name = 'unix://{}'.format(socket_name)
+    # pp.pprint(socket_name)
+    socket = host.socket(socket_name)
+
+    assert socket.is_listening

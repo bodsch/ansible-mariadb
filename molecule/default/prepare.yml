@@ -1,19 +1,19 @@
 ---
 
-- name: raw task to install python3
-  hosts: all
-  gather_facts: false
-
-  pre_tasks:
-    - name: Install python3 for ansible
-      raw: test -e /usr/bin/python3 || (apt-get -y update && apt install -y python3)
-      register: output
-      changed_when: output.stdout | length != 0
-
-    - name: Install pip3 for ansible
-      raw: test -e /usr/bin/pip3 || (apt-get -y update && apt install -y  python3-pip)
-      register: output
-      changed_when: output.stdout | length != 0
+# - name: raw task to install python3
+#   hosts: all
+#   gather_facts: false
+#
+#   pre_tasks:
+#     - name: Install python3 for ansible
+#       raw: test -e /usr/bin/python3 || (apt-get -y update && apt install -y python3)
+#       register: output
+#       changed_when: output.stdout | length != 0
+#
+#     - name: Install pip3 for ansible
+#       raw: test -e /usr/bin/pip3 || (apt-get -y update && apt install -y  python3-pip)
+#       register: output
+#       changed_when: output.stdout | length != 0
 
 - name: prepare container
   hosts: all
