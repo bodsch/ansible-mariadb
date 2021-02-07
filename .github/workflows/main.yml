@@ -24,6 +24,7 @@ jobs:
           - debian:9
           - debian:10
           - ubuntu:18.04
+          - ubuntu:20.04
           - centos:8
           - oraclelinux:8
         python-version:
@@ -56,7 +57,7 @@ jobs:
             sudo apt-get install apparmor-profiles
             sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-        if: ${{ startsWith(matrix.distribution, 'debian') || startsWith(matrix.distribution, 'ubuntu') }}
+        if: ${{ startsWith(matrix.distribution, 'debian') }} ${{ or }} ${{ startsWith(matrix.distribution, 'ubuntu') }}
 
       - name: test with tox
         run: |
