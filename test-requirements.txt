@@ -1,6 +1,12 @@
-molecule>=2.15.0
+molecule
+molecule-docker
+molecule-podman
 docker
-ansible-lint>=3.4.0
-testinfra>=1.7.0
+ansible-lint
+yamllint
+flake8
 jmespath
-mysql-connector-python>=8.0
+pytest
+pytest-testinfra
+tox
+tox-gh-actions

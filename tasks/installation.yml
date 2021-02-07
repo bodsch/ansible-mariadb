@@ -24,13 +24,54 @@
         use: dnf
       register: mariadb_install_packages
       when: ansible_distribution_version | int >= 8
+
   when: ansible_os_family | lower == 'redhat'
 
-- name: ensure python bindings for mariadb are installed
+- name: create requirements.txt
+  template:
+    src: requirements.txt.j2
+    dest: /tmp/mariadb-requirements.txt
+    mode: 0660
+
+- name: ensure python bindings for mariadb packages 1st
   pip:
     executable: pip3
-    name: "{{ item }}"
+    requirements: /tmp/mariadb-requirements.txt
     state: present
-  loop:
-    "{{ mariadb_python_packages }}"
-  register: mariadb_install_python_packages
+  register: pip_install
+  ignore_errors: true
+  no_log: true
+  # register: mariadb_install_python_packages
+
+- block:
+    - name: install build essentials
+      package:
+        name:
+          - mariadb-devel
+          - gcc
+          - gcc-c++
+          - autoconf
+          - automake
+        state: present
+
+    - name: ensure python bindings for mariadb packages 2nd
+      pip:
+        requirements: /tmp/mariadb-requirements.txt
+        state: present
+
+    - name: uninstall build essentials
+      package:
+        name:
+          - mariadb-devel
+          - gcc
+          - gcc-c++
+          - autoconf
+          - automake
+        state: absent
+
+  when: pip_install.failed
+
+- name: remove requirements.txt
+  file:
+    path: /tmp/mariadb-requirements.txt
+    state: absent
