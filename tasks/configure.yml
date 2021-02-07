@@ -154,4 +154,13 @@
   service:
     name: '{{ mariadb_service }}'
     state: started
-    enabled: true
+  register: service_status
+  notify:
+    - wait 20 seconds for clean startup
+
+- debug:
+    var: "{{ item }}"
+  when: item is defined
+  loop:
+    - service_status.state
+    - service_status.failed
