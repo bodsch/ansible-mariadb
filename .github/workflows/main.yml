@@ -52,12 +52,20 @@ jobs:
 
       # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
       - name: Disable AppArmor on Debian.
+        if: ${{ startsWith(matrix.distribution, 'debian') }}
         run: |
             set -x
             sudo apt-get install apparmor-profiles
             sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-        if: ${{ startsWith(matrix.distribution, 'debian') }} ${{ or }} ${{ startsWith(matrix.distribution, 'ubuntu') }}
+      - name: Disable AppArmor on Ubunto.
+        if: ${{ startsWith(matrix.distribution, 'debian') }}
+        run: |
+            set -x
+            sudo apt-get install apparmor-profiles
+            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+        if: ${{ startsWith(matrix.distribution, 'ubuntu') }}
 
       - name: test with tox
         run: |
