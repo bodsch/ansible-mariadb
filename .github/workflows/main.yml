@@ -52,7 +52,7 @@ jobs:
 
       # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
       - name: Disable AppArmor on Debian.
-        if: ${{ startsWith(matrix.distribution, 'debian') }}
+        if: ${{ startsWith(matrix.image, 'debian') }}
         run: |
             set -x
             sudo apt-get install apparmor-profiles
@@ -60,7 +60,7 @@ jobs:
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
 
       - name: Disable AppArmor on Ubuntu.
-        if: ${{ startsWith(matrix.distribution, 'ubuntu') }}
+        if: ${{ startsWith(matrix.image, 'ubuntu') }}
         run: |
             set -x
             sudo apt-get install apparmor-profiles
@@ -73,96 +73,4 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
-
-#   ubuntu:
-#     name: ubuntu
-#     runs-on: ubuntu-latest
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         distribution:
-#           - ubuntu:18.04
-#           - ubuntu:20.04
-#         python-version:
-#           - '3.8'
-#           - '3.9'
-#         ansible-version:
-#           - '2.9'
-#           - '2.10'
-#
-#     steps:
-#       - name: check out the codebase.
-#         uses: actions/checkout@v2
-#         with:
-#           path: 'ansible-mariadb'
-#
-#       - name: set up python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: ${{ matrix.python-version }}
-#
-#       - name: install dependencies
-#         run: |
-#           python -m pip install --upgrade pip
-#
-#       - name: install test dependencies.
-#         run: pip install -r test-requirements.txt
-#
-#       - name: Disable AppArmor on Debian.
-#         run: |
-#             set -x
-#             sudo apt-get install apparmor-profiles
-#             sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-#             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-#         if: ${{ startsWith(matrix.distribution, 'ubuntu') }}
-#
-#       - name: test with tox
-#         run: |
-#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
-#         env:
-#           PY_COLORS: '1'
-#           ANSIBLE_FORCE_COLOR: '1'
-#           MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
-#
-#   centos:
-#     name: centos
-#     runs-on: ubuntu-latest
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         distribution:
-#           - centos:8
-#         python-version:
-#           - '3.8'
-#           - '3.9'
-#         ansible-version:
-#           - '2.9'
-#           - '2.10'
-#
-#     steps:
-#       - name: check out the codebase.
-#         uses: actions/checkout@v2
-#         with:
-#           path: 'ansible-mariadb'
-#
-#       - name: set up python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: ${{ matrix.python-version }}
-#
-#       - name: install dependencies
-#         run: |
-#           python -m pip install --upgrade pip
-#
-#       - name: install test dependencies.
-#         run: pip install -r test-requirements.txt
-#
-#       - name: test with tox
-#         run: |
-#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
-#         env:
-#           PY_COLORS: '1'
-#           ANSIBLE_FORCE_COLOR: '1'
-#           MOLECULE_DISTRIBUTION: ${{ matrix.distribution }}
-#
+          MOLECULE_DISTRIBUTION: ${{ matrix.image }}
