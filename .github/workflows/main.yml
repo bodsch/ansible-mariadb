@@ -58,14 +58,14 @@ jobs:
             sudo apt-get install apparmor-profiles
             sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-      - name: Disable AppArmor on Ubunto.
+
+      - name: Disable AppArmor on Ubuntu.
         if: ${{ startsWith(matrix.distribution, 'ubuntu') }}
         run: |
             set -x
             sudo apt-get install apparmor-profiles
             sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
             sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-        if: ${{ startsWith(matrix.distribution, 'ubuntu') }}
 
       - name: test with tox
         run: |
