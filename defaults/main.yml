@@ -112,10 +112,6 @@ mariadb_log: ""
 # mariadb_log_error: /var/log/mysql/mysql.err
 # mariadb_syslog_tag: mysql
 
-mariadb_config_include_files: []
-#  - src: path/relative/to/playbook/file.cnf
-#  - { src: path/relative/to/playbook/anotherfile.cnf, force: yes }
-
 # Databases.
 mariadb_databases: []
 #   - name: example
