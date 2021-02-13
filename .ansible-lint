@@ -1,7 +1,6 @@
 
-# quiet: true
-
 skip_list:
-  - '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern
-  - '303'  # Using command rather than module
-
+  - role-name                 # '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern
+  - no-changed-when           # '301'  # Commands should not change things if nothing needs doing
+  - command-instead-of-module # '303'  # Using command rather than module
+  - risky-shell-pipe          # '306'  # Shells that use pipes should set the pipefail option
