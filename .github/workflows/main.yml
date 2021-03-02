@@ -94,7 +94,7 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRIBUTION: ${{ matrix.image }}
+          DISTRIBUTION: ${{ matrix.image }}
 
   publish:
     if: github.ref == 'refs/heads/master'
