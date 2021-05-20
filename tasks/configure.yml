@@ -158,7 +158,8 @@
   notify:
     - wait 20 seconds for clean startup
 
-- debug:
+- name: service state
+  debug:
     var: "{{ item }}"
   when: item is defined
   loop:
