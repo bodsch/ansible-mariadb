@@ -54,7 +54,7 @@ jobs:
       - lint
     runs-on: ubuntu-18.04
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         image:
           - debian:9
