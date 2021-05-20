@@ -6,7 +6,7 @@
     state: present
   register: mariadb_install_packages
   when:
-    ansible_os_family | lower == 'debian'
+    - ansible_os_family | lower == 'debian'
 
 - block:
     - name: ensure mariadb packages are installed (centos < 8)
@@ -15,7 +15,8 @@
         state: present
         use: yum
       register: mariadb_install_packages
-      when: ansible_distribution_version | int < 8
+      when:
+        - ansible_distribution_version | int < 8
 
     - name: ensure mariadb packages are installed (centos >= 8)
       package:
@@ -23,9 +24,11 @@
         state: present
         use: dnf
       register: mariadb_install_packages
-      when: ansible_distribution_version | int >= 8
+      when:
+        - ansible_distribution_version | int >= 8
 
-  when: ansible_os_family | lower == 'redhat'
+  when:
+    - ansible_os_family | lower == 'redhat'
 
 - name: create requirements.txt
   template:
@@ -75,3 +78,5 @@
   file:
     path: /tmp/mariadb-requirements.txt
     state: absent
+
+...

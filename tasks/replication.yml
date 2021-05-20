@@ -32,8 +32,8 @@
   register: master
   when:
     - (slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed)
-    - (mariadb_replication_role == 'slave')
-    - (mariadb_replication_master | length != 0)
+    - mariadb_replication_role == 'slave'
+    - mariadb_replication_master | length != 0
 
 - name: Configure replication on the slave.
   mysql_replication:
@@ -55,7 +55,7 @@
 - name: Start replication.
   mysql_replication:
     mode: startslave
-  when: >
-    ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
-    and (mariadb_replication_role == 'slave')
-    and (mariadb_replication_master | length != 0)
+  when:
+    - (slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed)
+    - mariadb_replication_role == 'slave'
+    - mariadb_replication_master | length != 0

@@ -7,9 +7,9 @@
 
     - name: do facts module to get latest information
       setup:
-  when: (
-    ansible_os_family | lower == 'redhat' and
-    ansible_distribution_version | int < 8)
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_version | int < 8
 
 - block:
     - name: add mariadb repository
@@ -33,9 +33,9 @@
     - name: update rpm cache
       yum:
         update_cache: true
-  when: (
-    mariadb_use_external_repo | bool and
-    ansible_os_family | lower == 'redhat')
+  when:
+    - mariadb_use_external_repo | bool
+    - ansible_os_family | lower == 'redhat'
 
 - block:
     - name: update apt cache
@@ -60,18 +60,20 @@
         repo: "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main"
         state: present
       when:
-        ansible_distribution | lower == 'debian'
+        - ansible_distribution | lower == 'debian'
 
     - name: add mariadb repository for ubuntu
       apt_repository:
         repo: "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
         state: present
       when:
-        ansible_distribution | lower == 'ubuntu'
+        - ansible_distribution | lower == 'ubuntu'
 
     - name: update apt cache
       apt:
         update_cache: true
-  when: (
-    mariadb_use_external_repo | bool and
-    ansible_os_family | lower == 'debian')
+  when:
+    - mariadb_use_external_repo | bool
+    - ansible_os_family | lower == 'debian'
+
+...

@@ -9,6 +9,8 @@
     state: "{{ item.state | default('present') }}"
     append_privs: "{{ item.append_privs | default('no') }}"
     encrypted: "{{ item.encrypted | default('no') }}"
-  with_items:
+  loop:
     '{{ mariadb_users }}'
+  loop_control:
+    label: "{{ item.name }}"
   no_log: true

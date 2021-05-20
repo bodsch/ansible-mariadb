@@ -50,7 +50,10 @@
     - src: etc/mysql/mariadb.conf.d/59-server-security.cnf.j2
       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-security.cnf'
   register: configuration
-  notify: restart mariadb
+  loop_control:
+    label: "{{ item.dest }}"
+  notify:
+    - restart mariadb
 
 - name: create data directory '{{ mariadb_datadir }}'
   file:
@@ -67,7 +70,10 @@
     owner: mysql
     group: mysql
     mode: 0755
-  when: mariadb_tmpdir != '/tmp' and mariadb_tmpdir is defined and mariadb_tmpdir | length != 0
+  when:
+    - mariadb_tmpdir != '/tmp'
+    - mariadb_tmpdir is defined
+    - mariadb_tmpdir | length != 0
 
 - name: create log directory '{{ mariadb_log_directory }}'
   file:
@@ -76,7 +82,9 @@
     owner: mysql
     group: mysql
     mode: 0755
-  when: mariadb_log_directory is defined and mariadb_log_directory | length != 0
+  when:
+    - mariadb_log_directory is defined
+    - mariadb_log_directory | length != 0
 
 - name: create pid directory '{{ mariadb_pid_file | dirname }}'
   file:
@@ -85,7 +93,9 @@
     owner: mysql
     group: mysql
     mode: 0755
-  when: mariadb_pid_file is defined and mariadb_pid_file | length != 0
+  when:
+    - mariadb_pid_file is defined
+    - mariadb_pid_file | length != 0
 
 # - block:
 #     - name: create {{ systemd_lib_directory }}/{{ mariadb_service }}.service.d
@@ -122,7 +132,8 @@
         group: "{{ mariadb_log_file_group }}"
         mode: 0640
 
-  when: mariadb_slow_query_log_enabled
+  when:
+    - mariadb_slow_query_log_enabled
 
 - block:
     - name: create error log file
@@ -141,14 +152,17 @@
         group: "{{ mariadb_log_file_group }}"
         mode: 0640
 
-  when: mariadb_log | length == 0 and mariadb_log_error | length != 0
+  when:
+    - mariadb_log | length == 0
+    - mariadb_log_error | length != 0
 
 - name: configure swappiness
   sysctl:
     name: vm.swappiness
     value: "{{ mariadb_swappiness | int }}"
     state: present
-  when: mariadb_configure_swappiness | bool
+  when:
+    - mariadb_configure_swappiness | bool
 
 - name: ensure mariadb is started and enabled on boot
   service:
@@ -158,10 +172,11 @@
   notify:
     - wait 20 seconds for clean startup
 
-- name: service state
-  debug:
-    var: "{{ item }}"
-  when: item is defined
-  loop:
-    - service_status.state
-    - service_status.failed
+# - name: service state
+#   debug:
+#     var: "{{ item }}"
+#   when: item is defined
+#   loop:
+#     - service_status.state
+#     - service_status.failed
+...

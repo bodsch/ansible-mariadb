@@ -66,4 +66,7 @@
   debug:
     msg:
       - "mariadb version: {{ mariadb_short_version }} - {{ mariadb_version }}"
-  when: mariadb_version | default("") | string | length != 0
+  when:
+    - mariadb_version | default("") | string | length != 0
+
+...

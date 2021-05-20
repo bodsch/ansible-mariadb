@@ -23,13 +23,13 @@
     - name: Gathering Facts now
       setup:
 
-    - debug:
-        msg:
-          - "os family            : {{ ansible_os_family }}"
-          - "distribution         : {{ ansible_distribution }}"
-          - "distribution version : {{ ansible_distribution_major_version }}"
-          - "ansible version      : {{ ansible_version.full }}"
-          - "python version       : {{ ansible_python.version.major }}"
+    # - debug:
+    #     msg:
+    #       - "os family            : {{ ansible_os_family }}"
+    #       - "distribution         : {{ ansible_distribution }}"
+    #       - "distribution version : {{ ansible_distribution_major_version }}"
+    #       - "ansible version      : {{ ansible_version.full }}"
+    #       - "python version       : {{ ansible_python.version.major }}"
 
   roles:
     - role: ansible-mariadb

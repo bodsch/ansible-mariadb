@@ -7,7 +7,8 @@
       The MariaDB root password was left empty.
       Please set a custom password with role variable mariadb_root_password
       to secure your database server!
-  when: mariadb_root_password | length == 0
+  when:
+    - mariadb_root_password | length == 0
 
 - name: check for mariadb root password change
   copy:
@@ -33,10 +34,10 @@
         owner: root
         group: root
         mode: 0600
-      when: (
-        mariadb_install_packages | bool or
-        mariadb_root_password_update)
-  when: rootpw_updated is changed
+      when:
+        - (mariadb_install_packages | bool or mariadb_root_password_update)
+  when:
+    - rootpw_updated is changed
 
 # This command will fail when the root password was set previously
 - name: check if root password is set
@@ -66,9 +67,12 @@
     name: ""
     host: "{{ item }}"
     state: absent
-  with_items: "{{ mariadb_anonymous_hosts.stdout_lines | default([]) }}"
+  loop:
+    "{{ mariadb_anonymous_hosts.stdout_lines | default([]) }}"
 
 - name: remove mariadb test database
   mysql_db:
     name: test
     state: absent
+
+...

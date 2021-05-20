@@ -6,5 +6,9 @@
     collation: "{{ item.collation | default('utf8_general_ci') }}"
     encoding: "{{ item.encoding | default('utf8') }}"
     state: "{{ item.state | default('present') }}"
-  with_items:
+  loop:
     '{{ mariadb_databases }}'
+  loop_control:
+    label: " schema: {{ item.name }} with collation: {{ item.collation | default('utf8_general_ci') }}"
+
+...
