@@ -157,11 +157,16 @@ def test_mariadb_running_and_enabled(host, get_vars):
 
 
 def test_listening_socket(host, get_vars):
+    """
 
-    for i in host.socket.get_listening_sockets():
+    """
+    listening = host.socket.get_listening_sockets()
+
+    for i in listening:
         pp.pprint(i)
 
     distribution = host.system_info.distribution
+    release = host.system_info.release
 
     if(distribution == 'ubuntu'):
         distribution = 'debian'
@@ -169,8 +174,21 @@ def test_listening_socket(host, get_vars):
         distribution = 'redhat'
 
     socket_name = get_vars.get('_mariadb_socket').get(distribution)
-    socket_name = 'unix://{}'.format(socket_name)
-    # pp.pprint(socket_name)
-    socket = host.socket(socket_name)
 
-    assert socket.is_listening
+    pp.pprint("  '{}'".format(socket_name))
+
+    f = host.file(socket_name)
+    assert f.exists
+
+    for spec in (
+        "tcp://127.0.0.1:3306",
+        "unix:///run/mysqld/mysqld.sock",
+        ):
+        assert spec in listening
+
+    # if not (distribution == 'debian' and release == '18.04'):
+    #     socket_name = 'unix://{}'.format(socket_name)
+    #     pp.pprint("  '{}'".format(socket_name))
+    #
+    #     socket = host.socket(socket_name)
+    #     assert socket.is_listening
