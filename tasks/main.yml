@@ -1,34 +1,31 @@
 ---
 
-- name: install repositories
-  include_tasks: preparations.yml
+- include_tasks: prepare.yaml
 
-- name: detect available mariadb version
-  include_tasks: detect_mariadb_version.yml
+- include_tasks: detect_mariadb_version.yml
 
-- name: install mariadb
-  include_tasks: installation.yml
+- include_tasks: installation.yml
 
-- name: configure mariadb
-  include_tasks: configure.yml
-
-- name: security changes
-  include_tasks: secure-installation.yml
-
-- name: create monitoring stuff
-  include_tasks: monitoring.yml
-
-- name: create databases
-  include_tasks: databases.yml
-
-- name: create users
-  include_tasks: users.yml
-
-# - include_tasks: replication.yml
-
-- name: ensure mariadb is enabled on boot
-  service:
-    name: '{{ mariadb_service }}'
-    enabled: true
+# - name: configure mariadb
+#   include_tasks: configure.yml
+#
+# - name: security changes
+#   include_tasks: secure-installation.yml
+#
+# - name: create monitoring stuff
+#   include_tasks: monitoring.yml
+#
+# - name: create databases
+#   include_tasks: databases.yml
+#
+# - name: create users
+#   include_tasks: users.yml
+#
+# # - include_tasks: replication.yml
+#
+# - name: ensure mariadb is enabled on boot
+#   service:
+#     name: '{{ mariadb_service }}'
+#     enabled: true
 
 ...

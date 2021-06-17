@@ -179,7 +179,7 @@ class PackageVersion(object):
         """
         self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
 
-        pattern = re.compile(r'^extra/{}[\w -](?P<version>\d\.\d).*-.*'.format(self.package_name), re.MULTILINE)
+        pattern = re.compile(r"^extra/{} (?P<version>.*)-\d".format(self.package_name), re.MULTILINE)
 
         args = []
         args.append("--noconfirm")

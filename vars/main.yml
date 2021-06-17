@@ -5,6 +5,10 @@ _systemd_lib_directory:
   debian: /lib/systemd/system
   redhat: /usr/lib/systemd/system
 
+_mariadb_server:
+  default: mariadb-server
+  archlinux: mariadb
+
 _mariadb_packages:
   default:
     - libmariadb-dev
@@ -13,6 +17,9 @@ _mariadb_packages:
     - python3-mysqldb
   archlinux:
     - mariadb
+    - mariadb-libs
+    - mariadb-clients
+    - python-mysqlclient
   redhat:
     - MariaDB-client
     - MariaDB-devel
@@ -63,6 +70,7 @@ _mariadb_python_packages:
     - name: mysqlclient
   redhat:
     - name: mysqlclient
+  archlinux: []
 
 _mariadb_service:
   default: mariadb
@@ -92,6 +100,11 @@ mariadb_pid_file: /run/mysqld/mysqld.pid
 
 mariadb_config_dir: /etc/mysql
 mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
+
+mariadb_server: "{{
+          _mariadb_server[ansible_os_family | lower] |
+  default(_mariadb_server[ansible_distribution | lower ] |
+  default(_mariadb_server['default'])) }}"
 
 mariadb_packages: "{{
           _mariadb_packages[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
