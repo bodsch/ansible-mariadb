@@ -56,7 +56,6 @@ _mariadb_packages:
     - python3-pip
     - python3-setuptools
 
-
 _mariadb_python_packages:
   default:
     - name: mysqlclient

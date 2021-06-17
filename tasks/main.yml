@@ -30,3 +30,5 @@
   service:
     name: '{{ mariadb_service }}'
     enabled: true
+
+...

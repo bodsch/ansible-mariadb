@@ -1,59 +1,83 @@
 ---
 
-- block:
-    - name: update apt cache
-      apt:
-        update_cache: true
+- name: detect available mariadb version
+  package_version:
+    name: mariadb-server
+  register: package_version
 
-    # ubuntu-16 provides mariadb         ("Version: 10.0.38-0ubuntu0.16.04.1")
-    # ubuntu-18 provides mariadb 10.1.43 ("Version: 1:10.1.43-0ubuntu0.18.04.1")
-    # debian-9  provides mariadb 10.1    ("Version: 10.1.41-0+deb9u1")
-    # debian-10 provides mariadb 10.3    ("Version: 1:10.3.18-0+deb10u1")
-    - name: detect available mariadb version  # noqa 301
-      shell: |
-        apt-cache show mariadb-server | egrep "^Version" | sort | tail -n1 | cut -d'-' -f1 | sed -e 's|1:||' | tr -d '[:space:]' | cut -d ':' -f2
-      args:
-        warn: false
-      ignore_errors: true
-      no_log: true
-      register: _detected_mariadb_version
 
-    - name: define mariadb version
-      set_fact:
-        mariadb_version: "{{ _detected_mariadb_version.stdout }}"
-      when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+- name: define mariadb version
+  set_fact:
+    mariadb_version: "{{ package_version.full_version }}"
+  when:
+    - package_version is defined
+    - package_version.full_version is defined
 
-    - name: define mariadb short version
-      set_fact:
-        mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
-      when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
-  when: ansible_os_family | lower == "debian"
+- name: define mariadb short version
+  set_fact:
+    mariadb_short_version: "{{ package_version.platform_version }}"
+  when:
+    - package_version is defined
+    - package_version.platform_version is defined
 
-- block:
-    - name: update rpm cache
-      yum:
-        update_cache: true
+- name: ''
+  debug:
+    msg: "{{ package_version }}"
 
-    # centos-7 provides mariadb 5.5 m(  ("Version     : 5.5.64")
-    # centos-8 provides mariadb 10      ("Version      : 10.3.11")
-    - name: detect available mariadb version  # noqa 301
-      shell: |
-        yum info mariadb-server | egrep "^Version" | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
-      args:
-        warn: false
-      no_log: true
-      register: _detected_mariadb_version
-
-    - name: define mariadb version
-      set_fact:
-        mariadb_version: "{{ _detected_mariadb_version.stdout }}"
-      when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
-
-    - name: define mariadb short version
-      set_fact:
-        mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
-      when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
-  when: ansible_os_family | lower == "redhat"
+# - block:
+#     - name: update apt cache
+#       package:
+#         update_cache: true
+#
+#     # ubuntu-16 provides mariadb         ("Version: 10.0.38-0ubuntu0.16.04.1")
+#     # ubuntu-18 provides mariadb 10.1.43 ("Version: 1:10.1.43-0ubuntu0.18.04.1")
+#     # debian-9  provides mariadb 10.1    ("Version: 10.1.41-0+deb9u1")
+#     # debian-10 provides mariadb 10.3    ("Version: 1:10.3.18-0+deb10u1")
+#     - name: detect available mariadb version  # noqa 301
+#       shell: |
+#         apt-cache show mariadb-server | egrep "^Version" | sort | tail -n1 | cut -d'-' -f1 | sed -e 's|1:||' | tr -d '[:space:]' | cut -d ':' -f2
+#       args:
+#         warn: false
+#       ignore_errors: true
+#       no_log: true
+#       register: _detected_mariadb_version
+#
+#     - name: define mariadb version
+#       set_fact:
+#         mariadb_version: "{{ _detected_mariadb_version.stdout }}"
+#       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+#
+#     - name: define mariadb short version
+#       set_fact:
+#         mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
+#       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+#   when: ansible_os_family | lower == "debian"
+#
+# - block:
+#     - name: update rpm cache
+#       package:
+#         update_cache: true
+#
+#     # centos-7 provides mariadb 5.5 m(  ("Version     : 5.5.64")
+#     # centos-8 provides mariadb 10      ("Version      : 10.3.11")
+#     - name: detect available mariadb version  # noqa 301
+#       shell: |
+#         yum info mariadb-server | egrep "^Version" | head -n1 | cut -d ':' -f 2 | tr -d '[:space:]'
+#       args:
+#         warn: false
+#       no_log: true
+#       register: _detected_mariadb_version
+#
+#     - name: define mariadb version
+#       set_fact:
+#         mariadb_version: "{{ _detected_mariadb_version.stdout }}"
+#       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+#
+#     - name: define mariadb short version
+#       set_fact:
+#         mariadb_short_version: "{{ _detected_mariadb_version.stdout.split('.')[0:2] | join('.') }}"
+#       when: _detected_mariadb_version is defined and _detected_mariadb_version.stdout is defined
+#   when: ansible_os_family | lower == "redhat"
 
 - name: assert missing mariadb_version
   assert:
@@ -66,7 +90,5 @@
   debug:
     msg:
       - "mariadb version: {{ mariadb_short_version }} - {{ mariadb_version }}"
-  when:
-    - mariadb_version | default("") | string | length != 0
 
 ...

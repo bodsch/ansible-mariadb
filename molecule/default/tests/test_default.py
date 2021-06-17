@@ -52,7 +52,8 @@ def get_vars(host):
 
 
 def test_data_directory(host, get_vars):
-
+    """
+    """
     directory = get_vars.get('mariadb_datadir')
     user = get_vars.get('mariadb_log_file_group')
     pp.pprint(directory)
@@ -66,7 +67,8 @@ def test_data_directory(host, get_vars):
 
 
 def test_tmp_directory(host, get_vars):
-
+    """
+    """
     directory = get_vars.get('mariadb_tmpdir')
 
     dir = host.file(directory)
@@ -75,9 +77,11 @@ def test_tmp_directory(host, get_vars):
 
 
 def test_log_directory(host, get_vars):
-
+    """
+    """
     directory = get_vars.get('mariadb_log_directory')
     user = get_vars.get('mariadb_log_file_group')
+
     pp.pprint(directory)
     pp.pprint(user)
 
@@ -96,7 +100,6 @@ def test_log_directory(host, get_vars):
 def test_directories(host, dirs):
     d = host.file(dirs)
     assert d.is_directory
-    assert d.exists
 
 
 @pytest.mark.parametrize("files", [
@@ -117,7 +120,6 @@ def test_directories(host, dirs):
 ])
 def test_files(host, files):
     f = host.file(files)
-    assert f.exists
     assert f.is_file
 
 
@@ -125,9 +127,9 @@ def test_user(host, get_vars):
 
     distribution = host.system_info.distribution
 
-    if(distribution in ['debian', 'ubuntu']):
+    if distribution in ['debian', 'ubuntu']:
         shell = '/bin/false'
-    elif(distribution in ['centos', 'redhat']):
+    elif distribution in ['centos', 'redhat', 'ol']:
         shell = '/sbin/nologin'
 
     user_name = "mysql"
@@ -141,12 +143,13 @@ def test_user(host, get_vars):
 
 
 def test_mariadb_running_and_enabled(host, get_vars):
-
+    """
+    """
     distribution = host.system_info.distribution
 
-    if(distribution == 'ubuntu'):
+    if distribution == 'ubuntu':
         distribution = 'debian'
-    elif(distribution == 'centos'):
+    elif distribution in ['centos', 'ol']:
         distribution = 'redhat'
 
     service_name = get_vars.get('_mariadb_service').get(distribution)
@@ -158,7 +161,6 @@ def test_mariadb_running_and_enabled(host, get_vars):
 
 def test_listening_socket(host, get_vars):
     """
-
     """
     listening = host.socket.get_listening_sockets()
 
@@ -168,23 +170,22 @@ def test_listening_socket(host, get_vars):
     distribution = host.system_info.distribution
     release = host.system_info.release
 
-    if(distribution == 'ubuntu'):
+    if distribution == 'ubuntu':
         distribution = 'debian'
-    elif(distribution == 'centos'):
+    elif distribution in ['centos', 'ol']:
         distribution = 'redhat'
 
     socket_name = get_vars.get('_mariadb_socket').get(distribution)
-
-    pp.pprint("  '{}'".format(socket_name))
 
     f = host.file(socket_name)
     assert f.exists
 
     for spec in (
         "tcp://127.0.0.1:3306",
-        "unix:///run/mysqld/mysqld.sock",
-        ):
-        assert spec in listening
+        "unix://{}".format(socket_name)):
+
+        socket = host.socket(spec)
+        assert socket.is_listening
 
     # if not (distribution == 'debian' and release == '18.04'):
     #     socket_name = 'unix://{}'.format(socket_name)
