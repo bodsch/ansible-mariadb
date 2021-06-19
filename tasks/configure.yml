@@ -20,6 +20,7 @@
     owner: root
     group: root
     mode: 0644
+    backup: true
 
 - name: create configuration files
   template:
@@ -28,6 +29,7 @@
     owner: root
     group: root
     mode: 0644
+    backup: true
 
 # - name: create configuration files
 #   template:

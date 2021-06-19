@@ -2,9 +2,9 @@
 
 - include_tasks: prepare.yaml
 
-# - include_tasks: detect_mariadb_version.yml
+- include_tasks: detect_mariadb_version.yml
 
-# - include_tasks: installation.yml
+- include_tasks: installation.yml
 
 - name: configure mariadb
   include_tasks: configure.yml
