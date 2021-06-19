@@ -1,0 +1,17 @@
+{%- macro print_segment(v) -%}
+  {% if v | type == "dict" -%}
+{%- for key, value in v.items() -%}
+{{ print_key_value(key, value) }}
+{%- endfor -%}
+  {% else %}
+{{ v }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro print_key_value(key, value) -%}{#- Formats a variable for inserting it into UCL -#}
+{% if value %}
+{{ key.ljust(35) }} = {{ value }}
+{% else %}
+{{ key }}
+{% endif %}
+{%- endmacro -%}

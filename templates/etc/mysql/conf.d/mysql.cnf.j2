@@ -1,4 +1,7 @@
 {{ ansible_managed | comment(decoration='# ') }}
+{% from "macros/macros.j2" import print_segment %}
 
-[mysql]
-
+{% for segment, v in mariadb_config.items() %}
+[{{ segment }}]
+{{ print_segment(v) }}
+{% endfor %}

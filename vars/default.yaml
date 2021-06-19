@@ -20,7 +20,8 @@ mariadb_server: ""
 # mariadb-server
 mariadb_packages: []
 # mysqlclient
-mariadb_python_packages: []
+mariadb_python_packages:
+  - name: ""
 # mariadb
 mariadb_service: ""
 # /usr/share/mysql

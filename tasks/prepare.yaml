@@ -1,14 +1,17 @@
 ---
 
 - name: include OS specific configuration
-  include_vars: "{{ lookup('first_found', findme) }}"
+  include_vars: "{{ lookup('first_found', params) }}"
   vars:
-    findme:
+    params:
       paths:
         - "vars"
       files:
+        # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
         - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+        # eg. debian / ubuntu / centos / oraclelinux
         - "{{ ansible_distribution | lower }}.yaml"
+        # eg. redhat / debian
         - "{{ ansible_os_family | lower }}.yaml"
         - default.yaml
       skip: true
@@ -44,10 +47,6 @@
 - name: do facts module to get latest information
   setup:
 
-# - name: ''
-#   debug:
-#     msg: "{{ ansible_python_interpreter }}"
-
 - block:
     - name: add mariadb repository
       yum_repository:
@@ -66,10 +65,6 @@
         option: module_hotfixes
         value: "1"
         mode: 0750
-
-    - name: update rpm cache
-      yum:
-        update_cache: true
   when:
     - mariadb_use_external_repo | bool
     - ansible_os_family | lower == 'redhat'
@@ -106,11 +101,17 @@
       when:
         - ansible_distribution | lower == 'ubuntu'
 
-    - name: update apt cache
-      apt:
-        update_cache: true
   when:
     - mariadb_use_external_repo | bool
     - ansible_os_family | lower == 'debian'
+
+- name: update package cache
+  package:
+    update_cache: true
+
+- name: detect if mariadb installed
+  stat:
+    path: /usr/sbin/mysqld
+  register: mysqld_binary_file
 
 ...

@@ -10,8 +10,12 @@ mariadb_packages:
 
 mariadb_python_packages: []
 
+mariadb_config_file: /etc/my.cnf
+
+# # ls -q my.cnf.d/*.cnf
+# my.cnf.d/client.cnf  my.cnf.d/mysql-clients.cnf  my.cnf.d/s3.cnf  my.cnf.d/server.cnf  my.cnf.d/spider.cnf
 mariadb_config_dir: /etc/my.cnf.d
-mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
+mariadb_config_include_dir: "{{ mariadb_config_dir }}"
 
 mariadb_service: mariadb
 

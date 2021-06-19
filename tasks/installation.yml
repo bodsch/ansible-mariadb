@@ -1,5 +1,16 @@
 ---
 
+- name: create policy-rc.d
+  copy:
+    dest: /usr/sbin/policy-rc.d
+    content: |
+      #!/bin/sh
+      exit 101
+    mode: 0755
+  when:
+    - not mysqld_binary_file is defined
+    - ansible_os_family | lower != 'archlinux'
+
 - name: ensure mariadb packages are installed
   package:
     name: "{{ mariadb_packages }}"
@@ -30,6 +41,15 @@
   when:
     - ansible_os_family | lower == 'redhat'
 
+- name: remove policy-rc.d
+  file:
+    path: /usr/sbin/policy-rc.d
+    state: absent
+  when:
+    - not mysqld_binary_file is defined
+    - ansible_os_family | lower != 'archlinux'
+
+
 - name: python support
   block:
     - name: create requirements.txt
@@ -45,22 +65,16 @@
         state: present
       register: pip_install
       ignore_errors: true
-      # no_log: true
-      register: mariadb_install_python_packages
+      no_log: true
 
     - name: ''
       debug:
-        msg: "{{ mariadb_install_python_packages }}"
+        msg: "{{ pip_install }}"
 
     - block:
         - name: install build essentials
           package:
-            name:
-              - mariadb-devel
-              - gcc
-              - gcc-c++
-              - autoconf
-              - automake
+            name: "{{ mariadb_build_packages }}"
             state: present
 
         - name: ensure python bindings for mariadb packages 2nd
@@ -70,16 +84,12 @@
 
         - name: uninstall build essentials
           package:
-            name:
-              - mariadb-devel
-              - gcc
-              - gcc-c++
-              - autoconf
-              - automake
+            name: "{{ mariadb_build_packages }}"
             state: absent
-
       when:
         - pip_install.failed
+        - mariadb_build_packages is defined
+        - mariadb_build_packages | length > 0
 
     - name: remove requirements.txt
       file:

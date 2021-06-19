@@ -2,181 +2,199 @@
 
 - name: create neccessary directories
   file:
-    path: '{{ item }}'
+    path: '{{ mariadb_config_dir }}/conf.d'
     state: directory
     owner: root
     group: root
     mode: 0755
-  loop:
-    - '{{ mariadb_config_dir }}/conf.d'
-    - '{{ mariadb_config_dir }}/mariadb.conf.d'
 
-- name: create configuration files
+- name: remove distribution directories
+  file:
+    path: "{{ mariadb_config_dir }}/mariadb.conf.d"
+    state: absent
+
+- name: create main configuration file
   template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "etc/my.cnf.j2"
+    dest: "{{ mariadb_config_file }}"
     owner: root
     group: root
     mode: 0644
-  with_items:
-    - src: etc/mysql/my.cnf.j2
-      dest: "{{ mariadb_config_dir }}/my.cnf"
-    - src: etc/mysql/mariadb.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.cnf'
-    - src: etc/mysql/my.cnf.fallback.j2
-      dest: '{{ mariadb_config_dir }}/my.cnf.fallback'
-    - src: etc/mysql/conf.d/mysql.cnf.j2
-      dest: '{{ mariadb_config_dir }}/conf.d/mysql.cnf'
-    - src: etc/mysql/conf.d/mysqldump.cnf.j2
-      dest: '{{ mariadb_config_dir }}/conf.d/mysqldump.cnf'
-    - src: etc/mysql/mariadb.conf.d/50-client.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-client.cnf'
-    - src: etc/mysql/mariadb.conf.d/59-client-security.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-client-security.cnf'
-    - src: etc/mysql/mariadb.conf.d/50-mysql-clients.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-mysql-clients.cnf'
-    - src: etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-mysqld_safe.cnf'
-    - src: etc/mysql/mariadb.conf.d/50-server.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-server.cnf'
-    - src: etc/mysql/mariadb.conf.d/59-server-replication.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-replication.cnf'
-    - src: etc/mysql/mariadb.conf.d/59-server-logging.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-logging.cnf'
-    - src: etc/mysql/mariadb.conf.d/59-server-innodb.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-innodb.cnf'
-    - src: etc/mysql/mariadb.conf.d/59-server-finetuning.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-finetuning.cnf'
-    - src: etc/mysql/mariadb.conf.d/59-server-security.cnf.j2
-      dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-security.cnf'
-  register: configuration
-  loop_control:
-    label: "{{ item.dest }}"
-  notify:
-    - restart mariadb
 
-- name: create data directory '{{ mariadb_datadir }}'
-  file:
-    path: "{{ mariadb_datadir }}"
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0755
+- name: create configuration files
+  template:
+    src: "etc/mysql/conf.d/mysql.cnf.j2"
+    dest: "{{ mariadb_config_include_dir }}/mysql.cnf"
+    owner: root
+    group: root
+    mode: 0644
 
-- name: create tmp directory '{{ mariadb_tmpdir }}'
-  file:
-    path: "{{ mariadb_tmpdir }}"
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0755
-  when:
-    - mariadb_tmpdir != '/tmp'
-    - mariadb_tmpdir is defined
-    - mariadb_tmpdir | length != 0
+# - name: create configuration files
+#   template:
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#     owner: root
+#     group: root
+#     mode: 0644
+#   with_items:
+#     - src: etc/mysql/my.cnf.j2
+#       dest: "{{ mariadb_config_dir }}/my.cnf"
+#     - src: etc/mysql/mariadb.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.cnf'
+#     - src: etc/mysql/my.cnf.fallback.j2
+#       dest: '{{ mariadb_config_dir }}/my.cnf.fallback'
+#     - src: etc/mysql/conf.d/mysql.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/conf.d/mysql.cnf'
+#     - src: etc/mysql/conf.d/mysqldump.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/conf.d/mysqldump.cnf'
+#     - src: etc/mysql/mariadb.conf.d/50-client.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-client.cnf'
+#     - src: etc/mysql/mariadb.conf.d/59-client-security.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-client-security.cnf'
+#     - src: etc/mysql/mariadb.conf.d/50-mysql-clients.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-mysql-clients.cnf'
+#     - src: etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-mysqld_safe.cnf'
+#     - src: etc/mysql/mariadb.conf.d/50-server.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/50-server.cnf'
+#     - src: etc/mysql/mariadb.conf.d/59-server-replication.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-replication.cnf'
+#     - src: etc/mysql/mariadb.conf.d/59-server-logging.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-logging.cnf'
+#     - src: etc/mysql/mariadb.conf.d/59-server-innodb.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-innodb.cnf'
+#     - src: etc/mysql/mariadb.conf.d/59-server-finetuning.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-finetuning.cnf'
+#     - src: etc/mysql/mariadb.conf.d/59-server-security.cnf.j2
+#       dest: '{{ mariadb_config_dir }}/mariadb.conf.d/59-server-security.cnf'
+#   register: configuration
+#   loop_control:
+#     label: "{{ item.dest }}"
+#   notify:
+#     - restart mariadb
 
-- name: create log directory '{{ mariadb_log_directory }}'
-  file:
-    path: "{{ mariadb_log_directory }}"
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0755
-  when:
-    - mariadb_log_directory is defined
-    - mariadb_log_directory | length != 0
-
-- name: create pid directory '{{ mariadb_pid_file | dirname }}'
-  file:
-    path: "{{ mariadb_pid_file | dirname }}"
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0755
-  when:
-    - mariadb_pid_file is defined
-    - mariadb_pid_file | length != 0
-
-# - block:
-#     - name: create {{ systemd_lib_directory }}/{{ mariadb_service }}.service.d
-#       file:
-#         path: "{{ systemd_lib_directory }}/{{ mariadb_service }}.service.d"
-#         state: directory
-#         mode: 0750
+# - name: create data directory '{{ mariadb_datadir }}'
+#   file:
+#     path: "{{ mariadb_datadir }}"
+#     state: directory
+#     owner: mysql
+#     group: mysql
+#     mode: 0755
 #
-#     - name: create overwrite.conf for systemd
-#       template:
-#         src: systemd/overwrite.conf.j2
-#         dest: "{{ systemd_lib_directory }}/{{ mariadb_service }}.service.d/override.conf"
-#         mode: 0440
-#       notify:
-#         - systemctl daemon-reload
+# - name: create tmp directory '{{ mariadb_tmpdir }}'
+#   file:
+#     path: "{{ mariadb_tmpdir }}"
+#     state: directory
+#     owner: mysql
+#     group: mysql
+#     mode: 0755
+#   when:
+#     - mariadb_tmpdir != '/tmp'
+#     - mariadb_tmpdir is defined
+#     - mariadb_tmpdir | length != 0
+#
+# - name: create log directory '{{ mariadb_log_directory }}'
+#   file:
+#     path: "{{ mariadb_log_directory }}"
+#     state: directory
+#     owner: mysql
+#     group: mysql
+#     mode: 0755
+#   when:
+#     - mariadb_log_directory is defined
+#     - mariadb_log_directory | length != 0
+#
+# - name: create pid directory '{{ mariadb_pid_file | dirname }}'
+#   file:
+#     path: "{{ mariadb_pid_file | dirname }}"
+#     state: directory
+#     owner: mysql
+#     group: mysql
+#     mode: 0755
+#   when:
+#     - mariadb_pid_file is defined
+#     - mariadb_pid_file | length != 0
+#
+# # - block:
+# #     - name: create {{ systemd_lib_directory }}/{{ mariadb_service }}.service.d
+# #       file:
+# #         path: "{{ systemd_lib_directory }}/{{ mariadb_service }}.service.d"
+# #         state: directory
+# #         mode: 0750
+# #
+# #     - name: create overwrite.conf for systemd
+# #       template:
+# #         src: systemd/overwrite.conf.j2
+# #         dest: "{{ systemd_lib_directory }}/{{ mariadb_service }}.service.d/override.conf"
+# #         mode: 0440
+# #       notify:
+# #         - systemctl daemon-reload
+# #
+# #   when:
+# #     - ansible_service_mgr == "systemd"
+#
+# - block:
+#     - name: create slow query log file
+#       file:
+#         path: "{{ mariadb_slow_query_log_file }}"
+#         state: touch
+#         owner: mysql
+#         group: "{{ mariadb_log_file_group }}"
+#         mode: 0640
+#
+#     - name: set ownership on slow query log file
+#       file:
+#         path: "{{ mariadb_slow_query_log_file }}"
+#         state: file
+#         owner: mysql
+#         group: "{{ mariadb_log_file_group }}"
+#         mode: 0640
 #
 #   when:
-#     - ansible_service_mgr == "systemd"
-
-- block:
-    - name: create slow query log file
-      file:
-        path: "{{ mariadb_slow_query_log_file }}"
-        state: touch
-        owner: mysql
-        group: "{{ mariadb_log_file_group }}"
-        mode: 0640
-
-    - name: set ownership on slow query log file
-      file:
-        path: "{{ mariadb_slow_query_log_file }}"
-        state: file
-        owner: mysql
-        group: "{{ mariadb_log_file_group }}"
-        mode: 0640
-
-  when:
-    - mariadb_slow_query_log_enabled
-
-- block:
-    - name: create error log file
-      file:
-        path: "{{ mariadb_log_error }}"
-        state: touch
-        owner: mysql
-        group: "{{ mariadb_log_file_group }}"
-        mode: 0640
-
-    - name: set ownership on error log file
-      file:
-        path: "{{ mariadb_log_error }}"
-        state: file
-        owner: mysql
-        group: "{{ mariadb_log_file_group }}"
-        mode: 0640
-
-  when:
-    - mariadb_log | length == 0
-    - mariadb_log_error | length != 0
-
-- name: configure swappiness
-  sysctl:
-    name: vm.swappiness
-    value: "{{ mariadb_swappiness | int }}"
-    state: present
-  when:
-    - mariadb_configure_swappiness | bool
-
-- name: ensure mariadb is started and enabled on boot
-  service:
-    name: '{{ mariadb_service }}'
-    state: started
-  register: service_status
-  notify:
-    - wait 20 seconds for clean startup
-
-# - name: service state
-#   debug:
-#     var: "{{ item }}"
-#   when: item is defined
-#   loop:
-#     - service_status.state
-#     - service_status.failed
+#     - mariadb_slow_query_log_enabled
+#
+# - block:
+#     - name: create error log file
+#       file:
+#         path: "{{ mariadb_log_error }}"
+#         state: touch
+#         owner: mysql
+#         group: "{{ mariadb_log_file_group }}"
+#         mode: 0640
+#
+#     - name: set ownership on error log file
+#       file:
+#         path: "{{ mariadb_log_error }}"
+#         state: file
+#         owner: mysql
+#         group: "{{ mariadb_log_file_group }}"
+#         mode: 0640
+#
+#   when:
+#     - mariadb_log | length == 0
+#     - mariadb_log_error | length != 0
+#
+# - name: configure swappiness
+#   sysctl:
+#     name: vm.swappiness
+#     value: "{{ mariadb_swappiness | int }}"
+#     state: present
+#   when:
+#     - mariadb_configure_swappiness | bool
+#
+# - name: ensure mariadb is started and enabled on boot
+#   service:
+#     name: '{{ mariadb_service }}'
+#     state: started
+#   register: service_status
+#   notify:
+#     - wait 20 seconds for clean startup
+#
+# # - name: service state
+# #   debug:
+# #     var: "{{ item }}"
+# #   when: item is defined
+# #   loop:
+# #     - service_status.state
+# #     - service_status.failed
 ...

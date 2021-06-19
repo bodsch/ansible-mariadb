@@ -6,7 +6,12 @@
   environment:
     NETRC: ''
 
-  # pre_tasks:
+  pre_tasks:
+    - debug:
+        msg:
+          - "os family            : {{ ansible_os_family }}"
+          - "distribution         : {{ ansible_distribution }}"
+
   #   - name: detect python3
   #     stat:
   #       path: /usr/bin/python3
