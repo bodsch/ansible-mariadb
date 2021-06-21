@@ -8,7 +8,7 @@
       exit 101
     mode: 0755
   when:
-    - not mysqld_binary_file is defined
+    - not mariadb_installed
     - ansible_os_family | lower != 'archlinux'
 
 - name: ensure mariadb packages are installed
@@ -46,7 +46,6 @@
     path: /usr/sbin/policy-rc.d
     state: absent
   when:
-    - not mysqld_binary_file is defined
     - ansible_os_family | lower != 'archlinux'
 
 

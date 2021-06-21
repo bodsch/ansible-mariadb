@@ -1,7 +1,5 @@
 ---
 
-systemd_lib_directory: "/lib/systemd/system"
-
 mariadb_packages:
   - libmariadb-dev
   - mariadb-server
@@ -9,91 +7,9 @@ mariadb_packages:
   - python3-pip
   - python3-setuptools
 
-mariadb_python_packages: []
-
-
-# DEBIAN 9
-#  # ls -1 /etc/mysql/*
-#  /etc/mysql/debian-start
-#  /etc/mysql/debian.cnf
-#  /etc/mysql/mariadb.cnf
-#  /etc/mysql/my.cnf
-#  /etc/mysql/my.cnf.fallback
-#
-#  /etc/mysql/conf.d:
-#  mysql.cnf
-#  mysqldump.cnf
-#
-#  /etc/mysql/mariadb.conf.d:
-#  50-client.cnf
-#  50-mysql-clients.cnf
-#  50-mysqld_safe.cnf
-#  50-server.cnf
-
-# DEBIAN 10
-#  # ls -1 /etc/mysql/*
-#  /etc/mysql/debian-start
-#  /etc/mysql/debian.cnf
-#  /etc/mysql/mariadb.cnf
-#  /etc/mysql/my.cnf
-#  /etc/mysql/my.cnf.fallback
-#
-#  /etc/mysql/conf.d:
-#  mysql.cnf
-#  mysqldump.cnf
-#
-#  /etc/mysql/mariadb.conf.d:
-#  50-client.cnf
-#  50-mysql-clients.cnf
-#  50-mysqld_safe.cnf
-#  50-server.cnf
-
-# UBUNTU 18
-# ls -l  /etc/mysql/*
-#  -rwxr-xr-x 1 root root 1509 May  3 01:40 /etc/mysql/debian-start
-#  -rw------- 1 root root  277 Jun 19 14:59 /etc/mysql/debian.cnf
-#  -rw-r--r-- 1 root root  869 May  3 01:40 /etc/mysql/mariadb.cnf
-#  lrwxrwxrwx 1 root root   24 Jun 19 14:59 /etc/mysql/my.cnf -> /etc/alternatives/my.cnf
-#  -rw-r--r-- 1 root root  839 Aug  3  2016 /etc/mysql/my.cnf.fallback
-#
-#  /etc/mysql/conf.d:
-#  total 8
-#  -rw-r--r-- 1 root root  8 Aug  3  2016 mysql.cnf
-#  -rw-r--r-- 1 root root 55 Aug  3  2016 mysqldump.cnf
-#
-#  /etc/mysql/mariadb.conf.d:
-#  total 16
-#  -rw-r--r-- 1 root root  733 May  3 01:40 50-client.cnf
-#  -rw-r--r-- 1 root root  336 May  3 01:40 50-mysql-clients.cnf
-#  -rw-r--r-- 1 root root 1032 May  3 01:40 50-mysqld_safe.cnf
-#  -rw-r--r-- 1 root root 3719 May  3 01:40 50-server.cnf
-
-# UBUNTU 20
-#  # ls -l  /etc/mysql/*
-#  -rwxr-xr-x 1 root root 1620 May  9 18:20 /etc/mysql/debian-start
-#  -rw------- 1 root root  261 Jun 19 15:04 /etc/mysql/debian.cnf
-#  -rw-r--r-- 1 root root  869 May  9 18:20 /etc/mysql/mariadb.cnf
-#  lrwxrwxrwx 1 root root   24 Jun 19 15:04 /etc/mysql/my.cnf -> /etc/alternatives/my.cnf
-#  -rw-r--r-- 1 root root  839 Aug  3  2016 /etc/mysql/my.cnf.fallback
-#
-#  /etc/mysql/conf.d:
-#  total 8
-#  -rw-r--r-- 1 root root  8 Aug  3  2016 mysql.cnf
-#  -rw-r--r-- 1 root root 55 Aug  3  2016 mysqldump.cnf
-#
-#  /etc/mysql/mariadb.conf.d:
-#  total 16
-#  -rw-r--r-- 1 root root  733 May  9 18:20 50-client.cnf
-#  -rw-r--r-- 1 root root  336 May  9 18:20 50-mysql-clients.cnf
-#  -rw-r--r-- 1 root root 1032 May  9 18:20 50-mysqld_safe.cnf
-#  -rw-r--r-- 1 root root 3940 May  9 18:20 50-server.cnf
-
 mariadb_config_file: /etc/mysql/my.cnf
 
 mariadb_config_dir: /etc/mysql
 mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
-
-mariadb_service: mariadb
-
 
 ...

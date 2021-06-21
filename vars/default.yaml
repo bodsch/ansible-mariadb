@@ -9,8 +9,6 @@ mariadb_log_directory: ""
 mariadb_slow_query_log_file: ""
 # /var/log/mysql/mysql.error
 mariadb_log_error: ""
-# /run/mysqld/mysqld.pid
-mariadb_pid_file: ""
 # /etc/mysql
 mariadb_config_dir: ""
 # /etc/mysql/conf.d
@@ -28,5 +26,7 @@ mariadb_service: ""
 mariadb_messages_dir: ""
 # /run/mysqld/mysqld.sock
 mariadb_socket: ""
+
+mariadb_config_defaults_mysqld: {}
 
 ...

@@ -39,17 +39,11 @@ mariadb_config_file: /etc/my.cnf
 mariadb_config_dir: /etc/my.cnf.d
 mariadb_config_include_dir: "{{ mariadb_config_dir }}"
 
-mariadb_log_directory: "/var/log/mysql"
-mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
-mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
-
-mariadb_pid_file: "/run/mysqld/mysqld.pid"
+# mariadb_log_directory: "/var/log/mysql"
+# mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
+# mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
 
 mariadb_server: "mariadb-server"
-
-mariadb_service: "mariadb"
-
-mariadb_messages_dir: "/usr/share/mysql"
 
 mariadb_socket: "/var/lib/mysql/mysql.sock"
 

@@ -1,33 +1,23 @@
 ---
 
-systemd_lib_directory: /lib/systemd/system
-
 mariadb_packages:
   - mariadb
   - mariadb-libs
   - mariadb-clients
   - python-mysqlclient
 
-mariadb_python_packages: []
-
 mariadb_config_file: /etc/my.cnf
 
-# # ls -q my.cnf.d/*.cnf
-# my.cnf.d/client.cnf  my.cnf.d/mysql-clients.cnf  my.cnf.d/s3.cnf  my.cnf.d/server.cnf  my.cnf.d/spider.cnf
 mariadb_config_dir: /etc/my.cnf.d
 mariadb_config_include_dir: "{{ mariadb_config_dir }}"
 
-mariadb_service: mariadb
+mariadb_server: "mariadb-server"
 
-mariadb_messages_dir: /usr/share/mysql
+# package name
+mariadb_server: mariadb
 
-mariadb_socket: /run/mysqld/mysqld.sock
-
-mariadb_log_directory: /var/log/mysql
-mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
-mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
-
-mariadb_pid_file: /run/mysqld/mysqld.pid
-
+# mariadb_log_directory: /var/log/mysql
+# mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
+# mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
 
 ...
