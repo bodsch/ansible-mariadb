@@ -11,10 +11,11 @@ mariadb_config_file: /etc/my.cnf
 mariadb_config_dir: /etc/my.cnf.d
 mariadb_config_include_dir: "{{ mariadb_config_dir }}"
 
-mariadb_server: "mariadb-server"
-
 # package name
 mariadb_server: mariadb
+
+# service name
+mariadb_service: mariadb
 
 # mariadb_log_directory: /var/log/mysql
 # mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"

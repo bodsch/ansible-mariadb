@@ -175,4 +175,3 @@ mariadb_replication_role: ''
 mariadb_replication_master: ''
 # Same keys as `mariadb_users` above.
 mariadb_replication_user: []
-

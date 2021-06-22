@@ -66,10 +66,6 @@
       ignore_errors: true
       no_log: true
 
-    - name: ''
-      debug:
-        msg: "{{ pip_install }}"
-
     - block:
         - name: install build essentials
           package:

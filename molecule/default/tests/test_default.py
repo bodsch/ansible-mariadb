@@ -54,13 +54,10 @@ def get_vars(host):
 def test_data_directory(host, get_vars):
     """
     """
-    directory = get_vars.get('mariadb_datadir')
-    user = get_vars.get('mariadb_log_file_group')
-    pp.pprint(directory)
-    pp.pprint(user)
+    directory = get_vars.get("mariadb_config_mysqld", {}).get("datadir")
+    user = "mysql"
 
     dir = host.file(directory)
-    assert dir.exists
     assert dir.is_directory
     assert dir.user == user
     assert dir.group == user
@@ -69,127 +66,125 @@ def test_data_directory(host, get_vars):
 def test_tmp_directory(host, get_vars):
     """
     """
-    directory = get_vars.get('mariadb_tmpdir')
+    directory = get_vars.get("mariadb_config_mysqld", {}).get("tmpdir")
 
     dir = host.file(directory)
-    assert dir.exists
     assert dir.is_directory
 
 
 def test_log_directory(host, get_vars):
     """
     """
-    directory = get_vars.get('mariadb_log_directory')
-    user = get_vars.get('mariadb_log_file_group')
+    error_log_file = get_vars.get("mariadb_config_mysqld", {}).get("log_error")
+    user = "mysql"
 
-    pp.pprint(directory)
-    pp.pprint(user)
-
-    dir = host.file(directory)
-    assert dir.exists
+    dir = host.file(os.path.dirname(error_log_file))
     assert dir.is_directory
     assert dir.user == user
-    assert dir.group == user
 
 
-@pytest.mark.parametrize("dirs", [
-    "/etc/mysql",
-    "/etc/mysql/conf.d",
-    "/etc/mysql/mariadb.conf.d"
-])
-def test_directories(host, dirs):
-    d = host.file(dirs)
-    assert d.is_directory
+def test_directories(host, get_vars):
 
+    pp.pprint(get_vars)
 
-@pytest.mark.parametrize("files", [
-    "/etc/mysql/my.cnf",
-    "/etc/mysql/mariadb.cnf",
-    "/etc/mysql/conf.d/mysql.cnf",
-    "/etc/mysql/conf.d/mysqldump.cnf",
-    "/etc/mysql/mariadb.conf.d/50-client.cnf",
-    "/etc/mysql/mariadb.conf.d/50-mysql-clients.cnf",
-    "/etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf",
-    "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "/etc/mysql/mariadb.conf.d/59-client-security.cnf",
-    "/etc/mysql/mariadb.conf.d/59-server-finetuning.cnf",
-    "/etc/mysql/mariadb.conf.d/59-server-innodb.cnf",
-    "/etc/mysql/mariadb.conf.d/59-server-logging.cnf",
-    "/etc/mysql/mariadb.conf.d/59-server-replication.cnf",
-    "/etc/mysql/mariadb.conf.d/59-server-security.cnf"
-])
-def test_files(host, files):
-    f = host.file(files)
-    assert f.is_file
+    directories = [
+        get_vars.get("mariadb_config_dir", "/etc/mysql")
+    ]
 
-
-def test_user(host, get_vars):
-
-    distribution = host.system_info.distribution
-
-    if distribution in ['debian', 'ubuntu']:
-        shell = '/bin/false'
-    elif distribution in ['centos', 'redhat', 'ol']:
-        shell = '/sbin/nologin'
-
-    user_name = "mysql"
-    u = host.user(user_name)
-    g = host.group(user_name)
-
-    assert g.exists
-    assert u.exists
-    assert user_name in u.groups
-    assert u.shell == shell
-
-
-def test_mariadb_running_and_enabled(host, get_vars):
-    """
-    """
-    distribution = host.system_info.distribution
-
-    if distribution == 'ubuntu':
-        distribution = 'debian'
-    elif distribution in ['centos', 'ol']:
-        distribution = 'redhat'
-
-    service_name = get_vars.get('_mariadb_service').get(distribution)
-
-    service = host.service(service_name)
-    assert service.is_running
-    assert service.is_enabled
-
-
-def test_listening_socket(host, get_vars):
-    """
-    """
-    listening = host.socket.get_listening_sockets()
-
-    for i in listening:
-        pp.pprint(i)
-
-    distribution = host.system_info.distribution
-    release = host.system_info.release
-
-    if distribution == 'ubuntu':
-        distribution = 'debian'
-    elif distribution in ['centos', 'ol']:
-        distribution = 'redhat'
-
-    socket_name = get_vars.get('_mariadb_socket').get(distribution)
-
-    f = host.file(socket_name)
-    assert f.exists
-
-    for spec in (
-        "tcp://127.0.0.1:3306",
-        "unix://{}".format(socket_name)):
-
-        socket = host.socket(spec)
-        assert socket.is_listening
-
-    # if not (distribution == 'debian' and release == '18.04'):
-    #     socket_name = 'unix://{}'.format(socket_name)
-    #     pp.pprint("  '{}'".format(socket_name))
-    #
-    #     socket = host.socket(socket_name)
-    #     assert socket.is_listening
+    for dirs in directories:
+        d = host.file(dirs)
+        assert d.is_directory
+#
+#
+# @pytest.mark.parametrize("files", [
+#     "/etc/mysql/my.cnf",
+#     "/etc/mysql/mariadb.cnf",
+#     "/etc/mysql/conf.d/mysql.cnf",
+#     "/etc/mysql/conf.d/mysqldump.cnf",
+#     "/etc/mysql/mariadb.conf.d/50-client.cnf",
+#     "/etc/mysql/mariadb.conf.d/50-mysql-clients.cnf",
+#     "/etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf",
+#     "/etc/mysql/mariadb.conf.d/50-server.cnf",
+#     "/etc/mysql/mariadb.conf.d/59-client-security.cnf",
+#     "/etc/mysql/mariadb.conf.d/59-server-finetuning.cnf",
+#     "/etc/mysql/mariadb.conf.d/59-server-innodb.cnf",
+#     "/etc/mysql/mariadb.conf.d/59-server-logging.cnf",
+#     "/etc/mysql/mariadb.conf.d/59-server-replication.cnf",
+#     "/etc/mysql/mariadb.conf.d/59-server-security.cnf"
+# ])
+# def test_files(host, files):
+#     f = host.file(files)
+#     assert f.is_file
+#
+#
+# def test_user(host, get_vars):
+#
+#     distribution = host.system_info.distribution
+#
+#     if distribution in ['debian', 'ubuntu']:
+#         shell = '/bin/false'
+#     elif distribution in ['centos', 'redhat', 'ol']:
+#         shell = '/sbin/nologin'
+#
+#     user_name = "mysql"
+#     u = host.user(user_name)
+#     g = host.group(user_name)
+#
+#     assert g.exists
+#     assert u.exists
+#     assert user_name in u.groups
+#     assert u.shell == shell
+#
+#
+# def test_mariadb_running_and_enabled(host, get_vars):
+#     """
+#     """
+#     distribution = host.system_info.distribution
+#
+#     if distribution == 'ubuntu':
+#         distribution = 'debian'
+#     elif distribution in ['centos', 'ol']:
+#         distribution = 'redhat'
+#
+#     service_name = get_vars.get('_mariadb_service').get(distribution)
+#
+#     service = host.service(service_name)
+#     assert service.is_running
+#     assert service.is_enabled
+#
+#
+# def test_listening_socket(host, get_vars):
+#     """
+#     """
+#     listening = host.socket.get_listening_sockets()
+#
+#     for i in listening:
+#         pp.pprint(i)
+#
+#     distribution = host.system_info.distribution
+#     release = host.system_info.release
+#
+#     if distribution == 'ubuntu':
+#         distribution = 'debian'
+#     elif distribution in ['centos', 'ol']:
+#         distribution = 'redhat'
+#
+#     socket_name = get_vars.get('_mariadb_socket').get(distribution)
+#
+#     f = host.file(socket_name)
+#     assert f.exists
+#
+#     for spec in (
+#         "tcp://127.0.0.1:3306",
+#         "unix://{}".format(socket_name)):
+#
+#         socket = host.socket(spec)
+#         assert socket.is_listening
+#
+#     # if not (distribution == 'debian' and release == '18.04'):
+#     #     socket_name = 'unix://{}'.format(socket_name)
+#     #     pp.pprint("  '{}'".format(socket_name))
+#     #
+#     #     socket = host.socket(socket_name)
+#     #     assert socket.is_listening
+#
