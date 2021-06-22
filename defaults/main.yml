@@ -87,7 +87,7 @@ mariadb_swappiness: 0
 # mariadb_socket: /var/lib/mysql/mysql.sock
 
 # Log file settings.
-mariadb_log_file_group: mysql
+# mariadb_log_file_group: mysql
 
 # Slow query log settings.
 # mariadb_slow_query_log_enabled: false

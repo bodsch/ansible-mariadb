@@ -12,7 +12,7 @@
 
 - name: check for mariadb root password change
   copy:
-    dest: "{{ mariadb_config_dir }}/rootpw_configured"
+    dest: "{{ mariadb_config_dir }}/.rootpw_configured"
     content: "{{ mariadb_root_password | checksum }}"
     owner: root
     group: root
@@ -24,7 +24,7 @@
       command: >
         mysqladmin --user=root password "{{ mariadb_root_password }}"
       changed_when: false
-      no_log: true
+      # no_log: true
 
     # Has to be after the root password assignment, for idempotency.
     - name: create .my.cnf file with root password credentials
@@ -41,7 +41,7 @@
 
 # This command will fail when the root password was set previously
 - name: check if root password is set
-  shell: >
+  command: >
     mysqladmin -u root status
   changed_when: false
   failed_when: false

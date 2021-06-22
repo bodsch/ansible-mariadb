@@ -3,6 +3,7 @@
 systemd_lib_directory: "/usr/lib/systemd/system"
 
 mariadb_packages:
+  - hostname
   - mariadb
   - mariadb-common
   - mariadb-server

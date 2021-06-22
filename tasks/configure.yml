@@ -152,33 +152,30 @@
   when:
     - mariadb_configure_swappiness | bool
 
-# TODO
-# detect bootstrap and run mysql_install_db when its needed
-# bash /usr/bin/mysql_install_db \
-#  --auth-root-authentication-method=socket \
-#  --rpm \
-#  --cross-bootstrap \
-#  --user=mysql \
-#  --disable-log-bin \
-#  --skip-test-db 2>&1 | \
-#  $ERR_LOGGER
+- name: run bootstrap on custom data directories '{{ mariadb_config_mysqld.datadir }}'
+  mariadb_bootstrap:
+    datadir: "{{ mariadb_config_mysqld.datadir }}"
+    skip_test_db: true
+  when:
+    - mariadb_config_mysqld.datadir is defined
+    - mariadb_config_mysqld.datadir != "/var/lib/mysql"
 
-# - name: start mariadb first time
-#   service:
-#     name: '{{ mariadb_service }}'
-#     state: started
-#   register: service_status
-#   environment:
-#     DEBIAN_SCRIPT_DEBUG: 1
-#   notify:
-#     - wait 10 seconds for clean startup
-#
-# - name: service state
-#   debug:
-#     var: "{{ item }}"
-#   when: item is defined
-#   loop:
-#     - service_status.state
-#     - service_status.failed
+- name: start mariadb first time
+  service:
+    name: '{{ mariadb_service }}'
+    state: started
+  register: service_status
+  #environment:
+  #  DEBIAN_SCRIPT_DEBUG: 1
+  notify:
+    - wait 10 seconds for clean startup
+
+- name: service state
+  debug:
+    var: "{{ item }}"
+  when: item is defined
+  loop:
+    - service_status.state
+    - service_status.failed
 
 ...
