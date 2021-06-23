@@ -67,26 +67,8 @@
     - mariadb_config_mysqld['pid-file'] is defined
     - mariadb_config_mysqld['pid-file'] | length > 0
 
-# - block:
-#     - name: create {{ systemd_lib_directory }}/{{ mariadb_service }}.service.d
-#       file:
-#         path: "{{ systemd_lib_directory }}/{{ mariadb_service }}.service.d"
-#         state: directory
-#         mode: 0750
-#
-#     - name: create overwrite.conf for systemd
-#       template:
-#         src: systemd/overwrite.conf.j2
-#         dest: "{{ systemd_lib_directory }}/{{ mariadb_service }}.service.d/override.conf"
-#         mode: 0440
-#       notify:
-#         - systemctl daemon-reload
-#
-#   when:
-#     - ansible_service_mgr == "systemd"
-
 - block:
-    - name: create log directory '{{ mariadb_config_mysqld.slow_query_log_file }}'
+    - name: create log directory '{{ mariadb_config_mysqld.slow_query_log_file | dirname }}'
       file:
         path: "{{ mariadb_config_mysqld.slow_query_log_file | dirname }}"
         state: directory
@@ -113,10 +95,9 @@
   when:
     - mariadb_config_mysqld.slow_query_log_file is defined
     - mariadb_config_mysqld.slow_query_log_file | length > 0
-    # - mariadb_slow_query_log_enabled
 
 - block:
-    - name: create log directory '{{ mariadb_config_mysqld.log_error }}'
+    - name: create log directory '{{ mariadb_config_mysqld.log_error | dirname }}'
       file:
         path: "{{ mariadb_config_mysqld.log_error | dirname }}"
         state: directory
@@ -167,13 +148,5 @@
   register: service_status
   notify:
     - wait 20 seconds for clean startup
-
-# - name: service state
-#   debug:
-#     var: "{{ item }}"
-#   when: item is defined
-#   loop:
-#     - service_status.state
-#     - service_status.failed
 
 ...

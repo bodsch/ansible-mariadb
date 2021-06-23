@@ -1,5 +1,7 @@
 ---
 
+# ansible_python_interpreter: python3
+
 mariadb_use_external_repo: false
 
 mariadb_bind_address: 127.0.0.1
@@ -21,6 +23,12 @@ mariadb_users:
 mariadb_config_mysqld:
   socket: "{{ mariadb_socket }}"
   skip-external-locking:
+  # Skip reverse DNS lookup of clients
   skip-name-resolve: 1
+  # enable performance schema
   performance_schema: 1
+  datadir: /opt/mariadb/data
+  tmpdir: /opt/mariadb/tmp
+  log_error: /opt/mariadb/log/error.log
+  slow_query_log_file: /opt/mariadb/log/mysql-slow.log
   expire_logs_days: 2
