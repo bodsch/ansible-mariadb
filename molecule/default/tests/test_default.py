@@ -1,16 +1,24 @@
 
 from ansible.parsing.dataloader import DataLoader
 from ansible.template import Templar
+
+import json
 import pytest
 import os
 
 import testinfra.utils.ansible_runner
 
-import pprint
-pp = pprint.PrettyPrinter()
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
+
+
+def pp_json(json_thing, sort=True, indents=2):
+    if type(json_thing) is str:
+        print(json.dumps(json.loads(json_thing), sort_keys=sort, indent=indents))
+    else:
+        print(json.dumps(json_thing, sort_keys=sort, indent=indents))
+    return None
 
 
 def base_directory():
@@ -32,17 +40,30 @@ def get_vars(host):
 
     """
     base_dir, molecule_dir = base_directory()
+    distribution = host.system_info.distribution
+
+    if distribution in ['debian', 'ubuntu']:
+        os = "debian"
+    elif distribution in ['centos', 'redhat', 'ol']:
+        os = "redhat"
+    elif distribution in ['arch']:
+        os = "archlinux"
+
+    print(" -> {} / {}".format(distribution, os))
 
     file_defaults = "file={}/defaults/main.yml name=role_defaults".format(base_dir)
     file_vars = "file={}/vars/main.yml name=role_vars".format(base_dir)
     file_molecule = "file={}/group_vars/all/vars.yml name=test_vars".format(molecule_dir)
+    file_distibution = "file={}/vars/{}.yaml name=role_distibution".format(base_dir, os)
 
     defaults_vars = host.ansible("include_vars", file_defaults).get("ansible_facts").get("role_defaults")
     vars_vars = host.ansible("include_vars", file_vars).get("ansible_facts").get("role_vars")
+    distibution_vars = host.ansible("include_vars", file_distibution).get("ansible_facts").get("role_distibution")
     molecule_vars = host.ansible("include_vars", file_molecule).get("ansible_facts").get("test_vars")
 
     ansible_vars = defaults_vars
     ansible_vars.update(vars_vars)
+    ansible_vars.update(distibution_vars)
     ansible_vars.update(molecule_vars)
 
     templar = Templar(loader=DataLoader(), variables=ansible_vars)
@@ -53,6 +74,7 @@ def get_vars(host):
 
 def test_data_directory(host, get_vars):
     """
+      configured datadir
     """
     directory = get_vars.get("mariadb_config_mysqld", {}).get("datadir")
     user = "mysql"
@@ -65,6 +87,7 @@ def test_data_directory(host, get_vars):
 
 def test_tmp_directory(host, get_vars):
     """
+      configured tmpdir
     """
     directory = get_vars.get("mariadb_config_mysqld", {}).get("tmpdir")
 
@@ -74,6 +97,7 @@ def test_tmp_directory(host, get_vars):
 
 def test_log_directory(host, get_vars):
     """
+      configured logdir
     """
     error_log_file = get_vars.get("mariadb_config_mysqld", {}).get("log_error")
     user = "mysql"
@@ -84,107 +108,95 @@ def test_log_directory(host, get_vars):
 
 
 def test_directories(host, get_vars):
+    """
+      used config directory
 
-    pp.pprint(get_vars)
+      debian based: /etc/mysql
+      redhat based: /etc/my.cnf.d
+      arch based  : /etc/my.cnf.d
+    """
+    pp_json(get_vars)
 
     directories = [
-        get_vars.get("mariadb_config_dir", "/etc/mysql")
+        get_vars.get("mariadb_config_dir"),
+        get_vars.get("mariadb_config_include_dir")
     ]
 
     for dirs in directories:
         d = host.file(dirs)
         assert d.is_directory
-#
-#
-# @pytest.mark.parametrize("files", [
-#     "/etc/mysql/my.cnf",
-#     "/etc/mysql/mariadb.cnf",
-#     "/etc/mysql/conf.d/mysql.cnf",
-#     "/etc/mysql/conf.d/mysqldump.cnf",
-#     "/etc/mysql/mariadb.conf.d/50-client.cnf",
-#     "/etc/mysql/mariadb.conf.d/50-mysql-clients.cnf",
-#     "/etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf",
-#     "/etc/mysql/mariadb.conf.d/50-server.cnf",
-#     "/etc/mysql/mariadb.conf.d/59-client-security.cnf",
-#     "/etc/mysql/mariadb.conf.d/59-server-finetuning.cnf",
-#     "/etc/mysql/mariadb.conf.d/59-server-innodb.cnf",
-#     "/etc/mysql/mariadb.conf.d/59-server-logging.cnf",
-#     "/etc/mysql/mariadb.conf.d/59-server-replication.cnf",
-#     "/etc/mysql/mariadb.conf.d/59-server-security.cnf"
-# ])
-# def test_files(host, files):
-#     f = host.file(files)
-#     assert f.is_file
-#
-#
-# def test_user(host, get_vars):
-#
-#     distribution = host.system_info.distribution
-#
-#     if distribution in ['debian', 'ubuntu']:
-#         shell = '/bin/false'
-#     elif distribution in ['centos', 'redhat', 'ol']:
-#         shell = '/sbin/nologin'
-#
-#     user_name = "mysql"
-#     u = host.user(user_name)
-#     g = host.group(user_name)
-#
-#     assert g.exists
-#     assert u.exists
-#     assert user_name in u.groups
-#     assert u.shell == shell
-#
-#
-# def test_mariadb_running_and_enabled(host, get_vars):
-#     """
-#     """
-#     distribution = host.system_info.distribution
-#
-#     if distribution == 'ubuntu':
-#         distribution = 'debian'
-#     elif distribution in ['centos', 'ol']:
-#         distribution = 'redhat'
-#
-#     service_name = get_vars.get('_mariadb_service').get(distribution)
-#
-#     service = host.service(service_name)
-#     assert service.is_running
-#     assert service.is_enabled
-#
-#
-# def test_listening_socket(host, get_vars):
-#     """
-#     """
-#     listening = host.socket.get_listening_sockets()
-#
-#     for i in listening:
-#         pp.pprint(i)
-#
-#     distribution = host.system_info.distribution
-#     release = host.system_info.release
-#
-#     if distribution == 'ubuntu':
-#         distribution = 'debian'
-#     elif distribution in ['centos', 'ol']:
-#         distribution = 'redhat'
-#
-#     socket_name = get_vars.get('_mariadb_socket').get(distribution)
-#
-#     f = host.file(socket_name)
-#     assert f.exists
-#
-#     for spec in (
-#         "tcp://127.0.0.1:3306",
-#         "unix://{}".format(socket_name)):
-#
-#         socket = host.socket(spec)
-#         assert socket.is_listening
-#
-#     # if not (distribution == 'debian' and release == '18.04'):
-#     #     socket_name = 'unix://{}'.format(socket_name)
-#     #     pp.pprint("  '{}'".format(socket_name))
-#     #
-#     #     socket = host.socket(socket_name)
-#     #     assert socket.is_listening
-#
+
+
+def test_files(host, get_vars):
+    """
+      created config files
+    """
+    files = [
+        get_vars.get("mariadb_config_file"),
+        "{}/mysql.cnf".format(get_vars.get("mariadb_config_include_dir"))
+    ]
+
+    for _file in files:
+        f = host.file(_file)
+        assert f.is_file
+
+
+def test_user(host, get_vars):
+    """
+      created user
+    """
+    distribution = host.system_info.distribution
+
+    if distribution in ['debian', 'ubuntu']:
+        shell = '/bin/false'
+    elif distribution in ['centos', 'redhat', 'ol']:
+        shell = '/sbin/nologin'
+
+    user_name = "mysql"
+    u = host.user(user_name)
+    g = host.group(user_name)
+
+    assert g.exists
+    assert u.exists
+    assert user_name in u.groups
+    assert u.shell == shell
+
+
+def test_service_running_and_enabled(host, get_vars):
+    """
+      running service
+    """
+    service_name = get_vars.get("mariadb_service")
+
+    service = host.service(service_name)
+    assert service.is_running
+    assert service.is_enabled
+
+
+def test_listening_socket(host, get_vars):
+    """
+    """
+    listening = host.socket.get_listening_sockets()
+
+    for i in listening:
+        print(i)
+
+    distribution = host.system_info.distribution
+    release = host.system_info.release
+
+    bind_address = get_vars.get("mariadb_config_mysqld").get("bind-address", "127.0.0.1")
+    bind_port = get_vars.get("mariadb_config_mysqld").get("port", 3306)
+    socket_name = get_vars.get("mariadb_socket")
+
+    f = host.file(socket_name)
+    assert f.exists
+
+    listen = []
+    listen.append("tcp://{}:{}".format(bind_address, bind_port))
+
+    if not (distribution == 'ubuntu' and release == '18.04'):
+        listen.append("unix://{}".format(socket_name))
+
+    for spec in listen:
+        socket = host.socket(spec)
+        assert socket.is_listening

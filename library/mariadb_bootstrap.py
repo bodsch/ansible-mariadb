@@ -100,6 +100,7 @@ class MariadbBootstrap(object):
             # This option can be useful if your DNS does not work.
             args.append("--skip-name-resolve")
 
+        # works NOT with mariadb 10.1
         if self.mariadb_skip_test_db:
             # Don't install the test database.
             args.append("--skip-test-db")

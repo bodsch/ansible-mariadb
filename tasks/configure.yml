@@ -61,7 +61,7 @@
     path: "{{ mariadb_config_mysqld['pid-file'] | dirname }}"
     state: directory
     owner: mysql
-    group: mysql
+    # group: mysql
     mode: 0755
   when:
     - mariadb_config_mysqld['pid-file'] is defined
@@ -155,7 +155,7 @@
 - name: run bootstrap on custom data directories '{{ mariadb_config_mysqld.datadir }}'
   mariadb_bootstrap:
     datadir: "{{ mariadb_config_mysqld.datadir }}"
-    skip_test_db: true
+    skip_test_db: false
   when:
     - mariadb_config_mysqld.datadir is defined
     - mariadb_config_mysqld.datadir != "/var/lib/mysql"
@@ -165,17 +165,15 @@
     name: '{{ mariadb_service }}'
     state: started
   register: service_status
-  #environment:
-  #  DEBIAN_SCRIPT_DEBUG: 1
   notify:
-    - wait 10 seconds for clean startup
+    - wait 20 seconds for clean startup
 
-- name: service state
-  debug:
-    var: "{{ item }}"
-  when: item is defined
-  loop:
-    - service_status.state
-    - service_status.failed
+# - name: service state
+#   debug:
+#     var: "{{ item }}"
+#   when: item is defined
+#   loop:
+#     - service_status.state
+#     - service_status.failed
 
 ...

@@ -17,6 +17,7 @@
         state: present
         append_privs: false
         encrypted: false
+        update_password: on_create
       no_log: true
 
     - name: create my.cnf file with password credentials
@@ -26,9 +27,9 @@
         owner: '{{ mariadb_monitoring_user }}'
         mode: 0644
   when:
+    - mariadb_monitoring is defined
+    - mariadb_monitoring | bool
     - mariadb_monitoring_user is defined
     - mariadb_monitoring_user | length != 0
-    - mariadb_monitoring is defined
-    - mariadb_monitoring
 
 ...
