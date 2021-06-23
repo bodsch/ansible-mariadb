@@ -1,5 +1,5 @@
 ---
-name: Code Linter
+name: code linter
 
 on:
   workflow_dispatch:
@@ -10,15 +10,15 @@ on:
 
 jobs:
   lint:
-    name: Linting
+    name: linting
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Lint
+      - name: lint
         uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           DEFAULT_BRANCH: master
