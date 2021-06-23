@@ -139,7 +139,6 @@
     skip_test_db: false
   when:
     - ansible_os_family | lower == 'archlinux'
-    - not mariadb_config_mysqld.datadir is defined
 
 - name: run bootstrap on custom data directories '{{ mariadb_config_mysqld.datadir }}'
   mariadb_bootstrap:
