@@ -1,5 +1,5 @@
 ---
-name: debian
+name: oraclelinux
 
 on:
   pull_request:
@@ -23,8 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - debian:9
-          - debian:10
+          - oraclelinux:8
         python-version:
           - '3.8'
           - '3.9'
