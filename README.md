@@ -1,11 +1,10 @@
 
-![CI](https://github.com/bodsch/ansible-mariadb/workflows/CI/badge.svg?branch=master)
+# Ansible Role:  `mariadb`
 
-installs and configure an mariadb.
 
-implement an monitoring user with own table.
+Installs and configure a mariadb on varoius linux systems.
 
-installs also `mysqltuner`
+Implement also an monitoring user with own table.
 
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-mariadb/CI)][ci]
@@ -204,4 +203,4 @@ tox -e py39-ansible210 -- molecule test
 
 ## License
 
-[Apache](https://raw.githubusercontent.com/bodsch/ansible-logrotate/master/LICENSE)
+[Apache](LICENSE)

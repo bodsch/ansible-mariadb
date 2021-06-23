@@ -27,6 +27,5 @@ jobs:
           VALIDATE_ANSIBLE: true
           VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
-          MARKDOWN_CONFIG_FILE: .markdown-lint.yml
-...
 
+...
