@@ -4,8 +4,6 @@
 #
 # The MariaDB/MySQL tools read configuration files in the following order:
 # 1. "{{ mariadb_config_dir }}/my.cnf" (this file) to set global defaults,
-# 2. "{{ mariadb_config_dir }}/conf.d/*.cnf" to set global options.
-# 3. "{{ mariadb_config_dir }}/mariadb.conf.d/*.cnf" to set MariaDB-only options.
 # 4. "~/.my.cnf" to set user-specific options.
 #
 # If the same option is defined multiple times, the last one will apply.
@@ -21,6 +19,4 @@
 [client-server]
 
 # Import all .cnf files from configuration directory
-!includedir {{ mariadb_config_dir }}
-!includedir {{ mariadb_config_dir }}/conf.d
-!includedir {{ mariadb_config_dir }}/mariadb.conf.d
+!includedir {{ mariadb_config_include_dir }}

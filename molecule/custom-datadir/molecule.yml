@@ -13,10 +13,13 @@ lint: |
 
 platforms:
   - name: instance
-    image: "diodonfrost/ansible-${MOLECULE_DISTRO:-debian}:${MOLECULE_VERSION:-10}"
+    image: "diodonfrost/ansible-${DISTRIBUTION:-debian:10}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
     pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
 provisioner:
   name: ansible

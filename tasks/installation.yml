@@ -1,82 +1,79 @@
 ---
 
-- name: ensure mariadb packages are installed (debian)
+- name: create policy-rc.d
+  copy:
+    dest: /usr/sbin/policy-rc.d
+    content: |
+      #!/bin/sh
+      exit 101
+    mode: 0755
+  when:
+    - not mariadb_installed
+    - ansible_os_family | lower != 'archlinux'
+
+- name: ensure mariadb packages are installed
   package:
     name: "{{ mariadb_packages }}"
     state: present
   register: mariadb_install_packages
+
+- name: fix debian specific debian-start file
+  template:
+    src: etc/mysql/debian-start.j2
+    dest: "{{ mariadb_config_dir }}/debian-start"
+    mode: 0755
   when:
     - ansible_os_family | lower == 'debian'
 
-- block:
-    - name: ensure mariadb packages are installed (centos < 8)
-      package:
-        name: "{{ mariadb_packages }}"
-        state: present
-        use: yum
-      register: mariadb_install_packages
-      when:
-        - ansible_distribution_version | int < 8
-
-    - name: ensure mariadb packages are installed (centos >= 8)
-      package:
-        name: "{{ mariadb_packages }}"
-        state: present
-        use: dnf
-      register: mariadb_install_packages
-      when:
-        - ansible_distribution_version | int >= 8
-
+- name: remove policy-rc.d
+  file:
+    path: /usr/sbin/policy-rc.d
+    state: absent
   when:
-    - ansible_os_family | lower == 'redhat'
+    - ansible_os_family | lower != 'archlinux'
 
-- name: create requirements.txt
-  template:
-    src: requirements.txt.j2
-    dest: /tmp/mariadb-requirements.txt
-    mode: 0660
+- name: python support
+  block:
+    - name: create requirements.txt
+      template:
+        src: requirements.txt.j2
+        dest: /tmp/mariadb-requirements.txt
+        mode: 0660
 
-- name: ensure python bindings for mariadb packages 1st
-  pip:
-    executable: pip3
-    requirements: /tmp/mariadb-requirements.txt
-    state: present
-  register: pip_install
-  ignore_errors: true
-  no_log: true
-  # register: mariadb_install_python_packages
-
-- block:
-    - name: install build essentials
-      package:
-        name:
-          - mariadb-devel
-          - gcc
-          - gcc-c++
-          - autoconf
-          - automake
-        state: present
-
-    - name: ensure python bindings for mariadb packages 2nd
+    - name: ensure python bindings for mariadb packages 1st
       pip:
+        # executable: pip3
         requirements: /tmp/mariadb-requirements.txt
         state: present
+      register: pip_install
+      ignore_errors: true
+      no_log: true
 
-    - name: uninstall build essentials
-      package:
-        name:
-          - mariadb-devel
-          - gcc
-          - gcc-c++
-          - autoconf
-          - automake
-        state: absent
+    - block:
+        - name: install build essentials
+          package:
+            name: "{{ mariadb_build_packages }}"
+            state: present
 
-  when: pip_install.failed
+        - name: ensure python bindings for mariadb packages 2nd
+          pip:
+            requirements: /tmp/mariadb-requirements.txt
+            state: present
 
-- name: remove requirements.txt
-  file:
-    path: /tmp/mariadb-requirements.txt
-    state: absent
+        - name: uninstall build essentials
+          package:
+            name: "{{ mariadb_build_packages }}"
+            state: absent
+      when:
+        - pip_install.failed
+        - mariadb_build_packages is defined
+        - mariadb_build_packages | length > 0
 
+    # - name: remove requirements.txt
+    #   file:
+    #     path: /tmp/mariadb-requirements.txt
+    #     state: absent
+  when:
+    - mariadb_python_packages is defined
+    - mariadb_python_packages | length > 0
 ...

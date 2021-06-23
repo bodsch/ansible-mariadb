@@ -31,13 +31,53 @@ mariadb_enabled_on_startup: true
 # update my.cnf. each time role is run? true | false
 overwrite_global_mycnf: true
 
-# MySQL connection settings.
-mariadb_port: 3306
-mariadb_bind_address: '127.0.0.1'
-mariadb_skip_name_resolve: true
-mariadb_datadir: /var/lib/mysql
-mariadb_tmpdir: /tmp
-mariadb_sql_mode: ''
+# config settings
+# every ini part like [mysqld, galera, embedded, ...] becomes an own segment
+
+# this is read by the standalone daemon and embedded servers
+mariadb_config_server: {}
+
+# This group is read by the client library
+mariadb_config_client: {}
+
+# These groups are read by MariaDB command-line tools
+mariadb_config_mysql: {}
+
+# this is only for the mysqld standalone daemon
+mariadb_config_mysqld:
+  socket: "{{ mariadb_socket }}"
+  skip-external-locking:
+  # Skip reverse DNS lookup of clients
+  skip-name-resolve: 1
+  # enable performance schema
+  performance_schema: 1
+
+# NOTE: This file is read only by the traditional SysV init script, not systemd.
+mariadb_config_mysqld_safe: {}
+
+mariadb_config_mysqldump: {}
+
+mariadb_config_galera: {}
+
+# this is only for embedded server
+mariadb_config_embedded: {}
+
+mariadb_config_custom:
+  # This group is only read by MariaDB servers, not by MySQL.
+  mariadb: {}
+  # This group is only read by MariaDB-$VERSION servers.
+  #mariadb-10.1: {}
+  #mariadb-10.5: {}
+  # This group is *never* read by mysql client library
+  client-mariadb: {}
+  mysql_upgrade: {}
+  mysqladmin: {}
+  mysqlbinlog: {}
+  mysqlcheck: {}
+  mysqlimport: {}
+  mysqlshow: {}
+  mysqlslap: {}
+
 
 mariadb_configure_swappiness: true
 mariadb_swappiness: 0
@@ -47,32 +87,32 @@ mariadb_swappiness: 0
 # mariadb_socket: /var/lib/mysql/mysql.sock
 
 # Log file settings.
-mariadb_log_file_group: mysql
+# mariadb_log_file_group: mysql
 
 # Slow query log settings.
-mariadb_slow_query_log_enabled: false
-mariadb_slow_query_time: "2"
-# The following variable has a default value depending on operating system.
-# mariadb_slow_query_log_file: /var/log/mysql-slow.log
-
-# Memory settings (default values optimized ~512MB RAM).
-mariadb_key_buffer_size: "256M"
-mariadb_max_allowed_packet: "64M"
-mariadb_table_open_cache: "256"
-mariadb_sort_buffer_size: "1M"
-mariadb_read_buffer_size: "1M"
-mariadb_read_rnd_buffer_size: "4M"
-mariadb_myisam_sort_buffer_size: "64M"
-mariadb_thread_cache_size: "8"
-mariadb_query_cache_type: "0"
-mariadb_query_cache_size: "16M"
-mariadb_query_cache_limit: "3M"
-mariadb_max_connections: "15"
-# When making adjustments, make mariadb_tmp_table_size and mariadb_max_heap_table_size equal
-mariadb_tmp_table_size: "64M"
-mariadb_max_heap_table_size: "64M"
-mariadb_group_concat_max_len: "1024"
-mariadb_join_buffer_size: "262144"
+# mariadb_slow_query_log_enabled: false
+# mariadb_slow_query_time: "2"
+# # The following variable has a default value depending on operating system.
+# # mariadb_slow_query_log_file: /var/log/mysql-slow.log
+#
+# # Memory settings (default values optimized ~512MB RAM).
+# mariadb_key_buffer_size: "256M"
+# mariadb_max_allowed_packet: "64M"
+# mariadb_table_open_cache: "256"
+# mariadb_sort_buffer_size: "1M"
+# mariadb_read_buffer_size: "1M"
+# mariadb_read_rnd_buffer_size: "4M"
+# mariadb_myisam_sort_buffer_size: "64M"
+# mariadb_thread_cache_size: "8"
+# mariadb_query_cache_type: "0"
+# mariadb_query_cache_size: "16M"
+# mariadb_query_cache_limit: "3M"
+# mariadb_max_connections: "15"
+# # When making adjustments, make mariadb_tmp_table_size and mariadb_max_heap_table_size equal
+# mariadb_tmp_table_size: "64M"
+# mariadb_max_heap_table_size: "64M"
+# mariadb_group_concat_max_len: "1024"
+# mariadb_join_buffer_size: "262144"
 
 # Other settings.
 mariadb_lower_case_table_names: "0"
@@ -127,6 +167,7 @@ mariadb_users: []
 #     priv: *.*:USAGE
 
 # Replication settings (replication is only enabled if master/user have values).
+
 mariadb_server_id: "1"
 mariadb_max_binlog_size: "100M"
 mariadb_binlog_format: "ROW"
@@ -135,7 +176,3 @@ mariadb_replication_role: ''
 mariadb_replication_master: ''
 # Same keys as `mariadb_users` above.
 mariadb_replication_user: []
-
-mariadb_default_character_set: utf8mb4
-mariadb_character_set_server: utf8mb4
-mariadb_collation_server: utf8mb4_general_ci

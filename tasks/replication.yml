@@ -1,61 +1,105 @@
 ---
 
-- name: Ensure replication user exists on master.
+- name: define network adresses for replicas
+  delegate_to: "127.0.0.1"
+  run_once: true
+  set_fact:
+    list_of_ips: "{{ groups['all'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+  when:
+    - mariadb_replication_role == 'master'
+
+- name: flush handlers at this point to avoid double restart
+  meta: flush_handlers
+
+- name: ensure replication user exists
   mysql_user:
     name: "{{ mariadb_replication_user.name }}"
-    host: "{{ mariadb_replication_user.host | default('%') }}"
+    host: "{{ item | default('%') }}"
     password: "{{ mariadb_replication_user.password }}"
     priv: "{{ mariadb_replication_user.priv | default('*.*:REPLICATION SLAVE,REPLICATION CLIENT') }}"
+    encrypted: "{{ mariadb_replication_user.encrypted | default('true') }}"
+    update_password: always
     state: present
+  run_once: true
+  register: create_replication_user
+  loop:
+    "{{ list_of_ips }}"
+  loop_control:
+    label: "{{ mariadb_replication_user.name }}@{{ item | default('%') }},
+        password encypted: {{ mariadb_replication_user.encrypted | default('true') }}"
   no_log: true
   when:
     - mariadb_replication_role == 'master'
-    - mariadb_replication_user
+    - mariadb_replication_master is defined
     - mariadb_replication_master | length != 0
+    - mariadb_replication_user is defined
+    - mariadb_replication_user.name is defined
+    - mariadb_replication_user.password is defined
+    - mariadb_replication_user.name | length > 0
+    - mariadb_replication_user.password | length > 0
 
-- name: Check slave replication status.
+- name: check slave replication status
   mysql_replication:
     mode: getslave
-    login_user: "{{ mariadb_replication_user.name }}"
-    login_password: "{{ mariadb_replication_user.password }}"
+    # login_user: "{{ mariadb_replication_user.name }}"
+    # login_password: "{{ mariadb_replication_user.password }}"
   ignore_errors: true
-  register: slave
+  register: state_of_replica
   no_log: true
   when:
-    - mariadb_replication_role == 'slave'
+    - mariadb_replication_role == 'replica'
+    - mariadb_replication_master is defined
     - mariadb_replication_master | length != 0
+    - mariadb_replication_user is defined
+    - mariadb_replication_user.name is defined
+    - mariadb_replication_user.password is defined
+    - mariadb_replication_user.name | length > 0
+    - mariadb_replication_user.password | length > 0
 
-- name: Check master replication status.
+- name: check master replication status
+  delegate_to: "{{ mariadb_replication_master }}"
+  run_once: true
   mysql_replication:
     mode: getmaster
-  delegate_to: "{{ mariadb_replication_master }}"
-  register: master
+  register: state_of_master
   when:
-    - (slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed)
-    - mariadb_replication_role == 'slave'
+    - (state_of_replica.Is_Slave is defined and not state_of_replica.Is_Slave) or
+      (state_of_replica.Is_Slave is not defined and state_of_replica is failed)
+    - mariadb_replication_role == 'replica'
+    - mariadb_replication_master is defined
     - mariadb_replication_master | length != 0
 
-- name: Configure replication on the slave.
+- name: configure replication on the slave
   mysql_replication:
     mode: changemaster
     master_host: "{{ mariadb_replication_master }}"
     master_user: "{{ mariadb_replication_user.name }}"
     master_password: "{{ mariadb_replication_user.password }}"
-    master_log_file: "{{ master.File }}"
-    master_log_pos: "{{ master.Position }}"
-  # ignore_errors: true
+    master_log_file: "{{ state_of_master.File }}"
+    master_log_pos: "{{ state_of_master.Position }}"
+    # master_auto_position: true
   failed_when: true
   no_log: true
   when:
-    - (slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed)
-    - mariadb_replication_role == 'slave'
+    - (state_of_replica.Is_Slave is defined and not state_of_replica.Is_Slave) or
+      (state_of_replica.Is_Slave is not defined and state_of_replica is failed)
+    - mariadb_replication_role == 'replica'
+    - mariadb_replication_master is defined
     - mariadb_replication_master | length != 0
-    - mariadb_replication_user
+    - mariadb_replication_user is defined
+    - mariadb_replication_user.name is defined
+    - mariadb_replication_user.password is defined
+    - mariadb_replication_user.name | length > 0
+    - mariadb_replication_user.password | length > 0
 
 - name: Start replication.
   mysql_replication:
     mode: startslave
   when:
-    - (slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed)
-    - mariadb_replication_role == 'slave'
+    - (state_of_replica.Is_Slave is defined and not state_of_replica.Is_Slave) or
+      (state_of_replica.Is_Slave is not defined and state_of_replica is failed)
+    - mariadb_replication_role == 'replica'
+    - mariadb_replication_master is defined
     - mariadb_replication_master | length != 0
+
+...

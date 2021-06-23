@@ -76,7 +76,7 @@ def test_data_directory(host, get_vars):
     """
       configured datadir
     """
-    directory = get_vars.get("mariadb_config_mysqld", {}).get("datadir", "/var/lib/mysql")
+    directory = get_vars.get("mariadb_config_mysqld", {}).get("datadir")
     user = "mysql"
 
     dir = host.file(directory)
@@ -89,7 +89,7 @@ def test_tmp_directory(host, get_vars):
     """
       configured tmpdir
     """
-    directory = get_vars.get("mariadb_config_mysqld", {}).get("tmpdir", "/tmp")
+    directory = get_vars.get("mariadb_config_mysqld", {}).get("tmpdir")
 
     dir = host.file(directory)
     assert dir.is_directory
@@ -99,7 +99,7 @@ def test_log_directory(host, get_vars):
     """
       configured logdir
     """
-    error_log_file = get_vars.get("mariadb_config_mysqld", {}).get("log_error", "/var/log/mysql/error.log")
+    error_log_file = get_vars.get("mariadb_config_mysqld", {}).get("log_error")
     user = "mysql"
 
     dir = host.file(os.path.dirname(error_log_file))
@@ -145,14 +145,12 @@ def test_user(host, get_vars):
     """
       created user
     """
-    shell = '/bin/false'
-
     distribution = host.system_info.distribution
 
-    if distribution in ['centos', 'redhat', 'ol']:
-        shell = "/sbin/nologin"
-    elif distribution == "arch":
-        shell = "/usr/bin/nologin"
+    if distribution in ['debian', 'ubuntu']:
+        shell = '/bin/false'
+    elif distribution in ['centos', 'redhat', 'ol']:
+        shell = '/sbin/nologin'
 
     user_name = "mysql"
     u = host.user(user_name)

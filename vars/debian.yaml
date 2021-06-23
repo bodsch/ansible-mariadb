@@ -1,0 +1,15 @@
+---
+
+mariadb_packages:
+  - libmariadb-dev
+  - mariadb-server
+  - python3-mysqldb
+  - python3-pip
+  - python3-setuptools
+
+mariadb_config_file: /etc/mysql/my.cnf
+
+mariadb_config_dir: /etc/mysql
+mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
+
+...

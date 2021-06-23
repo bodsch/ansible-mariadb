@@ -1,4 +1,65 @@
 {{ ansible_managed | comment(decoration='# ') }}
+{% from "macros/macros.j2" import print_segment %}
+{% from "macros/macros.j2" import print_key_value %}
 
+{% if mariadb_config_server is defined %}
+[server]
+{% for k, v in mariadb_config_server.items() %}
+{{ print_key_value(k, v) }}
+{% endfor %}
+{% endif %}
+
+{% if mariadb_config_client is defined %}
+[client]
+{% for k, v in mariadb_config_client.items() %}
+{{ print_key_value(k, v) }}
+{% endfor -%}
+{% endif %}
+
+{% if mariadb_config_mysql is defined %}
 [mysql]
+{% for k, v in mariadb_config_mysql.items() %}
+{{ print_key_value(k, v) -}}
+{% endfor -%}
+{% endif %}
 
+{% if mariadb_config_mysqld is defined %}
+[mysqld]
+{% for k, v in mariadb_config_mysqld.items() %}
+{{ print_key_value(k, v) -}}
+{% endfor -%}
+{% endif %}
+
+{% if mariadb_config_mysqld_safe is defined %}
+[mysqld_safe]
+{% for k, v in mariadb_config_mysqld_safe.items() %}
+{{ print_key_value(k, v) }}
+{% endfor %}
+{% endif %}
+
+{% if mariadb_config_mysqldump is defined %}
+[mysqldump]
+{% for k, v in mariadb_config_mysqldump.items() %}
+{{ print_key_value(k, v) }}
+{% endfor %}
+{% endif %}
+
+{% if mariadb_config_galera is defined %}
+[galera]
+{% for k, v in mariadb_config_galera.items() %}
+{{ print_key_value(k, v) }}
+{% endfor %}
+{% endif %}
+
+{% if mariadb_config_embedded is defined %}
+[embedded]
+{% for k, v in mariadb_config_embedded.items() %}
+{{ print_key_value(k, v) }}
+{% endfor %}
+{% endif %}
+
+# custom configurations
+{% for segment, v in mariadb_config_custom.items() %}
+[{{ segment }}]
+{{ print_segment(v) }}
+{% endfor %}

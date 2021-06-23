@@ -1,0 +1,7 @@
+---
+
+mariadb_replication_role: replica
+
+mariadb_server_id: 3
+
+...
