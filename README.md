@@ -199,7 +199,7 @@ Tests can be performed with `molecule` and `tox`.
 see also [Actions](https://github.com/bodsch/ansible-mariadb/actions)
 
 ```bash
-$ tox -e py39-ansible210 -- molecule test
+tox -e py39-ansible210 -- molecule test
 ```
 
 ## License
