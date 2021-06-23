@@ -16,30 +16,25 @@
     name: "{{ mariadb_packages }}"
     state: present
   register: mariadb_install_packages
+#   when:
+#     - ansible_os_family | lower != 'redhat'
+#
+# - name: ensure mariadb packages are installed (centos >= 8)
+#   package:
+#     name: "{{ mariadb_packages }}"
+#     state: present
+#     # use: dnf
+#   register: mariadb_install_packages
+#   when:
+#     - ansible_os_family | lower == 'redhat'
+
+- name: fix debian specific debian-start file
+  template:
+    src: etc/mysql/debian-start.j2
+    dest: "{{ mariadb_config_dir }}/debian-start"
+    mode: 0755
   when:
-    - ansible_os_family | lower != 'redhat'
-
-- block:
-    # - name: ensure mariadb packages are installed (centos < 8)
-    #   package:
-    #     name: "{{ mariadb_packages }}"
-    #     state: present
-    #     use: yum
-    #   register: mariadb_install_packages
-    #   when:
-    #     - ansible_distribution_version | int < 8
-
-    - name: ensure mariadb packages are installed (centos >= 8)
-      package:
-        name: "{{ mariadb_packages }}"
-        state: present
-        use: dnf
-      register: mariadb_install_packages
-      #when:
-      #  - ansible_distribution_version | int >= 8
-
-  when:
-    - ansible_os_family | lower == 'redhat'
+    - ansible_os_family | lower == 'debian'
 
 - name: remove policy-rc.d
   file:

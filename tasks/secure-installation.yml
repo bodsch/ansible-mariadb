@@ -67,6 +67,7 @@
     name: ""
     host: "{{ item }}"
     state: absent
+  no_log: true
   loop:
     "{{ mariadb_anonymous_hosts.stdout_lines | default([]) }}"
 

@@ -167,6 +167,7 @@ mariadb_users: []
 #     priv: *.*:USAGE
 
 # Replication settings (replication is only enabled if master/user have values).
+
 mariadb_server_id: "1"
 mariadb_max_binlog_size: "100M"
 mariadb_binlog_format: "ROW"

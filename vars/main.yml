@@ -36,7 +36,6 @@ mariadb_config_defaults_mysqld:
   # localhost which is more compatible and is not less secure.
   bind-address: 127.0.0.1
 
-  #
   # * Fine Tuning
   #
   #key_buffer_size: 16M
@@ -68,24 +67,33 @@ mariadb_config_defaults_mysqld:
   # Error log - should be very few entries.
   #
   log_error: /var/log/mysql/error.log
-  #
+
   # Enable the slow query log to see queries with especially long duration
   #slow_query_log_file: /var/log/mysql/mariadb-slow.log
   #long_query_time: 10
   #log_slow_rate_limit: 1000
   #log_slow_verbosity: query_plan
   #log-queries-not-using-indexes:
-  #
+
   # The following can be used as easy to replay backup logs or for replication.
   # note: if you are setting up a replication slave, see README.Debian about
   #       other settings you may need to change.
-  #server-id: 1
-  #log_bin: /var/log/mysql/mysql-bin.log
+  server-id: "{{ mariadb_server_id }}"
+  # https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#relay_log_basename
+  # relay_log_basename
+  relay_log: "{{ ansible_hostname }}-relay-bin"
+  relay_log_index: "{{ ansible_hostname }}-relay-bin.index"
+  # https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#log_bin_basename
+  # log_bin_basename:
+  log_bin: "{{ ansible_hostname }}-log-bin"
+  log_bin_index: "{{ ansible_hostname }}-log-bin.index"
+  log_bin_compress: 1
   expire_logs_days: 10
-  #max_binlog_size: 100M
-  #binlog_do_db: include_database_name
-  #binlog_ignore_db: exclude_database_name
-  #
+  max_relay_log_size: 100M
+  max_binlog_size: 100M
+  # binlog_do_db: include_database_name
+  binlog_ignore_db: monitoring
+
   # * Security Features
   #
   # Read the manual, too, if you want chroot!

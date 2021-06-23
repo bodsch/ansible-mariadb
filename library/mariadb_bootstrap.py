@@ -105,17 +105,15 @@ class MariadbBootstrap(object):
             # Don't install the test database.
             args.append("--skip-test-db")
 
-        # arch linux needs --basedir=/usr
-
         self.module.log(msg="  args: {}".format(args))
 
         rc, out, err = self.module.run_command(
             [mariadb_install_db] + args,
             check_rc=False)
 
-        self.module.log(msg="  rc : '{}'".format(rc))
-        self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
-        self.module.log(msg="  err: '{}'".format(err))
+        # self.module.log(msg="  rc : '{}'".format(rc))
+        # self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
+        # self.module.log(msg="  err: '{}'".format(err))
 
         if rc == 0:
             Path(self.bootstrapped_file).touch()
