@@ -145,12 +145,14 @@ def test_user(host, get_vars):
     """
       created user
     """
+    shell = '/bin/false'
+
     distribution = host.system_info.distribution
 
-    if distribution in ['debian', 'ubuntu']:
-        shell = '/bin/false'
-    elif distribution in ['centos', 'redhat', 'ol']:
-        shell = '/sbin/nologin'
+    if distribution in ['centos', 'redhat', 'ol']:
+        shell = "/sbin/nologin"
+    elif distribution == "arch":
+        shell = "/usr/bin/nologin"
 
     user_name = "mysql"
     u = host.user(user_name)
