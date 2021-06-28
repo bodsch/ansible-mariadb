@@ -57,6 +57,10 @@ class PackageVersion(object):
             self.pacman_bin = self.module.get_bin_path('pacman', True)
             error, version, msg = self._search_pacman()
 
+        self.module.log(msg="  error   : '{}'".format(error))
+        self.module.log(msg="  version : '{}'".format(version))
+        self.module.log(msg="  msg     : '{}'".format(msg))
+
         major_version, minor_version, _ = version.split(".")
 
         version = dict(
@@ -136,7 +140,7 @@ class PackageVersion(object):
         if(not package_mgr):
             return True, "", "no valid package manager (yum or dnf) found"
 
-        self.module.log(msg="  '{0}'".format(package_mgr))
+        # self.module.log(msg="  package manager: '{0}'".format(package_mgr))
 
         rc, out, err = self.module.run_command(
             [package_mgr, "info", self.package_name],
