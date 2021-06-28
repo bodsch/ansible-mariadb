@@ -4,13 +4,19 @@ systemd_lib_directory: "/usr/lib/systemd/system"
 
 mariadb_packages:
   - hostname
-  - mariadb
-  - mariadb-common
-  - mariadb-server
+  # - mariadb
+  # - mariadb-common
+  # - mariadb-server
+  # - mariadb-devel
+  - MariaDB-client
+  - MariaDB-common
+  - MariaDB-server
+  - MariaDB-shared
   - python3-setuptools
 
 mariadb_build_packages:
-  - mariadb-devel
+  # - mariadb-devel
+  - MariaDB-devel
   - gcc
   - gcc-c++
   - autoconf
@@ -44,7 +50,7 @@ mariadb_config_include_dir: "{{ mariadb_config_dir }}"
 # mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
 # mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
 
-mariadb_server: "mariadb-server"
+mariadb_server: "MariaDB-server"
 
 mariadb_socket: "/var/lib/mysql/mysql.sock"
 
