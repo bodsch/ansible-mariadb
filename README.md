@@ -1,11 +1,10 @@
 
-![CI](https://github.com/bodsch/ansible-mariadb/workflows/CI/badge.svg?branch=master)
+# Ansible Role:  `mariadb`
 
-installs and configure an mariadb.
 
-implement an monitoring user with own table.
+Installs and configure a mariadb on varoius linux systems.
 
-installs also `mysqltuner`
+Implement also an monitoring user with own table.
 
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-mariadb/CI)][ci]
@@ -30,13 +29,13 @@ installs also `mysqltuner`
 
 ### use and create own data directory
 
-```
+```yaml
 mariadb_datadir: /var/lib/mysql
 ```
 
 ### create databases
 
-```
+```yaml
 mariadb_databases:
   - name: example
     collation: utf8_general_ci
@@ -45,7 +44,7 @@ mariadb_databases:
 
 ### create users
 
-```
+```yaml
 mariadb_users:
   - name: example
     host: 127.0.0.1
@@ -55,20 +54,20 @@ mariadb_users:
 
 ### monitoring
 
-```
+```yaml
 mariadb_monitoring: true
 mariadb_monitoring_user: 'nobody'
 ```
 
 ### mysql tuner
 
-```
+```yaml
 mariadb_mysqltuner: true
 ```
 
 
 
-```
+```yaml
 mariadb_use_external_repo: true
 mariadb_version: 10.4
 
@@ -189,7 +188,7 @@ mariadb_default_character_set: utf8mb4
 mariadb_character_set_server: utf8mb4
 mariadb_collation_server: utf8mb4_general_ci
 ```
-``
+
 
 ## Tests
 
@@ -198,12 +197,10 @@ Tests can be performed with `molecule` and `tox`.
 
 see also [Actions](https://github.com/bodsch/ansible-mariadb/actions)
 
-```
-$ tox -e py39-ansible210 -- molecule test
+```bash
+tox -e py39-ansible210 -- molecule test
 ```
 
 ## License
 
-[Apache](https://raw.githubusercontent.com/bodsch/ansible-logrotate/master/LICENSE)
-
-
+[Apache](LICENSE)

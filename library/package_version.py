@@ -32,13 +32,14 @@ class PackageVersion(object):
         self.module = module
         self.package_version = module.params.get("version")
         self.package_name = module.params.get("name")
+        self.repository = module.params.get("repository")
 
         (self.distribution, self.version, self.codename) = distro.linux_distribution(full_distribution_name=False)
 
     def run(self):
         result = dict(
             failed=False,
-            available_php_version="none"
+            available_version="none"
         )
 
         version = ''
@@ -56,6 +57,17 @@ class PackageVersion(object):
         if self.distribution.lower() in ["arch"]:
             self.pacman_bin = self.module.get_bin_path('pacman', True)
             error, version, msg = self._search_pacman()
+
+        self.module.log(msg="  error   : '{}'".format(error))
+        self.module.log(msg="  version : '{}'".format(version))
+        self.module.log(msg="  msg     : '{}'".format(msg))
+
+        if error:
+            return dict(
+                failed=True,
+                available_versions=version,
+                msg=msg
+            )
 
         major_version, minor_version, _ = version.split(".")
 
@@ -136,10 +148,20 @@ class PackageVersion(object):
         if(not package_mgr):
             return True, "", "no valid package manager (yum or dnf) found"
 
-        self.module.log(msg="  '{0}'".format(package_mgr))
+        # self.module.log(msg="  package manager: '{0}'".format(package_mgr))
+
+        args = [package_mgr]
+        args.append("info")
+        args.append(self.package_name)
+        args.append("--disablerepo")
+        args.append("*")
+        args.append("--enablerepo")
+        args.append(self.repository)
+
+        self.module.log(msg="  package manager: '{0}'".format(args))
 
         rc, out, err = self.module.run_command(
-            [package_mgr, "info", self.package_name],
+            args,
             check_rc=False)
 
         version = ''
@@ -218,6 +240,7 @@ def main():
         argument_spec=dict(
             version=dict(required=False, default=''),
             name=dict(required=True),
+            repository=dict(required=False, default="MariaDB")
         ),
         supports_check_mode=False,
     )
