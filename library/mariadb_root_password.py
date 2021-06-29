@@ -10,20 +10,14 @@ import hashlib
 
 from ansible.module_utils.basic import AnsibleModule
 
-# try:
-#     import pymysql as mysql_driver
-# except ImportError:
-#     try:
-#         import MySQLdb as mysql_driver
-#     except ImportError:
-#         mysql_driver = None
-
 try:
-    from configparser import ConfigParser
+    from configparser import ConfigParser, DuplicateSectionError
+    # from configparser import NoSectionError, NoOptionError
 except ImportError:
-    from ConfigParser import ConfigParser  # ver. < 3.0
+    # ver. < 3.0
+    from ConfigParser import ConfigParser, DuplicateSectionError
+    # from ConfigParser import NoSectionError, NoOptionError
 
-# mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
 
 DOCUMENTATION = """
 ---
@@ -78,7 +72,7 @@ class MariaDBRootPassword(object):
         # self.module.log(msg="checksum file : {}".format(self.checksum_file))
         # self.module.log(msg="mycnf_file    : {}".format(self.mycnf_file))
         # self.module.log(msg="------------------------------")
-        #
+
         # self.db_connect_timeout = 30
 
     def run(self):
@@ -89,6 +83,8 @@ class MariaDBRootPassword(object):
 
         old_checksum = ""
         new_checksum = ""
+
+        self._write_mycnf()
 
         if checksum_file_exists:
             """
@@ -130,12 +126,65 @@ class MariaDBRootPassword(object):
         with open(self.checksum_file, "w") as checksum_file:
             checksum_file.write(new_checksum)
 
+        return dict(
+            changed=True,
+            msg="password was successful set"
+        )
+
+    def _write_mycnf(self):
+        """
+        """
+        # ini_password = None
+        # ini_username = None
+        # ini_socket = None
+        # ini_hostname = None
+
         if ConfigParser:
             """
               write ini style my.cnf
             """
             config = ConfigParser()
-            config.read(self.mycnf_file)
+
+            try:
+                config.read(self.mycnf_file)
+            except Exception:
+                # self.module.log(msg=" ERROR : {}".format(str(e)))
+                return
+
+            # try:
+            #     ini_username = config.get('client', 'user')
+            # except NoOptionError:
+            #     # self.module.log(msg=" WARNING : {}".format(e))
+            #     pass
+            #
+            # try:
+            #     ini_password = config.get('client', 'password')
+            # except NoOptionError:
+            #     # self.module.log(msg=" WARNING : {}".format(e))
+            #     pass
+            #
+            # try:
+            #     ini_socket = config.get('client', 'socket')
+            # except NoOptionError:
+            #     # self.module.log(msg=" WARNING : {}".format(e))
+            #     pass
+            #
+            # try:
+            #     ini_hostname = config.get('client', 'host')
+            # except NoOptionError:
+            #     # self.module.log(msg=" WARNING : {}".format(e))
+            #     pass
+
+            # self.module.log(msg="  - username: {}".format(ini_username))
+            # self.module.log(msg="  - password: {}".format(ini_password))
+            # self.module.log(msg="  - socket  : {}".format(ini_socket))
+            # self.module.log(msg="  - hostname: {}".format(ini_hostname))
+
+            try:
+                config.add_section('client')
+            except DuplicateSectionError:
+                # self.module.log(msg=" WARNING : {}".format(e))
+                pass
 
             config.set('client', 'user', self.dba_root_username)
             config.set('client', 'password', self.dba_root_password)
@@ -144,26 +193,21 @@ class MariaDBRootPassword(object):
                 config.set('client', 'socket', self.dba_socket)
 
             if self.dba_hostname:
-                config.set('client', 'hostname', self.dba_hostname)
+                config.set('client', 'host', self.dba_hostname)
 
             with open(self.mycnf_file, 'w') as configfile:    # save
                 config.write(configfile)
-
-        return dict(
-            changed=True,
-            msg="password was successful set"
-        )
 
     def _exec(self, command):
         """
           execute commands
         """
-        self.module.log(msg="command: {}".format(command))
+        # self.module.log(msg="command: {}".format(command))
 
         rc, out, err = self.module.run_command(command, check_rc=True)
-        self.module.log(msg="  rc : '{}'".format(rc))
-        self.module.log(msg="  out: '{}'".format(out))
-        self.module.log(msg="  err: '{}'".format(err))
+        # self.module.log(msg="  rc : '{}'".format(rc))
+        # self.module.log(msg="  out: '{}'".format(out))
+        # self.module.log(msg="  err: '{}'".format(err))
         return rc, out, err
 
     def _checksum(self, plaintext):
