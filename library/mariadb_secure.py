@@ -10,7 +10,7 @@ import os
 from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
-from ansible.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg
+from ansible.module_utils.mysql import mysql_driver, mysql_driver_fail_msg
 
 # try:
 #     import pymysql as mysql_driver
