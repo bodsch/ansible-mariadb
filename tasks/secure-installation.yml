@@ -10,34 +10,13 @@
   when:
     - mariadb_root_password | length == 0
 
-- name: check for mariadb root password change
-  copy:
-    dest: "{{ mariadb_config_dir }}/.rootpw_configured"
-    content: "{{ mariadb_root_password | checksum }}"
-    owner: root
-    group: root
-    mode: 0600
-  register: rootpw_updated
-
-- block:
-    - name: set MariaDB root password for the first time (root@localhost)
-      command: >
-        mysqladmin --user=root password "{{ mariadb_root_password }}"
-      changed_when: false
-      # no_log: true
-
-    # Has to be after the root password assignment, for idempotency.
-    - name: create .my.cnf file with root password credentials
-      template:
-        src: "root-my.cnf.j2"
-        dest: "{{ mariadb_root_home }}/.my.cnf"
-        owner: root
-        group: root
-        mode: 0600
-      when:
-        - (mariadb_install_packages | bool or mariadb_root_password_update)
-  when:
-    - rootpw_updated is changed
+- name: set MariaDB root password
+  mariadb_root_password:
+    dba_root_username: "{{ mariadb_root_username }}"
+    dba_root_password: "{{ mariadb_root_password }}"
+    dba_socket: "{{ mariadb_socket }}"
+    dba_config_directory: "{{ mariadb_config_dir }}"
+    mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
 
 # This command will fail when the root password was set previously
 - name: check if root password is set
