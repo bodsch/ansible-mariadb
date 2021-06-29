@@ -17,6 +17,7 @@
     dba_socket: "{{ mariadb_socket }}"
     dba_config_directory: "{{ mariadb_config_dir }}"
     mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
+  no_log: true
 
 - name: secure MariaDB
   mariadb_secure:
