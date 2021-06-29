@@ -231,7 +231,7 @@ def main():
             dba_socket=dict(required=True, type='str'),
             dba_hostname=dict(required=False, type='str'),
             dba_config_directory=dict(required=True, type='path'),
-            mycnf_file=dict(required=False, type="str", defaukt="/root/.my.cnf"),
+            mycnf_file=dict(required=False, type="str", default="/root/.my.cnf"),
         ),
         supports_check_mode=False,
     )
