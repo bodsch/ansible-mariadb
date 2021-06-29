@@ -10,16 +10,17 @@ import os
 from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
+from ansible.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg
 
-try:
-    import pymysql as mysql_driver
-except ImportError:
-    try:
-        import MySQLdb as mysql_driver
-    except ImportError:
-        mysql_driver = None
-
-mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
+# try:
+#     import pymysql as mysql_driver
+# except ImportError:
+#     try:
+#         import MySQLdb as mysql_driver
+#     except ImportError:
+#         mysql_driver = None
+#
+# mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
 
 DOCUMENTATION = """
 ---
@@ -66,7 +67,7 @@ class MariaDBSecure(object):
         """
           runner
         """
-        self.module.log(msg="-------------------------------------------------------------")
+        # self.module.log(msg="-------------------------------------------------------------")
 
         # mysqladmin_binary = self.module.get_bin_path("mysqladmin", False)
         # mysql_binary = self.module.get_bin_path("mysql", False)
@@ -116,8 +117,8 @@ class MariaDBSecure(object):
             msg="all fine.",
         )
 
-        self.module.log(msg="result: {}".format(res))
-        self.module.log(msg="-------------------------------------------------------------")
+        # self.module.log(msg="result: {}".format(res))
+        # self.module.log(msg="-------------------------------------------------------------")
 
         return res
 
@@ -241,6 +242,9 @@ class MariaDBSecure(object):
 
         # self.module.log(msg="config : {}".format(config))
 
+        if mysql_driver is None:
+            self.module.fail_json(msg=mysql_driver_fail_msg)
+
         try:
             db_connection = mysql_driver.connect(**config)
 
@@ -283,6 +287,8 @@ def main():
 
     client = MariaDBSecure(module)
     result = client.run()
+
+    module.log(msg="= result: {}".format(result))
 
     module.exit_json(**result)
 

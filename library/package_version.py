@@ -55,12 +55,11 @@ class PackageVersion(object):
             error, version, msg = self._search_yum()
 
         if self.distribution.lower() in ["arch"]:
-            self.pacman_bin = self.module.get_bin_path('pacman', True)
             error, version, msg = self._search_pacman()
 
-        self.module.log(msg="  error   : '{}'".format(error))
+        # self.module.log(msg="  error   : '{}'".format(error))
         self.module.log(msg="  version : '{}'".format(version))
-        self.module.log(msg="  msg     : '{}'".format(msg))
+        # self.module.log(msg="  msg     : '{}'".format(msg))
 
         if error:
             return dict(
@@ -113,12 +112,15 @@ class PackageVersion(object):
             pkg_version = pkg.versions[0]
             version = pkg_version.version
 
-            # self.module.log(msg="  - version   : {}".format(version))
+            pattern = re.compile(r"(.*?)(?=\-)")
+
+            # debian:9 : 1:10.4.20+maria~stretch'
+            # debian 10: 1:10.4.20+maria~buster
+            # self.module.log(msg="  - version   : '{}'".format(version))
 
             if version.startswith("1:"):
-                pattern = re.compile(r"(?<=\:)(.*?)(?=\-)")
-            else:
-                pattern = re.compile(r"(.*?)(?=\-)")
+                pattern = re.compile(r"(?<=\:)(.*?)(?=[-+])")
+                # pattern = re.compile(r"(?<=\:)(.*?)(?=\-)")
 
             result = re.search(pattern, version)
 
@@ -203,7 +205,8 @@ class PackageVersion(object):
 
         pattern = re.compile(r"^extra/{} (?P<version>.*)-\d".format(self.package_name), re.MULTILINE)
 
-        args = []
+        pacman_bin = self.module.get_bin_path('pacman', True)
+        args = [pacman_bin]
         args.append("--noconfirm")
         args.append("--sync")
         args.append("--search")
@@ -218,10 +221,9 @@ class PackageVersion(object):
         else:
             return True, "", "not found"
 
-    def _pacman(self, args):
-        '''   '''
-        cmd = [self.pacman_bin] + args
-
+    def _pacman(self, cmd):
+        """
+        """
         self.module.log(msg="cmd: {}".format(cmd))
 
         rc, out, err = self.module.run_command(cmd, check_rc=True)
