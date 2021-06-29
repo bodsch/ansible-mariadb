@@ -50,13 +50,19 @@
 
 - name: disallow root login remotely
   command: >
-    mysql --skip-column-names --batch --execute
+    mysql
+      --skip-column-names
+      --batch
+      --execute
       "delete from mysql.user where user = '{{ mariadb_root_username }}' and host not in ('localhost', '127.0.0.1', '::1')"
   changed_when: false
 
 - name: get list of hosts for the anonymous user
   command: >
-    mysql --skip-column-names --batch --execute
+    mysql
+      --skip-column-names
+      --batch
+      --execute
       'select host from mysql.user where user = ""'
   register: mariadb_anonymous_hosts
   changed_when: false
@@ -67,7 +73,7 @@
     name: ""
     host: "{{ item }}"
     state: absent
-  no_log: true
+  # no_log: true
   loop:
     "{{ mariadb_anonymous_hosts.stdout_lines | default([]) }}"
 

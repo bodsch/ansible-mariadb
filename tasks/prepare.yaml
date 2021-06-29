@@ -63,7 +63,8 @@
 
 - name: make sure dnf is installed (only redhat based <7)
   package:
-    name: dnf
+    name:
+      - dnf
     state: present
   when:
     - ansible_os_family | lower == 'redhat'
@@ -88,6 +89,8 @@
   when:
     - ansible_python.version.major == 2
     - python3_bin_present.stat.exists
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_version | int >= 8
 
 - block:
     - name: add mariadb repository

@@ -1,0 +1,39 @@
+---
+
+systemd_lib_directory: "/usr/lib/systemd/system"
+
+mariadb_packages:
+  - hostname
+  - MariaDB-client
+  - MariaDB-common
+  - MariaDB-server
+  - MariaDB-shared
+  - python-setuptools
+  - MySQL-python
+
+mariadb_build_packages:
+  - MariaDB-devel
+  - gcc
+  - gcc-c++
+  - autoconf
+  - automake
+  - python-devel
+
+mariadb_python_packages: []
+#   - name: PyMySQL
+#     version: 1.0.2
+#   #- name: MySQL-python
+#   #  version: 1.2.5
+#   - name: mysql-connector
+#     version: 2.2.9
+
+mariadb_config_file: /etc/my.cnf
+
+mariadb_config_dir: /etc/my.cnf.d
+mariadb_config_include_dir: "{{ mariadb_config_dir }}"
+
+mariadb_server: "MariaDB-server"
+
+mariadb_socket: "/var/lib/mysql/mysql.sock"
+
+...
