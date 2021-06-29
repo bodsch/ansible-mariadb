@@ -10,70 +10,19 @@
   when:
     - mariadb_root_password | length == 0
 
-- name: check for mariadb root password change
-  copy:
-    dest: "{{ mariadb_config_dir }}/.rootpw_configured"
-    content: "{{ mariadb_root_password | checksum }}"
-    owner: root
-    group: root
-    mode: 0600
-  register: rootpw_updated
-
-- block:
-    - name: set MariaDB root password for the first time (root@localhost)
-      command: >
-        mysqladmin --user=root password "{{ mariadb_root_password }}"
-      changed_when: false
-      # no_log: true
-
-    # Has to be after the root password assignment, for idempotency.
-    - name: create .my.cnf file with root password credentials
-      template:
-        src: "root-my.cnf.j2"
-        dest: "{{ mariadb_root_home }}/.my.cnf"
-        owner: root
-        group: root
-        mode: 0600
-      when:
-        - (mariadb_install_packages | bool or mariadb_root_password_update)
-  when:
-    - rootpw_updated is changed
-
-# This command will fail when the root password was set previously
-- name: check if root password is set
-  command: >
-    mysqladmin -u root status
-  changed_when: false
-  failed_when: false
-  register: root_pwd_check
-  tags: mariadb
-
-- name: disallow root login remotely
-  command: >
-    mysql --skip-column-names --batch --execute
-      "delete from mysql.user where user = '{{ mariadb_root_username }}' and host not in ('localhost', '127.0.0.1', '::1')"
-  changed_when: false
-
-- name: get list of hosts for the anonymous user
-  command: >
-    mysql --skip-column-names --batch --execute
-      'select host from mysql.user where user = ""'
-  register: mariadb_anonymous_hosts
-  changed_when: false
-  check_mode: false
-
-- name: remove anonymous mariadb users
-  mysql_user:
-    name: ""
-    host: "{{ item }}"
-    state: absent
+- name: set MariaDB root password
+  mariadb_root_password:
+    dba_root_username: "{{ mariadb_root_username }}"
+    dba_root_password: "{{ mariadb_root_password }}"
+    dba_socket: "{{ mariadb_socket }}"
+    dba_config_directory: "{{ mariadb_config_dir }}"
+    mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
   no_log: true
-  loop:
-    "{{ mariadb_anonymous_hosts.stdout_lines | default([]) }}"
 
-- name: remove mariadb test database
-  mysql_db:
-    name: test
-    state: absent
+- name: secure MariaDB
+  mariadb_secure:
+    disallow_anonymous_users: true
+    disallow_test_database: true
+    disallow_remote_root_login: true
 
 ...

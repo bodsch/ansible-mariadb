@@ -32,13 +32,14 @@ class PackageVersion(object):
         self.module = module
         self.package_version = module.params.get("version")
         self.package_name = module.params.get("name")
+        self.repository = module.params.get("repository")
 
         (self.distribution, self.version, self.codename) = distro.linux_distribution(full_distribution_name=False)
 
     def run(self):
         result = dict(
             failed=False,
-            available_php_version="none"
+            available_version="none"
         )
 
         version = ''
@@ -54,8 +55,18 @@ class PackageVersion(object):
             error, version, msg = self._search_yum()
 
         if self.distribution.lower() in ["arch"]:
-            self.pacman_bin = self.module.get_bin_path('pacman', True)
             error, version, msg = self._search_pacman()
+
+        # self.module.log(msg="  error   : '{}'".format(error))
+        self.module.log(msg="  version : '{}'".format(version))
+        # self.module.log(msg="  msg     : '{}'".format(msg))
+
+        if error:
+            return dict(
+                failed=True,
+                available_versions=version,
+                msg=msg
+            )
 
         major_version, minor_version, _ = version.split(".")
 
@@ -101,12 +112,15 @@ class PackageVersion(object):
             pkg_version = pkg.versions[0]
             version = pkg_version.version
 
-            # self.module.log(msg="  - version   : {}".format(version))
+            pattern = re.compile(r"(.*?)(?=\-)")
+
+            # debian:9 : 1:10.4.20+maria~stretch'
+            # debian 10: 1:10.4.20+maria~buster
+            # self.module.log(msg="  - version   : '{}'".format(version))
 
             if version.startswith("1:"):
-                pattern = re.compile(r"(?<=\:)(.*?)(?=\-)")
-            else:
-                pattern = re.compile(r"(.*?)(?=\-)")
+                pattern = re.compile(r"(?<=\:)(.*?)(?=[-+])")
+                # pattern = re.compile(r"(?<=\:)(.*?)(?=\-)")
 
             result = re.search(pattern, version)
 
@@ -136,10 +150,20 @@ class PackageVersion(object):
         if(not package_mgr):
             return True, "", "no valid package manager (yum or dnf) found"
 
-        self.module.log(msg="  '{0}'".format(package_mgr))
+        # self.module.log(msg="  package manager: '{0}'".format(package_mgr))
+
+        args = [package_mgr]
+        args.append("info")
+        args.append(self.package_name)
+        args.append("--disablerepo")
+        args.append("*")
+        args.append("--enablerepo")
+        args.append(self.repository)
+
+        self.module.log(msg="  package manager: '{0}'".format(args))
 
         rc, out, err = self.module.run_command(
-            [package_mgr, "info", self.package_name],
+            args,
             check_rc=False)
 
         version = ''
@@ -181,7 +205,8 @@ class PackageVersion(object):
 
         pattern = re.compile(r"^extra/{} (?P<version>.*)-\d".format(self.package_name), re.MULTILINE)
 
-        args = []
+        pacman_bin = self.module.get_bin_path('pacman', True)
+        args = [pacman_bin]
         args.append("--noconfirm")
         args.append("--sync")
         args.append("--search")
@@ -196,10 +221,9 @@ class PackageVersion(object):
         else:
             return True, "", "not found"
 
-    def _pacman(self, args):
-        '''   '''
-        cmd = [self.pacman_bin] + args
-
+    def _pacman(self, cmd):
+        """
+        """
         self.module.log(msg="cmd: {}".format(cmd))
 
         rc, out, err = self.module.run_command(cmd, check_rc=True)
@@ -218,6 +242,7 @@ def main():
         argument_spec=dict(
             version=dict(required=False, default=''),
             name=dict(required=True),
+            repository=dict(required=False, default="MariaDB")
         ),
         supports_check_mode=False,
     )

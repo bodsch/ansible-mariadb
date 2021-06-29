@@ -1,8 +1,6 @@
 ---
 
-# ansible_python_interpreter: python3
-
-mariadb_use_external_repo: false
+# mariadb_use_external_repo: false
 
 mariadb_bind_address: 127.0.0.1
 mariadb_root_password: root_password
