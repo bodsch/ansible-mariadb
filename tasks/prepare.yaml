@@ -154,7 +154,6 @@
 - name: update package cache
   package:
     update_cache: true
-#    cache_valid_time: 3600
 
 - name: detect if mariadb installed
   stat:
@@ -167,11 +166,6 @@
   when:
     - mysqld_binary_file is defined
     - mysqld_binary_file.stat is defined
-
-# - debug:
-#     msg:
-#       - "{{ mysqld_binary_file }}"
-#       - "{{ mariadb_installed }}"
 
 - name: do facts module to get latest information
   setup:
