@@ -8,8 +8,9 @@ mariadb_packages:
   - python3-pip
   - python3-setuptools
 
-mariadb_python_packages:
-  - name: mysqlclient
+# mariadb_python_packages:
+#   - name: mysqlclient
+#     version: 2.0.3
 
 mariadb_config_file: /etc/mysql/my.cnf
 

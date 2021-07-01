@@ -10,19 +10,20 @@
   when:
     - mariadb_root_password | length == 0
 
-- name: set MariaDB root password
+- name: set database root password
   mariadb_root_password:
     dba_root_username: "{{ mariadb_root_username }}"
     dba_root_password: "{{ mariadb_root_password }}"
     dba_socket: "{{ mariadb_socket }}"
     dba_config_directory: "{{ mariadb_config_dir }}"
     mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
-  no_log: true
+  # no_log: true
 
-- name: secure MariaDB
+- name: secure database (remove anonymous user, disallow remote root login, ...)
   mariadb_secure:
     disallow_anonymous_users: true
     disallow_test_database: true
     disallow_remote_root_login: true
+  # no_log: true
 
 ...

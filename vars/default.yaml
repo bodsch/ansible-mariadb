@@ -5,25 +5,35 @@ systemd_lib_directory: ""
 
 # /var/log/mysql
 mariadb_log_directory: ""
+
 # /var/log/mysql/mysql-slow.log
 mariadb_slow_query_log_file: ""
+
 # /var/log/mysql/mysql.error
 mariadb_log_error: ""
+
 # /etc/mysql
 mariadb_config_dir: ""
+
 # /etc/mysql/conf.d
 mariadb_config_include_dir: ""
+
 # mariadb-server
 mariadb_server: ""
+
 # mariadb-server
 mariadb_packages: []
+
 # mysqlclient
 mariadb_python_packages:
   - name: ""
+
 # mariadb
 mariadb_service: ""
+
 # /usr/share/mysql
 mariadb_messages_dir: ""
+
 # /run/mysqld/mysqld.sock
 mariadb_socket: ""
 

@@ -20,12 +20,6 @@ mariadb_build_packages:
   - python-devel
 
 mariadb_python_packages: []
-#   - name: PyMySQL
-#     version: 1.0.2
-#   #- name: MySQL-python
-#   #  version: 1.2.5
-#   - name: mysql-connector
-#     version: 2.2.9
 
 mariadb_config_file: /etc/my.cnf
 

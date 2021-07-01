@@ -115,17 +115,18 @@
     - ansible_os_family | lower == 'redhat'
 
 - block:
-    - name: update apt cache
-      apt:
-        update_cache: true
+    # - name: update apt cache
+    #   apt:
+    #     update_cache: true
+    #     cache_valid_time: 3600
 
-    - name: install requierements
-      package:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - software-properties-common
-        - dirmngr
+    # - name: install requierements
+    #   package:
+    #     name: "{{ item }}"
+    #     state: present
+    #   loop:
+    #     - software-properties-common
+    #     - dirmngr
 
     - name: add apt signing key
       apt_key:
@@ -153,6 +154,7 @@
 - name: update package cache
   package:
     update_cache: true
+    cache_valid_time: 3600
 
 - name: detect if mariadb installed
   stat:
