@@ -154,7 +154,7 @@
 - name: update package cache
   package:
     update_cache: true
-    cache_valid_time: 3600
+#    cache_valid_time: 3600
 
 - name: detect if mariadb installed
   stat:
