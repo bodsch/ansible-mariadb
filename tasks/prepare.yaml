@@ -61,6 +61,11 @@
     mariadb_config_custom: "{{ mariadb_config_defaults_custom |
       combine( mariadb_config_custom, recursive=True ) }}"
 
+- name: merge mariadb replication between defaults and custom
+  set_fact:
+    mariadb_replication: "{{ mariadb_defaults_replication |
+      combine( mariadb_replication, recursive=True ) }}"
+
 - name: make sure dnf is installed (only redhat based <7)
   package:
     name:

@@ -20,7 +20,6 @@ mariadb_config_defaults_mysql:
   default-character-set: utf8mb4
 
 mariadb_config_defaults_mysqld:
-
   # * Basic Settings
   #
   user: mysql
@@ -141,21 +140,21 @@ mariadb_config_defaults_mysqld:
   # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
   # Read the manual for more InnoDB related options. There are many!
 
-  innodb_large_prefix: "1"
+  # innodb_large_prefix: "1"
 
   # The parameter innodb_file_format is deprecated and has no effect.
   # It may be removed in future releases.
   # See https://mariadb.com/kb/en/library/xtradbinnodb-file-format/
-  innodb_file_format: barracuda
-  innodb_file_per_table: "1"
+  # innodb_file_format: barracuda
+  # innodb_file_per_table: "1"
   # Set .._buffer_pool_size up to 80% of RAM but beware of setting too high.
-  innodb_buffer_pool_size: 256M
+  # innodb_buffer_pool_size: 256M
   # Set .._log_file_size to 25% of buffer pool size.
-  innodb_log_file_size: 32M
-  innodb_log_buffer_size: 8M
-  innodb_flush_log_at_trx_commit: "1"
-  innodb_lock_wait_timeout: 50
-  innodb_data_file_path: ibdata1:10M:autoextend:max:128M
+  # innodb_log_file_size: 32M
+  # innodb_log_buffer_size: 8M
+  # innodb_flush_log_at_trx_commit: "1"
+  # innodb_lock_wait_timeout: 50
+  # innodb_data_file_path: ibdata1:10M:autoextend:max:128M
 
   #
   # * Unix socket authentication plugin is built-in since 10.0.22-6
@@ -211,6 +210,16 @@ mariadb_config_defaults_custom:
   mysqlimport: {}
   mysqlshow: {}
   mysqlslap: {}
+
+mariadb_defaults_replication:
+  role: '' # master or replica
+  master: ''
+  # Same keys as `mariadb_users` above.
+  user:
+    name: replication
+    # The password must not be longer than 32 characters!
+    # password: ""
+    encrypted: false
 
 systemd_lib_directory: /lib/systemd/system
 

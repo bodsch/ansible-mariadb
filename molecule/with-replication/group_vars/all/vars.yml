@@ -4,6 +4,8 @@
 
 mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
 
+mariadb_instances: "{{ groups['replica'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+
 mariadb_databases:
   - name: molecule
     collation: utf8mb4_bin
@@ -37,17 +39,20 @@ mariadb_config_mysqld:
   log_bin: /opt/mariadb/log/mysql-bin.log
   max_binlog_size: 100M
 
-mariadb_replication_master: "master"
+# mariadb_replication_master: "master"
 
 # -> https://dev.mysql.com/doc/refman/5.6/en/change-master-to.html
 # The following table shows the maximum permissible length for the string-valued options.
 # | Option          | Maximum Length |
 # | :----           | :----          |
 # | MASTER_PASSWORD | 32             |
-mariadb_replication_user:
-  name: replication
-  # The password must not be longer than 32 characters!
-  password: "vkxHlCVMHAEtEFkEB9pspPB3N"
-  encrypted: false
+mariadb_replication:
+  master: "master"
+  role: "{{ mariadb_replication_role }}"
+  user:
+    name: replication
+    # The password must not be longer than 32 characters!
+    password: "vkxHlCVMHAEtEFkEB9pspPB3N"
+    encrypted: false
 
 ...

@@ -5,8 +5,11 @@ mariadb_version: 10.4
 
 mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
 
-mariadb_monitoring: true
-mariadb_monitoring_user: 'nobody'
+mariadb_monitoring:
+  enabled: true
+  system_user: "nobody"
+  username: 'monitoring'
+  password: '8WOMmRWWYHPR'
 
 mariadb_mysqltuner: true
 
@@ -76,25 +79,23 @@ mariadb_swappiness: 0
 
 # Databases.
 mariadb_databases: []
-#   - name: example
-#     collation: utf8_general_ci
-#     encoding: utf8
-#     replicate: 1
 
 # Users.
 mariadb_users: []
-#   - name: example
-#     host: 127.0.0.1
-#     password: secret
-#     priv: *.*:USAGE
 
 # Replication settings (replication is only enabled if master/user have values).
-
 mariadb_server_id: "1"
-mariadb_max_binlog_size: "100M"
-mariadb_binlog_format: "ROW"
-mariadb_expire_logs_days: "10"
-mariadb_replication_role: ''
-mariadb_replication_master: ''
-# Same keys as `mariadb_users` above.
-mariadb_replication_user: []
+#mariadb_replication_role: ''
+#mariadb_replication_master: ''
+## Same keys as `mariadb_users` above.
+#mariadb_replication_user: []
+
+mariadb_replication:
+  # 'master' or 'replica'
+  role: ''
+  # hostname or IP for the master node
+  master: ''
+  # Same keys as `mariadb_users` above.
+  user: []
+
+...

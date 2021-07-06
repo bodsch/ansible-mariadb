@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+
 [client]
-user=monitoring
-password=monitoring
+user = {{ mariadb_monitoring.username }}
+password = {{ mariadb_monitoring.password | default(mariadb_monitoring.username, true) }}
