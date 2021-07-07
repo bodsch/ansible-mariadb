@@ -91,10 +91,12 @@ mariadb_server_id: "1"
 #mariadb_replication_user: []
 
 mariadb_replication:
+  # enable / disable replication
+  enabled: false
   # 'master' or 'replica'
   role: ''
   # hostname or IP for the master node
-  master: ''
+  primary: ''
   # Same keys as `mariadb_users` above.
   user: []
 

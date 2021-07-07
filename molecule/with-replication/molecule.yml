@@ -12,7 +12,7 @@ lint: |
   flake8 .
 
 platforms:
-  - name: master
+  - name: primary
     image: "diodonfrost/ansible-${DISTRIBUTION:-debian:10}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
@@ -22,7 +22,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - mariadb
-      - master
+      - primary
     docker_networks:
       - name: database
         ipam_config:

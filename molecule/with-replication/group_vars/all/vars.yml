@@ -47,7 +47,8 @@ mariadb_config_mysqld:
 # | :----           | :----          |
 # | MASTER_PASSWORD | 32             |
 mariadb_replication:
-  master: "master"
+  enabled: true
+  primary: "primary"
   role: "{{ mariadb_replication_role }}"
   user:
     name: replication

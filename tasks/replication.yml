@@ -6,13 +6,13 @@
   set_fact:
     list_of_ips: "{{ mariadb_instances }}"
   when:
-    - mariadb_replication.role == 'master'
+    - mariadb_replication.role == 'primary'
 
 - name: flush handlers at this point to avoid double restart
   meta: flush_handlers
 
 - name: ensure replication user exists
-  delegate_to: "{{ mariadb_replication.master }}"
+  delegate_to: "{{ mariadb_replication.primary }}"
   mysql_user:
     name: "{{ mariadb_replication.user.name }}"
     host: "{{ item | default('%') }}"
@@ -30,9 +30,9 @@
         password encypted: {{ mariadb_replication.user.encrypted | default('true') }}"
   no_log: true
   when:
-    - mariadb_replication.role == 'master'
-    - mariadb_replication.master is defined
-    - mariadb_replication.master | length != 0
+    - mariadb_replication.role == 'primary'
+    - mariadb_replication.primary is defined
+    - mariadb_replication.primary | length != 0
     - mariadb_replication.user is defined
     - mariadb_replication.user.name is defined
     - mariadb_replication.user.password is defined
@@ -49,31 +49,31 @@
     - mariadb_replication.role == 'replica'
 
 - name: check primary replication status
-  delegate_to: "{{ mariadb_replication.master }}"
+  delegate_to: "{{ mariadb_replication.primary }}"
   mariadb_replication:
     mode: get_primary
   register: state_of_primary
   when:
     - mariadb_replication.role == 'replica'
-    - (mariadb_replication.master is defined and mariadb_replication.master | length > 0)
+    - (mariadb_replication.primary is defined and mariadb_replication.primary | length > 0)
 
 - name: configure replication on the replica
   mariadb_replication:
     mode: change_primary
-    primary_host: "{{ mariadb_replication.master }}"
+    primary_host: "{{ mariadb_replication.primary }}"
     primary_user: "{{ mariadb_replication.user.name }}"
     primary_password: "{{ mariadb_replication.user.password }}"
     primary_log_file: "{{ state_of_primary.File }}"
     primary_log_pos: "{{ state_of_primary.Position }}"
   # failed_when: true
-  # no_log: true
+  no_log: true
   register: configure_replication_on_replica
   when:
     - (state_of_replica.Is_Replica is defined and not state_of_replica.Is_Replica) or
       (state_of_replica.Is_Replica is not defined and state_of_replica is failed)
     - mariadb_replication.role == 'replica'
-    - mariadb_replication.master is defined
-    - mariadb_replication.master | length != 0
+    - mariadb_replication.primary is defined
+    - mariadb_replication.primary | length != 0
     - mariadb_replication.user is defined
     - mariadb_replication.user.name is defined
     - mariadb_replication.user.password is defined
@@ -88,7 +88,7 @@
     - (state_of_replica.Is_Replica is defined and not state_of_replica.Is_Replica) or
       (state_of_replica.Is_Replica is not defined and state_of_replica is failed)
     - mariadb_replication.role == 'replica'
-    - mariadb_replication.master is defined
-    - mariadb_replication.master | length > 0
+    - mariadb_replication.primary is defined
+    - mariadb_replication.primary | length > 0
 
 ...

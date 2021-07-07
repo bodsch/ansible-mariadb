@@ -212,8 +212,9 @@ mariadb_config_defaults_custom:
   mysqlslap: {}
 
 mariadb_defaults_replication:
+  enabled: false
   role: '' # master or replica
-  master: ''
+  primary: ''
   # Same keys as `mariadb_users` above.
   user:
     name: replication
