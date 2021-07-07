@@ -20,7 +20,7 @@ Implement also an monitoring user with own table.
 
 * Debian 9 / 10
 * Ubuntu 18.04 / 20.04
-* CentOS 8
+* CentOS 7 / 8
 * Oracle Linux 8
 * Arch Linux
 
@@ -69,12 +69,15 @@ Enables and configures replication between 2 or more mariadb instances.
 
 ```yaml
 mariadb_replication:
-  # 'master' or 'replica'
-  role: ''
-  # hostname or IP for the master node
-  master: ''
+  enabled: false
+  role: '' # primary or replica
+  primary: ''
   # Same keys as `mariadb_users` above.
-  user: {}
+  user:
+    name: replication
+    # The password must not be longer than 32 characters!
+    # password: ""
+    encrypted: false
 ```
 
 **ATTENTION: The password for replication must not be longer than 32 characters!**
@@ -90,10 +93,19 @@ For example:
 
 ```yaml
 mariadb_replication:
+  enabled: true
+  role: 'primary'
+  primary: 'primary.mariadb.internal'
   user:
     name: replication
     password: "vkxHlCVMHAEtEFkEB9pspPB3N"
     encrypted: false
+```
+
+**EVERY replica** should have a `mariadb_server_id` greater then `1`.
+
+```yaml
+mariadb_server_id: 2
 ```
 
 ### mysql tuner
@@ -103,11 +115,105 @@ mariadb_mysqltuner: true
 ```
 
 
+### default variables
+
+see [default/main.yml](default/main.yml):
 
 ```yaml
+mariadb_use_external_repo: true
+mariadb_version: 10.4
 
+mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
+
+mariadb_monitoring:
+  enabled: true
+  system_user: "nobody"
+  username: 'monitoring'
+  password: '8WOMmRWWYHPR'
+
+mariadb_mysqltuner: true
+
+# The default root user installed by mysql - almost always root
+mariadb_root_home: /root
+mariadb_root_username: root
+mariadb_root_password: root
+
+# Set this to `true` to forcibly update the root password.
+mariadb_root_password_update: true
+mariadb_user_password_update: false
+
+mariadb_enabled_on_startup: true
+
+# config settings
+# every ini part like [mysqld, galera, embedded, ...] becomes an own segment
+# for default configuration settings, see: vars/main.yml
+
+# this is read by the standalone daemon and embedded servers
+mariadb_config_server: {}
+
+# This group is read by the client library
+mariadb_config_client: {}
+
+# These groups are read by MariaDB command-line tools
+mariadb_config_mysql: {}
+
+# this is only for the mysqld standalone daemon
+mariadb_config_mysqld:
+  socket: "{{ mariadb_socket }}"
+  skip-external-locking:
+  # Skip reverse DNS lookup of clients
+  skip-name-resolve: 1
+  # enable performance schema
+  performance_schema: 1
+
+# NOTE: This file is read only by the traditional SysV init script, not systemd.
+mariadb_config_mysqld_safe: {}
+
+mariadb_config_mysqldump: {}
+
+mariadb_config_galera: {}
+
+# this is only for embedded server
+mariadb_config_embedded: {}
+
+mariadb_config_custom:
+  # This group is only read by MariaDB servers, not by MySQL.
+  mariadb: {}
+  # This group is only read by MariaDB-$VERSION servers.
+  #mariadb-10.1: {}
+  #mariadb-10.5: {}
+  # This group is *never* read by mysql client library
+  client-mariadb: {}
+  mysql_upgrade: {}
+  mysqladmin: {}
+  mysqlbinlog: {}
+  mysqlcheck: {}
+  mysqlimport: {}
+  mysqlshow: {}
+  mysqlslap: {}
+
+mariadb_configure_swappiness: true
+mariadb_swappiness: 0
+
+# Databases.
+mariadb_databases: []
+
+# Users.
+mariadb_users: []
+
+# Replication settings (replication is only enabled if master/user have values).
+mariadb_server_id: "1"
+
+mariadb_replication:
+  # enable / disable replication
+  enabled: false
+  # 'master' or 'replica'
+  role: ''
+  # hostname or IP for the master node
+  primary: ''
+  # Same keys as `mariadb_users` above.
+  user: []
 ```
-
 
 ## Tests
 

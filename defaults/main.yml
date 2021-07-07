@@ -24,9 +24,6 @@ mariadb_user_password_update: false
 
 mariadb_enabled_on_startup: true
 
-# update my.cnf. each time role is run? true | false
-overwrite_global_mycnf: true
-
 # config settings
 # every ini part like [mysqld, galera, embedded, ...] becomes an own segment
 
@@ -85,10 +82,6 @@ mariadb_users: []
 
 # Replication settings (replication is only enabled if master/user have values).
 mariadb_server_id: "1"
-#mariadb_replication_role: ''
-#mariadb_replication_master: ''
-## Same keys as `mariadb_users` above.
-#mariadb_replication_user: []
 
 mariadb_replication:
   # enable / disable replication
