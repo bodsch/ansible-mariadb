@@ -522,7 +522,7 @@ class MariadbReplication():
         self.module.log(msg="- version: {}".format(LooseVersion(version)))
 
         if LooseVersion(version) >= LooseVersion('10.5.1'):  # or LooseVersion(result) >= LooseVersion('8.0.22'):
-            self.primary_term = 'PRIMARY'
+            # self.primary_term = 'PRIMARY'
             self.replica_term = 'REPLICA'
             if self.primary_use_gtid == 'slave_pos':
                 self.primary_use_gtid = 'replica_pos'
