@@ -4,6 +4,7 @@ mariadb_packages:
   - libmariadb-dev
   - mariadb-server
   - python-mysqldb
+  - python-pathlib
   - python3-mysqldb
   - python3-pip
   - python3-setuptools
