@@ -16,6 +16,21 @@
         - default.yaml
       skip: true
 
+
+- block:
+    - name: make sure dnf is installed (only redhat based <7)
+      package:
+        name:
+          - dnf
+          - iproute
+        state: present
+
+    - name: get latest system information
+      setup:
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_version | int < 8
+
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
     mariadb_config_server: "{{ mariadb_config_defaults_server |
@@ -65,15 +80,6 @@
   set_fact:
     mariadb_replication: "{{ mariadb_defaults_replication |
       combine( mariadb_replication, recursive=True ) }}"
-
-- name: make sure dnf is installed (only redhat based <7)
-  package:
-    name:
-      - dnf
-    state: present
-  when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_version | int < 8
 
 - name: ensure the ansible_python_interpreter is set to python2 (only redhat based <7)
   set_fact:

@@ -4,6 +4,7 @@ systemd_lib_directory: "/usr/lib/systemd/system"
 
 mariadb_packages:
   - hostname
+  - iproute
   - MariaDB-client
   - MariaDB-common
   - MariaDB-server

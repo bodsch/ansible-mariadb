@@ -6,7 +6,6 @@
 
 from __future__ import absolute_import, print_function
 import os
-from pathlib import Path
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -40,6 +39,18 @@ class MariadbBootstrap(object):
         self.mariadb_skip_test_db = module.params.get("skip_test_db")
 
         self.bootstrapped_file = "/etc/.mariadb.bootstrapped"
+
+    def get_file_ownership(self, filename):
+        return (
+            getpwuid(os.stat(filename).st_uid).pw_name,
+            getgrgid(os.stat(filename).st_gid).gr_name
+        )
+
+    def touch(self, fname):
+        try:
+            os.utime(fname, None)
+        except OSError:
+            open(fname, 'a').close()
 
     def run(self):
         result = dict(
@@ -116,7 +127,7 @@ class MariadbBootstrap(object):
         # self.module.log(msg="  err: '{}'".format(err))
 
         if rc == 0:
-            Path(self.bootstrapped_file).touch()
+            self.touch(self.bootstrapped_file)
 
             return dict(
                 failed=False,
