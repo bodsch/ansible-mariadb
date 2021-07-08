@@ -6,6 +6,8 @@
 
 from __future__ import absolute_import, print_function
 import os
+import grp
+import pwd
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -42,8 +44,8 @@ class MariadbBootstrap(object):
 
     def get_file_ownership(self, filename):
         return (
-            getpwuid(os.stat(filename).st_uid).pw_name,
-            getgrgid(os.stat(filename).st_gid).gr_name
+            pwd.getpwuid(os.stat(filename).st_uid).pw_name,
+            grp.getgrgid(os.stat(filename).st_gid).gr_name
         )
 
     def touch(self, fname):

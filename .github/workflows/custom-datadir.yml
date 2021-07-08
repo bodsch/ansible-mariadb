@@ -185,7 +185,7 @@ jobs:
         run: |
           tox -- molecule test --scenario-name custom-datadir
         env:
-          TOXENV: py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.')
+          TOXENV: "py$(printf ${{ matrix.python-version }} | tr -d '.')-ansible$(printf ${{ matrix.ansible-version }} | tr -d '.')"
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           DISTRIBUTION: ${{ matrix.image }}
