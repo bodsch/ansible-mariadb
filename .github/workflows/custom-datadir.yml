@@ -1,5 +1,5 @@
 ---
-name: master-replica
+name: custom datadir
 
 on:
   pull_request:
