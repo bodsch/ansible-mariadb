@@ -70,8 +70,13 @@ class MariadbBootstrap(object):
                 msg="can't find 'mysql_install_db' on system. please install package first."
             )
 
-        user_table_exists = os.path.exists(os.path.join(self.mariadb_datadir, "mysql", "user.MYD"))
+        user_table_exists = os.path.exists(os.path.join(self.mariadb_datadir, "mysql", "user.frm"))
         bootstrap_file_exists = os.path.exists(self.bootstrapped_file)
+
+        # self.module.log(msg="= user.MYD             : {}".format(os.path.join(self.mariadb_datadir, "mysql", "user.frm")))
+        # self.module.log(msg="= user_table_exists    : {}".format(user_table_exists))
+        # self.module.log(msg="= bootstrap_file_exists: {}".format(bootstrap_file_exists))
+
         # bootstrapped_file found
         if user_table_exists and bootstrap_file_exists:
             return dict(
@@ -116,7 +121,7 @@ class MariadbBootstrap(object):
             # Don't install the test database.
             args.append("--skip-test-db")
 
-        self.module.log(msg="  args: {}".format(args))
+        # self.module.log(msg="  args: {}".format(args))
 
         rc, out, err = self.module.run_command(
             [mariadb_install_db] + args,
@@ -162,8 +167,13 @@ def main():
         supports_check_mode = False,
     )
 
+    module.log(msg="-------------------------------------------------------------")
+
     helper = MariadbBootstrap(module)
     result = helper.run()
+
+    module.log(msg="= result: {}".format(result))
+    module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 

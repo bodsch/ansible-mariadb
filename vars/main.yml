@@ -41,7 +41,6 @@ mariadb_config_defaults_mysqld:
   # The number of seconds the server waits for activity on a connection before closing it
   wait_timeout: 320
 
-
   # * Fine Tuning
   #
   #key_buffer_size: 16M
