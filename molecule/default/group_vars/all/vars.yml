@@ -1,10 +1,6 @@
 ---
 
-# mariadb_use_external_repo: false
-
-mariadb_bind_address: 127.0.0.1
-mariadb_root_password: root_password
-mariadb_max_connections: 20
+mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
 
 mariadb_databases:
   - name: molecule
@@ -19,8 +15,10 @@ mariadb_users:
     encrypted: false
 
 mariadb_config_mysqld:
+  bind-address: 127.0.0.1
   socket: "{{ mariadb_socket }}"
   skip-external-locking:
   skip-name-resolve: 1
   performance_schema: 1
   expire_logs_days: 2
+  max_connections: 20

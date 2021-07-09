@@ -10,9 +10,9 @@
 
     - name: create monitoring user
       mysql_user:
-        name: monitoring
+        name: "{{ mariadb_monitoring.username }}"
         host: '%'
-        password: monitoring
+        password: "{{ mariadb_monitoring.password }}"
         priv: 'monitoring.*:ALL'
         state: present
         append_privs: false
@@ -24,12 +24,14 @@
       template:
         src: monitoring-my.cnf.j2
         dest: /usr/local/etc/.my.cnf
-        owner: '{{ mariadb_monitoring_user }}'
+        owner: '{{ mariadb_monitoring.system_user }}'
         mode: 0644
   when:
     - mariadb_monitoring is defined
-    - mariadb_monitoring | bool
-    - mariadb_monitoring_user is defined
-    - mariadb_monitoring_user | length != 0
+    - mariadb_monitoring.enabled | bool
+    - mariadb_monitoring.system_user is defined
+    - mariadb_monitoring.system_user | length != 0
+    - mariadb_monitoring.username is defined
+    - mariadb_monitoring.username | length != 0
 
 ...

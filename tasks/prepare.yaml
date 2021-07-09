@@ -16,6 +16,21 @@
         - default.yaml
       skip: true
 
+
+- block:
+    - name: make sure dnf is installed (only redhat based <7)
+      package:
+        name:
+          - dnf
+          - iproute
+        state: present
+
+    - name: get latest system information
+      setup:
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_version | int < 8
+
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
     mariadb_config_server: "{{ mariadb_config_defaults_server |
@@ -61,14 +76,10 @@
     mariadb_config_custom: "{{ mariadb_config_defaults_custom |
       combine( mariadb_config_custom, recursive=True ) }}"
 
-- name: make sure dnf is installed (only redhat based <7)
-  package:
-    name:
-      - dnf
-    state: present
-  when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_version | int < 8
+- name: merge mariadb replication between defaults and custom
+  set_fact:
+    mariadb_replication: "{{ mariadb_defaults_replication |
+      combine( mariadb_replication, recursive=True ) }}"
 
 - name: ensure the ansible_python_interpreter is set to python2 (only redhat based <7)
   set_fact:
@@ -115,17 +126,18 @@
     - ansible_os_family | lower == 'redhat'
 
 - block:
-    - name: update apt cache
-      apt:
-        update_cache: true
+    # - name: update apt cache
+    #   apt:
+    #     update_cache: true
+    #     cache_valid_time: 3600
 
-    - name: install requierements
-      package:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - software-properties-common
-        - dirmngr
+    # - name: install requierements
+    #   package:
+    #     name: "{{ item }}"
+    #     state: present
+    #   loop:
+    #     - software-properties-common
+    #     - dirmngr
 
     - name: add apt signing key
       apt_key:
@@ -165,11 +177,6 @@
   when:
     - mysqld_binary_file is defined
     - mysqld_binary_file.stat is defined
-
-# - debug:
-#     msg:
-#       - "{{ mysqld_binary_file }}"
-#       - "{{ mariadb_installed }}"
 
 - name: do facts module to get latest information
   setup:

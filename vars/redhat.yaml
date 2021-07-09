@@ -4,10 +4,6 @@ systemd_lib_directory: "/usr/lib/systemd/system"
 
 mariadb_packages:
   - hostname
-  # - mariadb
-  # - mariadb-common
-  # - mariadb-server
-  # - mariadb-devel
   - MariaDB-client
   - MariaDB-common
   - MariaDB-server
@@ -15,7 +11,6 @@ mariadb_packages:
   - python3-setuptools
 
 mariadb_build_packages:
-  # - mariadb-devel
   - MariaDB-devel
   - gcc
   - gcc-c++
@@ -23,32 +18,14 @@ mariadb_build_packages:
   - automake
   - python3-devel
 
-mariadb_python_packages:
-  - name: mysqlclient
-
-# CENTOS-8:
-#  # ls -1 /etc/my.cnf.d/
-#  auth_gssapi.cnf
-#  client.cnf
-#  enable_encryption.preset
-#  mariadb-server.cnf
-#  mysql-clients.cnf
-
-# ORACLELINUX 8:
-#  # ls -1 /etc/my.cnf.d/
-#  client.cnf
-#  enable_encryption.preset
-#  mariadb-server.cnf
-#  mysql-clients.cnf
+#mariadb_python_packages:
+#  - name: mysqlclient
+#    version: 2.0.3
 
 mariadb_config_file: /etc/my.cnf
 
 mariadb_config_dir: /etc/my.cnf.d
 mariadb_config_include_dir: "{{ mariadb_config_dir }}"
-
-# mariadb_log_directory: "/var/log/mysql"
-# mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
-# mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
 
 mariadb_server: "MariaDB-server"
 

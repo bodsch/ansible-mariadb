@@ -42,7 +42,6 @@
 
     - name: ensure python bindings for mariadb packages 1st
       pip:
-        # executable: pip3
         requirements: /tmp/mariadb-requirements.txt
         state: present
       register: pip_install
@@ -68,12 +67,30 @@
         - pip_install.failed
         - mariadb_build_packages is defined
         - mariadb_build_packages | length > 0
-
-    # - name: remove requirements.txt
-    #   file:
-    #     path: /tmp/mariadb-requirements.txt
-    #     state: absent
   when:
     - mariadb_python_packages is defined
     - mariadb_python_packages | length > 0
+
+- name: install mysqltuner
+  get_url:
+    url: "https://raw.githubusercontent.com/major/MySQLTuner-perl/master/{{ item.name }}"
+    dest: /usr/local/bin/{{ item.name }}
+    mode: "{{ item.mode }}"
+  register: _download_mysqltuner
+  until: _download_mysqltuner is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
+  loop:
+    - name: mysqltuner.pl
+      mode: 0o750
+    - name: basic_passwords.txt
+      mode: 0o640
+    - name: vulnerabilities.csv
+      mode: 0o640
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - mariadb_mysqltuner
+
 ...

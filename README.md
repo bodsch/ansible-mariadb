@@ -20,7 +20,7 @@ Implement also an monitoring user with own table.
 
 * Debian 9 / 10
 * Ubuntu 18.04 / 20.04
-* CentOS 8
+* CentOS 7 / 8
 * Oracle Linux 8
 * Arch Linux
 
@@ -47,16 +47,65 @@ mariadb_databases:
 ```yaml
 mariadb_users:
   - name: example
-    host: 127.0.0.1
     password: secret
+    encrypted: false
+    host: 127.0.0.1
     priv: *.*:USAGE
 ```
 
 ### monitoring
 
 ```yaml
-mariadb_monitoring: true
-mariadb_monitoring_user: 'nobody'
+mariadb_monitoring:
+  enabled: true
+  system_user: "nobody"
+  username: 'monitoring'
+  password: '8WOMmRWWYHPR'
+```
+
+### replication
+
+Enables and configures replication between 2 or more mariadb instances.
+
+```yaml
+mariadb_replication:
+  enabled: false
+  role: '' # primary or replica
+  primary: ''
+  # Same keys as `mariadb_users` above.
+  user:
+    name: replication
+    # The password must not be longer than 32 characters!
+    # password: ""
+    encrypted: false
+```
+
+**ATTENTION: The password for replication must not be longer than 32 characters!**
+
+[see](https://dev.mysql.com/doc/refman/5.6/en/change-master-to.html)
+
+The following table shows the maximum permissible length for the string-valued options.
+| Option          | Maximum Length |
+| :----           | :----          |
+| MASTER_PASSWORD | 32             |
+
+For example:
+
+```yaml
+mariadb_replication:
+  enabled: true
+  role: 'primary'
+  primary: 'primary.mariadb.internal'
+  user:
+    name: replication
+    password: "vkxHlCVMHAEtEFkEB9pspPB3N"
+    encrypted: false
+```
+
+**EVERY replica** should have a `mariadb_server_id` greater then `1`.
+
+```yaml
+mariadb_server_id: 2
 ```
 
 ### mysql tuner
@@ -66,6 +115,9 @@ mariadb_mysqltuner: true
 ```
 
 
+### default variables
+
+see [default/main.yml](default/main.yml):
 
 ```yaml
 mariadb_use_external_repo: true
@@ -73,11 +125,13 @@ mariadb_version: 10.4
 
 mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
 
-# Set this to the user ansible is logging in as - should have root
-# or sudo access
-mariadb_user_home: ''
-mariadb_user_name: ''
-mariadb_user_password: ''
+mariadb_monitoring:
+  enabled: true
+  system_user: "nobody"
+  username: 'monitoring'
+  password: '8WOMmRWWYHPR'
+
+mariadb_mysqltuner: true
 
 # The default root user installed by mysql - almost always root
 mariadb_root_home: /root
@@ -90,105 +144,76 @@ mariadb_user_password_update: false
 
 mariadb_enabled_on_startup: true
 
-# update my.cnf. each time role is run? true | false
-overwrite_global_mycnf: true
+# config settings
+# every ini part like [mysqld, galera, embedded, ...] becomes an own segment
+# for default configuration settings, see: vars/main.yml
 
-# MySQL connection settings.
-mariadb_port: 3306
-mariadb_bind_address: '127.0.0.1'
-mariadb_skip_name_resolve: true
+# this is read by the standalone daemon and embedded servers
+mariadb_config_server: {}
 
-mariadb_tmpdir: /tmp
-mariadb_sql_mode: ''
+# This group is read by the client library
+mariadb_config_client: {}
+
+# These groups are read by MariaDB command-line tools
+mariadb_config_mysql: {}
+
+# this is only for the mysqld standalone daemon
+mariadb_config_mysqld:
+  socket: "{{ mariadb_socket }}"
+  skip-external-locking:
+  # Skip reverse DNS lookup of clients
+  skip-name-resolve: 1
+  # enable performance schema
+  performance_schema: 1
+
+# NOTE: This file is read only by the traditional SysV init script, not systemd.
+mariadb_config_mysqld_safe: {}
+
+mariadb_config_mysqldump: {}
+
+mariadb_config_galera: {}
+
+# this is only for embedded server
+mariadb_config_embedded: {}
+
+mariadb_config_custom:
+  # This group is only read by MariaDB servers, not by MySQL.
+  mariadb: {}
+  # This group is only read by MariaDB-$VERSION servers.
+  #mariadb-10.1: {}
+  #mariadb-10.5: {}
+  # This group is *never* read by mysql client library
+  client-mariadb: {}
+  mysql_upgrade: {}
+  mysqladmin: {}
+  mysqlbinlog: {}
+  mysqlcheck: {}
+  mysqlimport: {}
+  mysqlshow: {}
+  mysqlslap: {}
 
 mariadb_configure_swappiness: true
 mariadb_swappiness: 0
 
-# The following variables have a default value depending on operating system.
-# mariadb_pid_file: /var/run/mysqld/mysqld.pid
-# mariadb_socket: /var/lib/mysql/mysql.sock
+# Databases.
+mariadb_databases: []
 
-# Log file settings.
-mariadb_log_file_group: mysql
-
-# Slow query log settings.
-mariadb_slow_query_log_enabled: false
-mariadb_slow_query_time: "2"
-# The following variable has a default value depending on operating system.
-# mariadb_slow_query_log_file: /var/log/mysql-slow.log
-
-# Memory settings (default values optimized ~512MB RAM).
-mariadb_key_buffer_size: "256M"
-mariadb_max_allowed_packet: "64M"
-mariadb_table_open_cache: "256"
-mariadb_sort_buffer_size: "1M"
-mariadb_read_buffer_size: "1M"
-mariadb_read_rnd_buffer_size: "4M"
-mariadb_myisam_sort_buffer_size: "64M"
-mariadb_thread_cache_size: "8"
-mariadb_query_cache_type: "0"
-mariadb_query_cache_size: "16M"
-mariadb_query_cache_limit: "3M"
-mariadb_max_connections: "15"
-# When making adjustments, make mariadb_tmp_table_size and mariadb_max_heap_table_size equal
-mariadb_tmp_table_size: "64M"
-mariadb_max_heap_table_size: "64M"
-mariadb_group_concat_max_len: "1024"
-mariadb_join_buffer_size: "262144"
-
-# Other settings.
-mariadb_lower_case_table_names: "0"
-mariadb_wait_timeout: "28800"
-mariadb_event_scheduler_state: "OFF"
-
-# InnoDB settings.
-mariadb_innodb_file_per_table: "1"
-mariadb_supports_innodb_large_prefix: false
-# Set .._buffer_pool_size up to 80% of RAM but beware of setting too high.
-mariadb_innodb_buffer_pool_size: "256M"
-# Set .._log_file_size to 25% of buffer pool size.
-mariadb_innodb_log_file_size: "32M"
-mariadb_innodb_log_buffer_size: "8M"
-mariadb_innodb_flush_log_at_trx_commit: "1"
-mariadb_innodb_lock_wait_timeout: "50"
-
-# These settings require MySQL > 5.5.
-mariadb_innodb_large_prefix: "1"
-
-# The parameter innodb_file_format is deprecated and has no effect.
-# It may be removed in future releases.
-# See https://mariadb.com/kb/en/library/xtradbinnodb-file-format/
-# default: barracuda
-mariadb_innodb_file_format: ''
-
-mariadb_innodb_data_file_path: ibdata1:10M:autoextend:max:128M
-
-# mysqldump settings.
-mariadb_mysqldump_max_allowed_packet: "64M"
-
-# Logging settings.
-# set an *FILE* for query logging
-mariadb_log: ""
-
-# The following variables have a default value depending on operating system.
-# mariadb_log_error: /var/log/mysql/mysql.err
-# mariadb_syslog_tag: mysql
+# Users.
+mariadb_users: []
 
 # Replication settings (replication is only enabled if master/user have values).
 mariadb_server_id: "1"
-mariadb_max_binlog_size: "100M"
-mariadb_binlog_format: "ROW"
-mariadb_expire_logs_days: "10"
-mariadb_replication_role: ''
-mariadb_replication_master: ''
-# Same keys as `mariadb_users` above.
-mariadb_replication_user: []
 
-mariadb_default_character_set: utf8mb4
-mariadb_character_set_server: utf8mb4
-mariadb_collation_server: utf8mb4_general_ci
+mariadb_replication:
+  # enable / disable replication
+  enabled: false
+  # 'master' or 'replica'
+  role: ''
+  # hostname or IP for the master node
+  primary: ''
+  # Same keys as `mariadb_users` above.
+  user: []
 ```
-
 
 ## Tests
 

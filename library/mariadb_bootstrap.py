@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
@@ -6,7 +6,8 @@
 
 from __future__ import absolute_import, print_function
 import os
-from pathlib import Path
+import grp
+import pwd
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -41,6 +42,18 @@ class MariadbBootstrap(object):
 
         self.bootstrapped_file = "/etc/.mariadb.bootstrapped"
 
+    def get_file_ownership(self, filename):
+        return (
+            pwd.getpwuid(os.stat(filename).st_uid).pw_name,
+            grp.getgrgid(os.stat(filename).st_gid).gr_name
+        )
+
+    def touch(self, fname):
+        try:
+            os.utime(fname, None)
+        except OSError:
+            open(fname, 'a').close()
+
     def run(self):
         result = dict(
             failed=False,
@@ -59,8 +72,13 @@ class MariadbBootstrap(object):
                 msg="can't find 'mysql_install_db' on system. please install package first."
             )
 
-        user_table_exists = os.path.exists(os.path.join(self.mariadb_datadir, "mysql", "user.MYD"))
+        user_table_exists = os.path.exists(os.path.join(self.mariadb_datadir, "mysql", "user.frm"))
         bootstrap_file_exists = os.path.exists(self.bootstrapped_file)
+
+        # self.module.log(msg="= user.MYD             : {}".format(os.path.join(self.mariadb_datadir, "mysql", "user.frm")))
+        # self.module.log(msg="= user_table_exists    : {}".format(user_table_exists))
+        # self.module.log(msg="= bootstrap_file_exists: {}".format(bootstrap_file_exists))
+
         # bootstrapped_file found
         if user_table_exists and bootstrap_file_exists:
             return dict(
@@ -105,7 +123,7 @@ class MariadbBootstrap(object):
             # Don't install the test database.
             args.append("--skip-test-db")
 
-        self.module.log(msg="  args: {}".format(args))
+        # self.module.log(msg="  args: {}".format(args))
 
         rc, out, err = self.module.run_command(
             [mariadb_install_db] + args,
@@ -116,7 +134,7 @@ class MariadbBootstrap(object):
         # self.module.log(msg="  err: '{}'".format(err))
 
         if rc == 0:
-            Path(self.bootstrapped_file).touch()
+            self.touch(self.bootstrapped_file)
 
             return dict(
                 failed=False,
@@ -151,8 +169,13 @@ def main():
         supports_check_mode = False,
     )
 
+    module.log(msg="-------------------------------------------------------------")
+
     helper = MariadbBootstrap(module)
     result = helper.run()
+
+    module.log(msg="= result: {}".format(result))
+    module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 

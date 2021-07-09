@@ -6,6 +6,8 @@ mariadb_packages:
   - mariadb-clients
   - python-mysqlclient
 
+mariadb_python_packages: []
+
 mariadb_config_file: /etc/my.cnf
 
 mariadb_config_dir: /etc/my.cnf.d
@@ -16,9 +18,5 @@ mariadb_server: mariadb
 
 # service name
 mariadb_service: mariadb
-
-# mariadb_log_directory: /var/log/mysql
-# mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
-# mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
 
 ...

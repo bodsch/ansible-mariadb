@@ -1,5 +1,5 @@
 ---
-name: CI
+name: custom datadir
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - master
       - development
   schedule:
-    - cron: "0 2 * * 0"
+    - cron: "0 3 * * 0"
 
 defaults:
   run:
@@ -78,7 +78,8 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
+          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') \
+            -- molecule test --scenario-name custom-datadir
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -130,7 +131,8 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
+          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') \
+            -- molecule test --scenario-name custom-datadir
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -181,21 +183,10 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
+          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') \
+            -- molecule test --scenario-name custom-datadir
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           DISTRIBUTION: ${{ matrix.image }}
 
-  publish:
-    if: github.ref == 'refs/heads/master'
-    needs:
-      - arch
-      - deb
-      - rpm
-    runs-on: ubuntu-18.04
-    steps:
-      - name: galaxy
-        uses: robertdebock/galaxy-action@1.1.0
-        with:
-          galaxy_api_key: ${{ secrets.galaxy_api_key }}

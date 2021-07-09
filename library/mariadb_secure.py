@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
@@ -67,8 +67,6 @@ class MariaDBSecure(object):
         """
           runner
         """
-        # self.module.log(msg="-------------------------------------------------------------")
-
         # mysqladmin_binary = self.module.get_bin_path("mysqladmin", False)
         # mysql_binary = self.module.get_bin_path("mysql", False)
         #
@@ -82,7 +80,7 @@ class MariaDBSecure(object):
         if self.disallow_remote_root_login:
             state, error, error_message = self._remove_anonymous_users()
 
-            # self.module.log(msg=" - state: {}".format(state))
+            self.module.log(msg=" - disallow remote root login: {}".format(state))
 
             if error:
                 return dict(
@@ -93,7 +91,7 @@ class MariaDBSecure(object):
         if self.disallow_anonymous_users:
             state, error, error_message = self._remove_remote_root_login()
 
-            # self.module.log(msg=" - state: {}".format(state))
+            self.module.log(msg=" - disallow anonymous users: {}".format(state))
 
             if error:
                 return dict(
@@ -104,7 +102,7 @@ class MariaDBSecure(object):
         if self.disallow_test_database:
             state, error, error_message = self._remove_test_database()
 
-            # self.module.log(msg=" - state: {}".format(state))
+            self.module.log(msg=" - remove test database: {}".format(state))
 
             if error:
                 return dict(
@@ -116,9 +114,6 @@ class MariaDBSecure(object):
             changed=False,
             msg="all fine.",
         )
-
-        # self.module.log(msg="result: {}".format(res))
-        # self.module.log(msg="-------------------------------------------------------------")
 
         return res
 
@@ -278,17 +273,20 @@ def main():
             disallow_anonymous_users=dict(required=False, type='bool'),
             disallow_test_database=dict(required=False, type='bool'),
             disallow_remote_root_login=dict(required=False, type='bool'),
-            dba_root_username=dict(required=False, type='str'),
-            dba_root_password=dict(required=False, type='str'),
+            # dba_root_username=dict(required=False, type='str'),
+            # dba_root_password=dict(required=False, type='str', no_log=True),
             mycnf_file=dict(required=False, type="str", default="/root/.my.cnf"),
         ),
         supports_check_mode=False,
     )
 
+    module.log(msg="-------------------------------------------------------------")
+
     client = MariaDBSecure(module)
     result = client.run()
 
     module.log(msg="= result: {}".format(result))
+    module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 

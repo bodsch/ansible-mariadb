@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
@@ -236,10 +236,13 @@ def main():
         supports_check_mode=False,
     )
 
+    module.log(msg="-------------------------------------------------------------")
+
     client = MariaDBRootPassword(module)
     result = client.run()
 
     module.log(msg="= result: {}".format(result))
+    module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 

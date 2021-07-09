@@ -20,7 +20,6 @@ mariadb_config_defaults_mysql:
   default-character-set: utf8mb4
 
 mariadb_config_defaults_mysqld:
-  #
   # * Basic Settings
   #
   user: mysql
@@ -36,6 +35,12 @@ mariadb_config_defaults_mysqld:
   # localhost which is more compatible and is not less secure.
   bind-address: 127.0.0.1
 
+  lower_case_table_names: "1"
+  # Possible values are ON, OFF, and DISABLED
+  event_scheduler: "ON"
+  # The number of seconds the server waits for activity on a connection before closing it
+  wait_timeout: 320
+
   # * Fine Tuning
   #
   #key_buffer_size: 16M
@@ -49,13 +54,21 @@ mariadb_config_defaults_mysqld:
   #table_cache: 64
   #thread_concurrency: 10
 
-  #
   # * Query Cache Configuration
   #
   #query_cache_limit: 1M
+  query_cache_type: "0"
+  query_cache_limit: 3M
   query_cache_size: 16M
+  # The largest size for temporary tables in memory
+  # https://mariadb.com/kb/en/library/server-system-variables/#tmp_table_size
+  tmp_table_size: "1024"
+  # Maximum size in bytes for user-created MEMORY tables
+  # https://mariadb.com/kb/en/library/server-system-variables/#max_heap_table_size
+  max_heap_table_size: 64M
+  # https://mariadb.com/kb/en/server-system-variables/#join_buffer_size
+  join_buffer_size: 262144
 
-  #
   # * Logging and Replication
   #
   # Both location gets rotated by the cronjob.
@@ -126,6 +139,22 @@ mariadb_config_defaults_mysqld:
   # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
   # Read the manual for more InnoDB related options. There are many!
 
+  # innodb_large_prefix: "1"
+
+  # The parameter innodb_file_format is deprecated and has no effect.
+  # It may be removed in future releases.
+  # See https://mariadb.com/kb/en/library/xtradbinnodb-file-format/
+  # innodb_file_format: barracuda
+  # innodb_file_per_table: "1"
+  # Set .._buffer_pool_size up to 80% of RAM but beware of setting too high.
+  # innodb_buffer_pool_size: 256M
+  # Set .._log_file_size to 25% of buffer pool size.
+  # innodb_log_file_size: 32M
+  # innodb_log_buffer_size: 8M
+  # innodb_flush_log_at_trx_commit: "1"
+  # innodb_lock_wait_timeout: 50
+  # innodb_data_file_path: ibdata1:10M:autoextend:max:128M
+
   #
   # * Unix socket authentication plugin is built-in since 10.0.22-6
   #
@@ -171,7 +200,7 @@ mariadb_config_defaults_custom:
   mariadb: {}
   mariadb-10.3:
     # mariadb > 10.1
-    log_bin_compress: 1
+    log_bin_compress: "1"
   client-mariadb: {}
   mysql_upgrade: {}
   mysqladmin: {}
@@ -181,11 +210,24 @@ mariadb_config_defaults_custom:
   mysqlshow: {}
   mysqlslap: {}
 
+mariadb_defaults_replication:
+  enabled: false
+  role: '' # primary or replica
+  primary: ''
+  # Same keys as `mariadb_users` above.
+  user:
+    name: replication
+    # The password must not be longer than 32 characters!
+    # password: ""
+    encrypted: false
+
 systemd_lib_directory: /lib/systemd/system
 
 mariadb_build_packages: []
 
-mariadb_python_packages: []
+mariadb_python_packages:
+  - name: mysqlclient
+    version: 2.0.3
 
 # package name
 mariadb_server: "mariadb-server"
@@ -196,140 +238,5 @@ mariadb_service: mariadb
 mariadb_socket: /run/mysqld/mysqld.sock
 
 mariadb_installed: false
-
-#mariadb_log_directory: "/var/log/mysql"
-#mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
-#mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
-
-
-# # ---------------------------------------------------
-#
-# _systemd_lib_directory:
-#   default: /lib/systemd/system
-#   debian: /lib/systemd/system
-#   redhat: /usr/lib/systemd/system
-#
-# _mariadb_server:
-#   default: mariadb-server
-#   archlinux: mariadb
-#
-# _mariadb_packages:
-#   default:
-#     - libmariadb-dev
-#     - mariadb-server
-#     - python-mysqldb
-#     - python3-mysqldb
-#   archlinux:
-#     - mariadb
-#     - mariadb-libs
-#     - mariadb-clients
-#     - python-mysqlclient
-#   redhat:
-#     - MariaDB-client
-#     - MariaDB-devel
-#     - MariaDB-server
-#     - MariaDB-shared
-#     - gcc
-#     - make
-#     - python3-setuptools
-#     - python36-devel
-#     - redhat-rpm-config
-#   redhat-8:
-#     - gcc
-#     - make
-#     - mariadb
-#     - mariadb-common
-#     - mariadb-server
-#     - mariadb-devel
-#     - python3-devel
-#     - python3-setuptools
-#     - redhat-rpm-config
-#   redhat-8-external:
-#     - MariaDB-client
-#     - MariaDB-devel
-#     - MariaDB-server
-#     - MariaDB-shared
-#     - gcc
-#     - make
-#     - python3-devel
-#     - python3-setuptools
-#     - redhat-rpm-config
-#   debian:
-#     - libmariadb-dev
-#     - mariadb-server
-#     - python3-mysqldb
-#     - python3-pip
-#     - python3-setuptools
-#   ubuntu:
-#     - libmariadb-dev
-#     - mariadb-server
-#     - python3-mysqldb
-#     - python3-pip
-#     - python3-setuptools
-#
-# _mariadb_python_packages:
-#   default:
-#     - name: mysqlclient
-#   debian:
-#     - name: mysqlclient
-#   redhat:
-#     - name: mysqlclient
-#   archlinux: []
-#
-# _mariadb_service:
-#   default: mariadb
-#   archlinux: mariadb
-#   redhat: mariadb
-#   debian: mariadb
-#
-#
-# _mariadb_socket:
-#   default: /run/mysqld/mysqld.sock
-#   archlinux: /run/mysqld/mysqld.sock
-#   redhat: /var/lib/mysql/mysql.sock
-#   centos: /var/lib/mysql/mysql.sock
-#   debian: /run/mysqld/mysqld.sock
-#
-# systemd_lib_directory: "{{
-#           _systemd_lib_directory[ansible_os_family | lower] |
-#   default(_systemd_lib_directory['default']) }}"
-#
-# mariadb_log_directory: /var/log/mysql
-# mariadb_slow_query_log_file: "{{ mariadb_log_directory }}/mysql-slow.log"
-# mariadb_log_error: "{{ mariadb_log_directory }}/mysql.error"
-#
-# mariadb_pid_file: /run/mysqld/mysqld.pid
-#
-# mariadb_config_dir: /etc/mysql
-# mariadb_config_include_dir: "{{ mariadb_config_dir }}/conf.d"
-#
-# mariadb_server: "{{
-#           _mariadb_server[ansible_os_family | lower] |
-#   default(_mariadb_server[ansible_distribution | lower ] |
-#   default(_mariadb_server['default'])) }}"
-#
-# mariadb_packages: "{{
-#           _mariadb_packages[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
-#   default(_mariadb_packages[ansible_os_family | lower] |
-#   default(_mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version ~ '-external' if mariadb_use_external_repo else '' ] |
-#   default(_mariadb_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-#   default(_mariadb_packages[ansible_distribution | lower] |
-#   default(_mariadb_packages['default']))))) }}"
-#
-# mariadb_python_packages: "{{
-#           _mariadb_python_packages[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
-#   default(_mariadb_python_packages[ansible_os_family | lower] |
-#   default(_mariadb_python_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-#   default(_mariadb_python_packages['default']))) }}"
-#
-# mariadb_service: "{{
-#           _mariadb_service[ansible_os_family | lower] |
-#   default(_mariadb_service[ansible_distribution | lower ] |
-#   default(_mariadb_service['default'])) }}"
-#
-# mariadb_socket: "{{
-#           _mariadb_socket[ansible_os_family | lower ] |
-#   default(_mariadb_socket[ansible_distribution | lower] |
-#   default(_mariadb_socket['default'])) }}"
 
 ...

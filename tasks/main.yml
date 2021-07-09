@@ -23,9 +23,9 @@
 
 - include_tasks: replication.yml
   when:
-    - mariadb_replication_role is defined
-    - mariadb_replication_role | length > 0
-    - mariadb_replication_role in ['master', 'replica']
+    - (mariadb_replication.enabled is defined and mariadb_replication.enabled)
+    - (mariadb_replication.role is defined and mariadb_replication.role | length > 0)
+    - mariadb_replication.role in ['primary', 'replica']
 
 - name: ensure mariadb is enabled on boot
   service:
