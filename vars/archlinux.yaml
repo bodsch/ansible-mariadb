@@ -1,9 +1,10 @@
 ---
 
 mariadb_packages:
+  - iproute2
   - mariadb
-  - mariadb-libs
   - mariadb-clients
+  - mariadb-libs
   - python-mysqlclient
 
 mariadb_python_packages: []

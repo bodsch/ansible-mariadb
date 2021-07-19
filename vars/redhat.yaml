@@ -3,24 +3,21 @@
 systemd_lib_directory: "/usr/lib/systemd/system"
 
 mariadb_packages:
-  - hostname
   - MariaDB-client
   - MariaDB-common
   - MariaDB-server
   - MariaDB-shared
+  - hostname
+  - iproute
   - python3-setuptools
 
 mariadb_build_packages:
   - MariaDB-devel
-  - gcc
-  - gcc-c++
   - autoconf
   - automake
+  - gcc
+  - gcc-c++
   - python3-devel
-
-#mariadb_python_packages:
-#  - name: mysqlclient
-#    version: 2.0.3
 
 mariadb_config_file: /etc/my.cnf
 

@@ -1,6 +1,6 @@
 ---
 
-- name: include OS specific configuration
+- name: include OS specific configuration ({{ ansible_distribution }} ({{ ansible_os_family }}) {{ ansible_distribution_major_version }})
   include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
@@ -16,20 +16,23 @@
         - default.yaml
       skip: true
 
-
 - block:
     - name: make sure dnf is installed (only redhat based <7)
       package:
         name:
           - dnf
-          - iproute
         state: present
 
     - name: get latest system information
       setup:
   when:
     - ansible_os_family | lower == 'redhat'
+    - ansible_distribution | lower == 'centos'
     - ansible_distribution_version | int < 8
+
+- name: update package cache
+  package:
+    update_cache: true
 
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
@@ -101,6 +104,7 @@
     - ansible_python.version.major == 2
     - python3_bin_present.stat.exists
     - ansible_os_family | lower == 'redhat'
+    - ansible_distribution | lower == 'centos'
     - ansible_distribution_version | int >= 8
 
 - block:

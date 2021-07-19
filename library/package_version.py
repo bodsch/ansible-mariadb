@@ -142,15 +142,13 @@ class PackageVersion(object):
         if(package_version):
             package_version = package_version.replace('.', '')
 
-        package_mgr = self.module.get_bin_path('dnf', True)
+        package_mgr = self.module.get_bin_path('dnf', False)
 
         if(not package_mgr):
             package_mgr = self.module.get_bin_path('yum', False)
 
         if(not package_mgr):
             return True, "", "no valid package manager (yum or dnf) found"
-
-        # self.module.log(msg="  package manager: '{0}'".format(package_mgr))
 
         args = [package_mgr]
         args.append("info")
