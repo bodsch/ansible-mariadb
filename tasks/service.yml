@@ -1,0 +1,8 @@
+---
+
+- name: ensure mariadb is enabled on boot
+  service:
+    name: '{{ mariadb_service }}'
+    enabled: true
+
+...

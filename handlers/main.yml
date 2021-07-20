@@ -13,4 +13,4 @@
 
 - name: wait 20 seconds for clean startup
   pause:
-    seconds: 20
+    seconds: 2
