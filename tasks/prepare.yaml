@@ -17,10 +17,11 @@
       skip: true
 
 - block:
-    - name: make sure dnf is installed (only redhat based <7)
+    - name: make sure dnf is installed (only redhat based <8)
       package:
         name:
           - dnf
+          - iproute
         state: present
 
     - name: get latest system information
