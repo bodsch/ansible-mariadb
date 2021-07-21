@@ -21,7 +21,7 @@ Implement also an monitoring user with own table.
 * Debian 9 / 10
 * Ubuntu 18.04 / 20.04
 * CentOS 7 / 8
-* Oracle Linux 8
+* Oracle Linux 7 / 8
 * Arch Linux
 
 

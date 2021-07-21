@@ -85,65 +85,16 @@
     mariadb_replication: "{{ mariadb_defaults_replication |
       combine( mariadb_replication, recursive=True ) }}"
 
-# - name: ensure the ansible_python_interpreter is set to python2 (only redhat based <7)
-#   set_fact:
-#     ansible_python_interpreter: python2
-#   when:
-#     - ansible_os_family | lower == 'redhat'
-#     - ansible_distribution_version | int < 8
-#
-# - name: detect python3
-#   stat:
-#     path: /usr/bin/python3
-#   register: python3_bin_present
-#   changed_when: not python3_bin_present.stat.exists
-#
-# - name: ensure the ansible_python_interpreter is set to python3
-#   set_fact:
-#     ansible_python_interpreter: /usr/bin/python3
-#   when:
-#     - ansible_python.version.major == 2
-#     - python3_bin_present.stat.exists
-#     - ansible_os_family | lower == 'redhat'
-#     - ansible_distribution | lower == 'centos'
-#     - ansible_distribution_version | int >= 8
-
-- block:
-    - name: add mariadb repository
-      yum_repository:
-        name: MariaDB
-        state: present
-        description: MariaDB {{ mariadb_version }} CentOS repository {{ ansible_distribution_major_version }} - amd64
-        baseurl: http://yum.mariadb.org/{{ mariadb_version }}/centos{{ ansible_distribution_major_version }}-amd64
-        gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-        gpgcheck: 1
-        enabled: 1
-
-    - name: enable module_hotfixes
-      ini_file:
-        dest: /etc/yum.repos.d/MariaDB.repo
-        section: MariaDB
-        option: module_hotfixes
-        value: "1"
-        mode: 0750
+- name: create mariadb repository
+  template:
+    src: etc/mariadb.repo.j2
+    dest: /etc/yum.repos.d/MariaDB.repo
+    mode: 0750
   when:
     - mariadb_use_external_repo | bool
     - ansible_os_family | lower == 'redhat'
 
 - block:
-    # - name: update apt cache
-    #   apt:
-    #     update_cache: true
-    #     cache_valid_time: 3600
-
-    # - name: install requierements
-    #   package:
-    #     name: "{{ item }}"
-    #     state: present
-    #   loop:
-    #     - software-properties-common
-    #     - dirmngr
-
     - name: add apt signing key
       apt_key:
         url: https://mariadb.org/mariadb_release_signing_key.asc
