@@ -26,6 +26,7 @@
         dest: /usr/local/etc/.my.cnf
         owner: '{{ mariadb_monitoring.system_user }}'
         mode: 0644
+        backup: true
   when:
     - mariadb_monitoring is defined
     - mariadb_monitoring.enabled | bool

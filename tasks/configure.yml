@@ -154,6 +154,6 @@
     state: started
   register: service_status
   notify:
-    - wait 20 seconds for clean startup
+    - wait 2 seconds for clean startup
 
 ...

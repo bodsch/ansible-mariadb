@@ -9,8 +9,8 @@
     name: '{{ mariadb_service }}'
     state: restarted
   notify:
-    - wait 20 seconds for clean startup
+    - wait 2 seconds for clean startup
 
-- name: wait 20 seconds for clean startup
+- name: wait 2 seconds for clean startup
   pause:
-    seconds: 20
+    seconds: 2
