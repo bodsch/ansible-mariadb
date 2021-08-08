@@ -3,7 +3,8 @@
 mariadb_use_external_repo: true
 mariadb_version: 10.4
 
-mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
+# mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
+mariadb_debian_repo: "https://ftp.agdsn.de/pub/mirrors/mariadb/repo"
 
 mariadb_monitoring:
   enabled: true

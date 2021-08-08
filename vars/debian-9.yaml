@@ -4,10 +4,10 @@ mariadb_packages:
   - iproute2
   - libmariadb-dev
   - mariadb-server
-  - python-mysqldb
-  - python3-mysqldb
-  - python3-pip
-  - python3-setuptools
+  - python{{ '3' if ansible_python.version.major == '3' else '' }}-mysqldb
+  - python{{ '3' if ansible_python.version.major == '3' else '' }}-pip
+  - python{{ '3' if ansible_python.version.major == '3' else '' }}-setuptools
+  - python{{ '3' if ansible_python.version.major == '3' else '' }}-pymysql
 
 mariadb_config_file: /etc/mysql/my.cnf
 

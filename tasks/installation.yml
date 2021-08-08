@@ -44,7 +44,7 @@
       pip:
         requirements: /tmp/mariadb-requirements.txt
         state: present
-        executable: pip3
+        executable: pip{{ '3' if ansible_python.version.major | int == 3 else '' }}
       register: pip_install
       ignore_errors: true
       no_log: true
@@ -59,7 +59,7 @@
           pip:
             requirements: /tmp/mariadb-requirements.txt
             state: present
-            executable: pip3
+            executable: pip{{ '3' if ansible_python.version.major | int == 3 else '' }}
 
         - name: uninstall build essentials
           package:

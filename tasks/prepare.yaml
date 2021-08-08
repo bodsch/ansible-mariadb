@@ -31,6 +31,20 @@
     - ansible_distribution | lower == 'centos'
     - ansible_distribution_version | int < 8
 
+- block:
+    - name: make sure python3-apt is installed (only debian based)
+      package:
+        name:
+          - python3-apt
+        state: present
+
+    - name: clean apt cache
+      command: apt-get clean
+      args:
+        warn: false
+  when:
+    - ansible_os_family | lower == 'debian'
+
 - name: update package cache
   package:
     update_cache: true
