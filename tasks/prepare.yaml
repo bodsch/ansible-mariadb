@@ -45,10 +45,6 @@
   when:
     - ansible_os_family | lower == 'debian'
 
-- name: update package cache
-  package:
-    update_cache: true
-
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
     mariadb_config_server: "{{ mariadb_config_defaults_server |
