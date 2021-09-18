@@ -54,7 +54,7 @@ class PackageVersion(object):
         if self.distribution.lower() in ["centos", "oracle", "redhat", "fedora"]:
             error, version, msg = self._search_yum()
 
-        if self.distribution.lower() in ["arch"]:
+        if self.distribution.lower() in ["arch", "artix"]:
             error, version, msg = self._search_pacman()
 
         # self.module.log(msg="  error   : '{}'".format(error))
@@ -201,7 +201,7 @@ class PackageVersion(object):
         """
         self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
 
-        pattern = re.compile(r"^extra/{} (?P<version>.*)-\d".format(self.package_name), re.MULTILINE)
+        pattern = re.compile(r"(?P<repository>extra|world)/{} (?P<version>.*)-\d".format(self.package_name), re.MULTILINE)
 
         pacman_bin = self.module.get_bin_path('pacman', True)
         args = [pacman_bin]
@@ -247,6 +247,8 @@ def main():
 
     helper = PackageVersion(module)
     result = helper.run()
+
+    module.log(msg="  result : '{}'".format(result))
 
     module.exit_json(**result)
 
