@@ -32,6 +32,18 @@
   when:
     - ansible_os_family | lower == 'debian'
 
+- block:
+    - name: make sure iproute is installed (only redhat based)
+      package:
+        name:
+          - iproute
+        state: present
+
+    - name: do facts module to get latest information
+      setup:
+  when:
+    - ansible_os_family | lower == 'redhat'
+
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
     mariadb_config_server: "{{ mariadb_config_defaults_server |
