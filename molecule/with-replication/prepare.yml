@@ -5,32 +5,31 @@
   gather_facts: true
 
   pre_tasks:
-    - name: update package cache
-      package:
-        update_cache: true
-
-    - name: install netstat
-      package:
-        name:
-          - net-tools
-          - iproute2
-        state: present
-      when:
-        - ansible_os_family | lower in [ 'archlinux', 'debian' ]
-
-    - name: install netstat
-      package:
-        name:
-          - iproute
-        state: present
-      when:
-        - ansible_os_family | lower == 'redhat'
-        - ansible_distribution_major_version == 7
+    # - name: update package cache
+    #   package:
+    #     update_cache: true
+    #
+    # - name: install netstat
+    #   package:
+    #     name:
+    #       - net-tools
+    #       - iproute2
+    #     state: present
+    #   when:
+    #     - ansible_os_family | lower in [ 'archlinux', 'debian' ]
+    #
+    # - name: install netstat
+    #   package:
+    #     name:
+    #       - iproute
+    #     state: present
+    #   when:
+    #     - ansible_os_family | lower == 'redhat'
+    #     - ansible_distribution_major_version == 7
 
     - debug:
         msg:
-          - "os family            : {{ ansible_os_family }}"
-          - "distribution         : {{ ansible_distribution }}"
+          - "os family            : {{ ansible_distribution }} ({{ ansible_os_family }})"
           - "distribution version : {{ ansible_distribution_major_version }}"
           - "ansible version      : {{ ansible_version.full }}"
           - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"

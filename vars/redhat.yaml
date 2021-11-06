@@ -2,14 +2,16 @@
 
 systemd_lib_directory: "/usr/lib/systemd/system"
 
+mariadb_dependencies:
+  - iproute
+  - hostname
+  - python3-setuptools
+
 mariadb_packages:
   - MariaDB-client
   - MariaDB-common
   - MariaDB-server
   - MariaDB-shared
-  - hostname
-  - iproute
-  - python3-setuptools
 
 mariadb_build_packages:
   - MariaDB-devel

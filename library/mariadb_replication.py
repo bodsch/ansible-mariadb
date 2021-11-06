@@ -14,8 +14,20 @@ import warnings
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
 from ansible.module_utils.mysql import (
-    mysql_driver, mysql_driver_fail_msg, mysql_common_argument_spec, _mysql_cursor_param
+    mysql_driver, mysql_driver_fail_msg, mysql_common_argument_spec
 )
+
+try:
+    import pymysql as mysql_driver
+    _mysql_cursor_param = 'cursor'
+except ImportError:
+    try:
+        import MySQLdb as mysql_driver
+        import MySQLdb.cursors
+        _mysql_cursor_param = 'cursorclass'
+    except ImportError:
+        mysql_driver = None
+
 from ansible.module_utils._text import to_native
 from distutils.version import LooseVersion
 
@@ -798,7 +810,14 @@ class MariadbReplication():
 
             return (None, None, True, message)
 
-        return (db_connection.cursor(**{_mysql_cursor_param: mysql_driver.cursors.DictCursor}), db_connection, False, "successful connected")
+        return (
+            db_connection.cursor(
+                **{_mysql_cursor_param: mysql_driver.cursors.DictCursor}
+            ),
+            db_connection,
+            False,
+            "successful connected"
+        )
 
     def _parse_from_mysql_config_file(self, cnf):
         cp = configparser.ConfigParser()

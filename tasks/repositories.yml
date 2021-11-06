@@ -1,0 +1,36 @@
+---
+
+- name: use external repository
+  block:
+    - name: create mariadb repository
+      template:
+        src: etc/yum/mariadb.repo.j2
+        dest: /etc/yum.repos.d/MariaDB.repo
+        mode: 0750
+      when:
+        - ansible_os_family | lower == 'redhat'
+
+    - block:
+        - name: add apt signing key
+          apt_key:
+            url: https://mariadb.org/mariadb_release_signing_key.asc
+            state: present
+
+        - name: install mariadb repositories for debian based
+          template:
+            src: etc/apt/mariadb.list.j2
+            dest: /etc/apt/sources.list.d/mariadb.list
+            mode: 0644
+            owner: root
+            group: root
+      when:
+        - ansible_os_family | lower == 'debian'
+
+    - name: update package cache
+      package:
+        update_cache: true
+
+  when:
+    - mariadb_use_external_repo | bool
+
+...

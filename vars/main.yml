@@ -225,6 +225,8 @@ systemd_lib_directory: /lib/systemd/system
 
 mariadb_build_packages: []
 
+mariadb_dependencies: []
+
 mariadb_python_packages:
   - name: mysqlclient
     version: 2.0.3

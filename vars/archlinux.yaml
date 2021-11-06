@@ -1,7 +1,9 @@
 ---
 
-mariadb_packages:
+mariadb_dependencies:
   - iproute2
+
+mariadb_packages:
   - mariadb
   - mariadb-clients
   - mariadb-libs

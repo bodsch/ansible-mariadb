@@ -18,31 +18,21 @@
         - default.yaml
       skip: true
 
-- block:
-    - name: make sure python3-apt is installed (only debian based)
-      package:
-        name:
-          - python3-apt
-        state: present
+- name: update package cache
+  package:
+    update_cache: true
 
-    - name: clean apt cache
-      command: apt-get clean
-      args:
-        warn: false
-  when:
-    - ansible_os_family | lower == 'debian'
+- name: install dependecies
+  package:
+    name: "{{ mariadb_dependencies }}"
+    state: present
 
-- block:
-    - name: make sure iproute is installed (only redhat based)
-      package:
-        name:
-          - iproute
-        state: present
-
-    - name: do facts module to get latest information
-      setup:
-  when:
-    - ansible_os_family | lower == 'redhat'
+- name: do facts module to get latest information
+  setup:
+    # gather_subset:
+    #   - '!all'
+    #   - '!any'
+    #   - facter
 
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
@@ -94,42 +84,8 @@
     mariadb_replication: "{{ mariadb_defaults_replication |
       combine( mariadb_replication, recursive=True ) }}"
 
-- name: create mariadb repository
-  template:
-    src: etc/mariadb.repo.j2
-    dest: /etc/yum.repos.d/MariaDB.repo
-    mode: 0750
-  when:
-    - mariadb_use_external_repo | bool
-    - ansible_os_family | lower == 'redhat'
-
-- block:
-    - name: add apt signing key
-      apt_key:
-        url: https://mariadb.org/mariadb_release_signing_key.asc
-        state: present
-
-    - name: add mariadb repository for debian
-      apt_repository:
-        repo: "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main"
-        state: present
-      when:
-        - ansible_distribution | lower == 'debian'
-
-    - name: add mariadb repository for ubuntu
-      apt_repository:
-        repo: "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
-        state: present
-      when:
-        - ansible_distribution | lower == 'ubuntu'
-
-  when:
-    - mariadb_use_external_repo | bool
-    - ansible_os_family | lower == 'debian'
-
-- name: update package cache
-  package:
-    update_cache: true
+- name: repositories
+  include_tasks: repositories.yml
 
 - name: detect if mariadb installed
   stat:
@@ -145,5 +101,9 @@
 
 - name: do facts module to get latest information
   setup:
+    gather_subset:
+      - '!all'
+      - '!any'
+      - facter
 
 ...

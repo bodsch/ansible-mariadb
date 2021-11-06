@@ -1,0 +1,13 @@
+# mariadb apt repositories
+
+{% if ansible_distribution | lower == 'debian' %}
+{% set _family = ansible_os_family | lower %}
+{% endif %}
+{% if ansible_distribution | lower == 'ubuntu' %}
+{% set _family = ansible_distribution | lower %}
+{% endif %}
+
+# "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_os_family | lower }} {{ ansible_distribution_release | lower }} main"
+# "deb {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
+
+deb [arch={{ docker_apt_arch | default('amd64') }}] {{ mariadb_debian_repo }}/{{ mariadb_version }}/{{ _family }} {{ ansible_distribution_release }} main
