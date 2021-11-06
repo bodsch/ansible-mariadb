@@ -14,7 +14,7 @@ import warnings
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
 from ansible.module_utils.mysql import (
-    mysql_driver, mysql_driver_fail_msg, mysql_common_argument_spec
+    mysql_driver_fail_msg, mysql_common_argument_spec
 )
 
 try:
@@ -23,7 +23,7 @@ try:
 except ImportError:
     try:
         import MySQLdb as mysql_driver
-        import MySQLdb.cursors
+#        import MySQLdb.cursors
         _mysql_cursor_param = 'cursorclass'
     except ImportError:
         mysql_driver = None
