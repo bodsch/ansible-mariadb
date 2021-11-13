@@ -23,6 +23,12 @@
             mode: 0644
             owner: root
             group: root
+
+        - name: clean apt cache
+          command: apt-get clean
+          args:
+            warn: false
+
       when:
         - ansible_os_family | lower == 'debian'
 
