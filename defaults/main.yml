@@ -1,7 +1,7 @@
 ---
 
 mariadb_use_external_repo: true
-mariadb_version: 10.4
+mariadb_version: 10.6
 
 mariadb_debian_repo: https://mirror.netcologne.de/mariadb/repo
 
