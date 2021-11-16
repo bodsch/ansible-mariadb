@@ -30,11 +30,22 @@ class PackageVersion(object):
           Initialize all needed Variables
         """
         self.module = module
+        self.state = module.params.get("state")
         self.package_version = module.params.get("version")
         self.package_name = module.params.get("name")
         self.repository = module.params.get("repository")
 
-        (self.distribution, self.version, self.codename) = distro.linux_distribution(full_distribution_name=False)
+        # (self.distribution, self.version, self.codename) = distro.linux_distribution(
+        #     full_distribution_name=False
+        # )
+        #
+        # self.module.log(msg="distribution: {}".format(self.distribution))
+        # self.module.log(msg="version     : {}".format(self.version))
+        # self.module.log(msg="codename    : {}".format(self.codename))
+
+        self.distribution = distro.id()
+        self.version = distro.version()
+        self.codename = distro.codename()
 
     def run(self):
         result = dict(
@@ -46,7 +57,7 @@ class PackageVersion(object):
         error = True
         msg = "not supported distribution: {}".format(self.distribution)
 
-        self.module.log(msg="  distribution : '{}'".format(self.distribution))
+        # self.module.log(msg="  distribution : '{}'".format(self.distribution))
 
         if self.distribution.lower() in ["debian", "ubuntu"]:
             error, version, msg = self._search_apt()
@@ -58,7 +69,7 @@ class PackageVersion(object):
             error, version, msg = self._search_pacman()
 
         # self.module.log(msg="  error   : '{}'".format(error))
-        self.module.log(msg="  version : '{}'".format(version))
+        # self.module.log(msg="  version : '{}'".format(version))
         # self.module.log(msg="  msg     : '{}'".format(msg))
 
         if error:
@@ -201,12 +212,28 @@ class PackageVersion(object):
         """
         self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
 
-        pattern = re.compile(r"(?P<repository>extra|world)/{} (?P<version>.*)-\d".format(self.package_name), re.MULTILINE)
-
         pacman_bin = self.module.get_bin_path('pacman', True)
-        args = [pacman_bin]
-        args.append("--noconfirm")
-        args.append("--sync")
+
+        pattern = re.compile(
+            r'^(?P<repository>extra|world|local)\/' + self.package_name + '[0-9\\s](?P<version>(\\d{1,2}\\.\\d{1,2}\\.\\d{1,3}))-.*',
+            re.MULTILINE
+        )
+
+        args = []
+        args.append(pacman_bin)
+
+        if self.state == "installed":
+            """
+              installed
+            """
+            args.append("--query")
+        else:
+            """
+              available
+            """
+            args.append("--noconfirm")
+            args.append("--sync")
+
         args.append("--search")
         args.append(self.package_name)
 
@@ -238,9 +265,24 @@ class PackageVersion(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            version=dict(required=False, default=''),
-            name=dict(required=True),
-            repository=dict(required=False, default="MariaDB")
+            state=dict(
+                choices=[
+                    "installed",
+                    "available",
+                ],
+                default="installed"
+            ),
+            version=dict(
+                required=False,
+                default=''
+            ),
+            name=dict(
+                required=True
+            ),
+            repository=dict(
+                required=False,
+                default="MariaDB"
+            )
         ),
         supports_check_mode=False,
     )
