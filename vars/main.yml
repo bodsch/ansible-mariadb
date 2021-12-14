@@ -1,5 +1,7 @@
 ---
 
+systemd_lib_directory: /lib/systemd/system
+
 mariadb_config_defaults_server: {}
 
 mariadb_config_defaults_client:
@@ -220,8 +222,6 @@ mariadb_defaults_replication:
     # The password must not be longer than 32 characters!
     # password: ""
     encrypted: false
-
-systemd_lib_directory: /lib/systemd/system
 
 mariadb_build_packages: []
 
