@@ -229,7 +229,7 @@ mariadb_dependencies: []
 
 mariadb_python_packages:
   - name: mysqlclient
-    version: 2.0.3
+    version: 2.1.0
 
 # package name
 mariadb_server: "mariadb-server"
