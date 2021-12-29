@@ -1,6 +1,7 @@
 ---
 
 mariadb_dependencies:
+  - gpg
   - iproute2
 
 mariadb_packages:

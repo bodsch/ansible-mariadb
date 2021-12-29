@@ -18,6 +18,22 @@ ANSIBLE_METADATA = {
     'supported_by': 'community'
 }
 
+DOCUMENTATION = """
+---
+module: package_version.py
+author:
+    - 'Bodo Schulz'
+short_description: tries to determine the version of a package to be installed.
+description: ''
+"""
+
+EXAMPLES = """
+- name: get version of installed mariadb
+  package_version:
+    package_name: "mariadb"
+  register: package_version
+"""
+
 
 class PackageVersion(object):
     """
@@ -31,17 +47,9 @@ class PackageVersion(object):
         """
         self.module = module
         self.state = module.params.get("state")
-        self.package_version = module.params.get("version")
-        self.package_name = module.params.get("name")
+        self.package_version = module.params.get("package_version")
+        self.package_name = module.params.get("package_name")
         self.repository = module.params.get("repository")
-
-        # (self.distribution, self.version, self.codename) = distro.linux_distribution(
-        #     full_distribution_name=False
-        # )
-        #
-        # self.module.log(msg="distribution: {}".format(self.distribution))
-        # self.module.log(msg="version     : {}".format(self.version))
-        # self.module.log(msg="codename    : {}".format(self.codename))
 
         self.distribution = distro.id()
         self.version = distro.version()
@@ -272,11 +280,11 @@ def main():
                 ],
                 default="installed"
             ),
-            version=dict(
+            package_version=dict(
                 required=False,
                 default=''
             ),
-            name=dict(
+            package_name=dict(
                 required=True
             ),
             repository=dict(

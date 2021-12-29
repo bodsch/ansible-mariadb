@@ -3,8 +3,8 @@
 - name: create or remove mariadb users
   mysql_user:
     name: "{{ item.name }}"
-    host: "{{ item.host | default('localhost') }}"
     password: "{{ item.password }}"
+    host: "{{ item.host | default('localhost') }}"
     priv: "{{ item.priv | default('*.*:USAGE') }}"
     state: "{{ item.state | default('present') }}"
     append_privs: "{{ item.append_privs | default('false') }}"

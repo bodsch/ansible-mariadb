@@ -3,7 +3,7 @@
 - name: detect available mariadb version
   package_version:
     state: available
-    name: "{{ mariadb_server }}"
+    package_name: "{{ mariadb_server }}"
   register: package_version
 
 - name: define mariadb version

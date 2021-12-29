@@ -49,6 +49,7 @@ jobs:
           - '3.9'
         ansible-version:
           - '2.10'
+          - '5.1'
 
     steps:
       - name: check out the codebase.
@@ -100,6 +101,7 @@ jobs:
           - '3.9'
         ansible-version:
           - '2.10'
+          - '5.1'
 
     steps:
       - name: check out the codebase.
@@ -150,6 +152,7 @@ jobs:
           - '3.9'
         ansible-version:
           - '2.10'
+          - '5.1'
 
     steps:
       - name: check out the codebase.
