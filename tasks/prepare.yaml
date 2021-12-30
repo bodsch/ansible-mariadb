@@ -59,10 +59,6 @@
 
 - name: update facts to get latest information
   setup:
-    gather_subset:
-      - '!all'
-      - '!any'
-      - facter
 
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
