@@ -148,7 +148,6 @@ jobs:
           - centos:8
           - oraclelinux:7
           - oraclelinux:8
-          - rockylinux:8
         python-version:
           - '3.9'
         ansible-version:
