@@ -28,8 +28,8 @@ provisioner:
     # - -vvv
   config_options:
     defaults:
-      deprecation_warnings: True
-      stdout_callback: yaml
+      deprecation_warnings: true
+      callbacks_enabled: true
 
 scenario:
   test_sequence:

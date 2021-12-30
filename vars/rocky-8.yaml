@@ -1,0 +1,34 @@
+---
+
+systemd_lib_directory: "/usr/lib/systemd/system"
+
+mariadb_dependencies:
+  - iproute
+  - hostname
+  - python3-setuptools
+  - procps-ng
+
+mariadb_packages:
+  - MariaDB-client
+  - MariaDB-common
+  - MariaDB-server
+  - MariaDB-shared
+
+mariadb_build_packages:
+  - MariaDB-devel
+  - autoconf
+  - automake
+  - gcc
+  - gcc-c++
+  - python3-devel
+
+mariadb_config_file: /etc/my.cnf
+
+mariadb_config_dir: /etc/my.cnf.d
+mariadb_config_include_dir: "{{ mariadb_config_dir }}"
+
+mariadb_server: "MariaDB-server"
+
+mariadb_socket: "/var/lib/mysql/mysql.sock"
+
+...

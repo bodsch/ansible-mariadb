@@ -18,6 +18,21 @@
         - default.yaml
       skip: true
 
+- block:
+    - name: set python interpreter
+      set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+
+    - name: update facts to get latest information
+      setup:
+        gather_subset:
+          - '!all'
+          - '!any'
+          - facter
+  when:
+    - ansible_distribution | lower == 'debian'
+    - ansible_distribution_major_version | int == 9
+
 - name: validate mariadb users
   fail:
     msg: "your users definition is not valid!\n
@@ -42,8 +57,12 @@
     name: "{{ mariadb_dependencies }}"
     state: present
 
-- name: do facts module to get latest information
+- name: update facts to get latest information
   setup:
+    gather_subset:
+      - '!all'
+      - '!any'
+      - facter
 
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
@@ -97,6 +116,8 @@
 
 - name: repositories
   include_tasks: repositories.yml
+  when:
+    - mariadb_use_external_repo | bool
 
 - name: detect if mariadb installed
   stat:
@@ -110,7 +131,7 @@
     - mysqld_binary_file is defined
     - mysqld_binary_file.stat is defined
 
-- name: do facts module to get latest information
+- name: update facts to get latest information
   setup:
     gather_subset:
       - '!all'

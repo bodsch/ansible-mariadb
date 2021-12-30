@@ -30,8 +30,7 @@ provisioner:
     defaults:
       deprecation_warnings: True
       stdout_callback: yaml
-      # callback_whitelist: profile_tasks
-      # ansible_python_interpreter: /usr/bin/python3
+      callback_whitelist: profile_tasks
 
 scenario:
   test_sequence:

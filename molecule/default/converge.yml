@@ -3,9 +3,6 @@
   hosts: all
   any_errors_fatal: false
 
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
-
   environment:
     NETRC: ''
 

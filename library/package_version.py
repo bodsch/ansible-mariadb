@@ -70,7 +70,7 @@ class PackageVersion(object):
         if self.distribution.lower() in ["debian", "ubuntu"]:
             error, version, msg = self._search_apt()
 
-        if self.distribution.lower() in ["centos", "oracle", "redhat", "fedora"]:
+        if self.distribution.lower() in ["centos", "oracle", "redhat", "fedora", "rocky"]:
             error, version, msg = self._search_yum()
 
         if self.distribution.lower() in ["arch", "artix"]:
