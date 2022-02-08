@@ -48,7 +48,7 @@ jobs:
         python-version:
           - '3.9'
         ansible-version:
-          - '3.4.0'
+          - '4.1.0'
           - '5.1.0'
 
     steps:
@@ -93,14 +93,14 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - debian:9
           - debian:10
+          - debian:11
           - ubuntu:18.04
           - ubuntu:20.04
         python-version:
           - '3.9'
         ansible-version:
-          - '3.4.0'
+          - '4.1.0'
           - '5.1.0'
 
     steps:
@@ -145,14 +145,13 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - centos:7
-          - centos:8
-          - oraclelinux:7
           - oraclelinux:8
+          - rockylinux:8
+          - almalinux:8
         python-version:
           - '3.9'
         ansible-version:
-          - '3.4.0'
+          - '4.1.0'
           - '5.1.0'
 
     steps:
