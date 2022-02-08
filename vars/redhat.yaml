@@ -4,6 +4,7 @@ systemd_lib_directory: "/usr/lib/systemd/system"
 
 mariadb_dependencies:
   - iproute
+  - procps-ng
   - hostname
   - python3-setuptools
 

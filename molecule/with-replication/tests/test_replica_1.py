@@ -150,7 +150,7 @@ def test_user(host, get_vars):
 
     distribution = host.system_info.distribution
 
-    if distribution in ['centos', 'redhat', 'ol']:
+    if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
         shell = "/sbin/nologin"
     elif distribution == "arch":
         shell = "/usr/bin/nologin"

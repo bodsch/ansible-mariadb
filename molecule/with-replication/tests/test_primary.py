@@ -45,7 +45,7 @@ def get_vars(host):
 
     if distribution in ['debian', 'ubuntu']:
         os = "debian"
-    elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
+    #elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
         os = "redhat"
     elif distribution in ['arch']:
         os = "archlinux"
@@ -150,7 +150,7 @@ def test_user(host, get_vars):
 
     distribution = host.system_info.distribution
 
-    if distribution in ['centos', 'redhat', 'ol']:
+    if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
         shell = "/sbin/nologin"
     elif distribution == "arch":
         shell = "/usr/bin/nologin"
