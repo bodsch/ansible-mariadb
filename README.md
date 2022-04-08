@@ -18,15 +18,14 @@ Implement also an monitoring user with own table.
 
 ## tested operating systems
 
+* ArchLinux
 * Debian based
     - Debian 10 / 11
-    - Ubuntu 18.04 / 20.04
+    - Ubuntu 20.04
 * RedHat based
-    - CentOS 8 (**not longer supported**)
     - Alma Linux 8
     - Rocky Linux 8
     - OracleLinux 8
-* ArchLinux
 
 ## usage
 
@@ -229,6 +228,22 @@ see also [Actions](https://github.com/bodsch/ansible-mariadb/actions)
 tox -e py39-ansible210 -- molecule test
 ```
 
+## Contribution
+
+Please read [Contribution](CONTRIBUTING.md)
+
+## Development,  Branches (Git Tags)
+
+The `master` Branch is my *Working Horse* includes the "latest, hot shit" and can be complete broken!
+
+If you want to use something stable, please use a [Tagged Version](https://gitlab.com/bodsch/ansible-logrotate/-/tags)!
+
+## Author
+
+- Bodo Schulz
+
 ## License
 
 [Apache](LICENSE)
+
+`FREE SOFTWARE, HELL YEAH!`

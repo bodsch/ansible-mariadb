@@ -10,24 +10,20 @@ galaxy_info:
   license: "Apache"
   min_ansible_version: 2.9
   platforms:
-    - name: Ubuntu
-      versions:
-        # 18.04
-        - bionic
-        # 20.04
-        - focal
+    - name: Archlinux
     - name: Debian
       versions:
-        # 9
-        - etch
         # 10
         - buster
         # 11
         - bullseye
+    - name: Ubuntu
+      versions:
+        # 20.04
+        - focal
     - name: EL
       versions:
         - 8
-    - name: Archlinux
 
   galaxy_tags:
     - sql
