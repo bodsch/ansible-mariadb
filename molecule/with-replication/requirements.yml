@@ -3,11 +3,11 @@
 - name: snapd
   src: https://github.com/bodsch/ansible-snapd.git
   scm: git
-  version: 1.0.0
+  version: 1.1.1
 
 - name: apparmor
   src: https://github.com/bodsch/ansible-apparmor.git
   scm: git
-  version: 1.0.0
+  version: 1.0.1
 
 ...
