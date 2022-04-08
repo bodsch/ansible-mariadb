@@ -1,11 +1,11 @@
 ---
-name: master-replica
+name: primary with replica
 
 on:
   pull_request:
   push:
     branches:
-      - master
+      - main
       - development
   schedule:
     - cron: "0 3 * * 0"
