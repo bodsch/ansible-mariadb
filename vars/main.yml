@@ -102,7 +102,7 @@ mariadb_config_defaults_mysqld:
   # log_bin_basename:
   log_bin: "{{ ansible_hostname }}-log-bin"
   log_bin_index: "{{ ansible_hostname }}-log-bin.index"
-
+  log_bin_trust_function_creators: "1"
   expire_logs_days: 10
   max_relay_log_size: 100M
   max_binlog_size: 100M
