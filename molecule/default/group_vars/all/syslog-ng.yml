@@ -1,0 +1,9 @@
+---
+
+syslog_logs:
+  ansible:
+    file_name: ansible.log
+    filter:
+      filter: program(ansible)
+
+...

@@ -11,6 +11,8 @@
         - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
         # eg. archlinux-systemd / archlinux-openrc
         - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yaml"
+        # eg. artixlinux
+        - "{{ ansible_distribution | lower | replace(' ', '') }}.yml"
         # eg. debian / ubuntu / centos / oraclelinux
         - "{{ ansible_distribution | lower }}.yaml"
         # eg. redhat / debian / archlinux
@@ -62,53 +64,16 @@
 
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
-    mariadb_config_server: "{{ mariadb_config_defaults_server |
-      combine( mariadb_config_server, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for client between defaults and custom
-  set_fact:
-    mariadb_config_client: "{{ mariadb_config_defaults_client |
-      combine( mariadb_config_client, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for mysql between defaults and custom
-  set_fact:
-    mariadb_config_mysql: "{{ mariadb_config_defaults_mysql |
-      combine( mariadb_config_mysql, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for mysqld between defaults and custom
-  set_fact:
-    mariadb_config_mysqld: "{{ mariadb_config_defaults_mysqld |
-      combine( mariadb_config_mysqld, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for mysqld_safe between defaults and custom
-  set_fact:
-    mariadb_config_mysqld_safe: "{{ mariadb_config_defaults_mysqld_safe |
-      combine( mariadb_config_mysqld_safe, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for mysqldump between defaults and custom
-  set_fact:
-    mariadb_config_mysqldump: "{{ mariadb_config_defaults_mysqldump |
-      combine( mariadb_config_mysqldump, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for galera between defaults and custom
-  set_fact:
-    mariadb_config_galera: "{{ mariadb_config_defaults_galera |
-      combine( mariadb_config_galera, recursive=True ) }}"
-
-- name: merge mariadb configuration segment for emmbedded between defaults and custom
-  set_fact:
-    mariadb_config_embedded: "{{ mariadb_config_defaults_embedded |
-      combine( mariadb_config_embedded, recursive=True ) }}"
-
-- name: merge mariadb custom configurations between defaults and custom
-  set_fact:
-    mariadb_config_custom: "{{ mariadb_config_defaults_custom |
-      combine( mariadb_config_custom, recursive=True ) }}"
-
-- name: merge mariadb replication between defaults and custom
-  set_fact:
-    mariadb_replication: "{{ mariadb_defaults_replication |
-      combine( mariadb_replication, recursive=True ) }}"
+    mariadb_config_server: "{{ mariadb_config_defaults_server | combine( mariadb_config_server, recursive=True ) }}"
+    mariadb_config_client: "{{ mariadb_config_defaults_client | combine( mariadb_config_client, recursive=True ) }}"
+    mariadb_config_mysql: "{{ mariadb_config_defaults_mysql | combine( mariadb_config_mysql, recursive=True ) }}"
+    mariadb_config_mysqld: "{{ mariadb_config_defaults_mysqld | combine( mariadb_config_mysqld, recursive=True ) }}"
+    mariadb_config_mysqld_safe: "{{ mariadb_config_defaults_mysqld_safe | combine( mariadb_config_mysqld_safe, recursive=True ) }}"
+    mariadb_config_mysqldump: "{{ mariadb_config_defaults_mysqldump | combine( mariadb_config_mysqldump, recursive=True ) }}"
+    mariadb_config_galera: "{{ mariadb_config_defaults_galera | combine( mariadb_config_galera, recursive=True ) }}"
+    mariadb_config_embedded: "{{ mariadb_config_defaults_embedded | combine( mariadb_config_embedded, recursive=True ) }}"
+    mariadb_config_custom: "{{ mariadb_config_defaults_custom | combine( mariadb_config_custom, recursive=True ) }}"
+    mariadb_replication: "{{ mariadb_defaults_replication | combine( mariadb_replication, recursive=True ) }}"
 
 - name: repositories
   include_tasks: repositories.yml
