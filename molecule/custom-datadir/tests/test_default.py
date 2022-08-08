@@ -41,20 +41,19 @@ def get_vars(host):
     """
     base_dir, molecule_dir = base_directory()
     distribution = host.system_info.distribution
+    operation_system = None
 
     if distribution in ['debian', 'ubuntu']:
-        os = "debian"
+        operation_system = "debian"
     elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        os = "redhat"
-    elif distribution in ['arch']:
-        os = "archlinux"
+        operation_system = "redhat"
+    elif distribution in ['arch', 'artix']:
+        operation_system = "archlinux"
 
-    print(" -> {} / {}".format(distribution, os))
-
-    file_defaults = "file={}/defaults/main.yml name=role_defaults".format(base_dir)
-    file_vars = "file={}/vars/main.yml name=role_vars".format(base_dir)
-    file_molecule = "file={}/group_vars/all/vars.yml name=test_vars".format(molecule_dir)
-    file_distibution = "file={}/vars/{}.yaml name=role_distibution".format(base_dir, os)
+    file_defaults = f"file={base_dir}/defaults/main.yml name=role_defaults"
+    file_vars = f"file={base_dir}/vars/main.yml name=role_vars"
+    file_molecule = f"file={molecule_dir}/group_vars/all/vars.yml name=test_vars"
+    file_distibution = f"file={base_dir}/vars/{operation_system}.yml name=role_distibution"
 
     defaults_vars = host.ansible("include_vars", file_defaults).get("ansible_facts").get("role_defaults")
     vars_vars = host.ansible("include_vars", file_vars).get("ansible_facts").get("role_vars")
@@ -122,6 +121,8 @@ def test_directories(host, get_vars):
         get_vars.get("mariadb_config_include_dir")
     ]
 
+    print(directories)
+
     for dirs in directories:
         d = host.file(dirs)
         assert d.is_directory
@@ -133,7 +134,7 @@ def test_files(host, get_vars):
     """
     files = [
         get_vars.get("mariadb_config_file"),
-        "{}/mysql.cnf".format(get_vars.get("mariadb_config_include_dir"))
+        f"{get_vars.get('mariadb_config_include_dir')}/mysql.cnf"
     ]
 
     for _file in files:
@@ -153,6 +154,8 @@ def test_user(host, get_vars):
         shell = "/sbin/nologin"
     elif distribution == "arch":
         shell = "/usr/bin/nologin"
+    elif distribution  == 'artix':
+        shell = "/bin/nologin"
 
     user_name = "mysql"
     u = host.user(user_name)

@@ -138,7 +138,8 @@
     datadir: /var/lib/mysql
     skip_test_db: false
   when:
-    - ansible_os_family | lower == 'archlinux'
+    - ansible_os_family | lower == 'archlinux' or
+      ansible_distribution | lower | replace(' ', '') == 'artixlinux'
 
 - name: run bootstrap on custom data directories '{{ mariadb_config_mysqld.datadir }}'
   mariadb_bootstrap:

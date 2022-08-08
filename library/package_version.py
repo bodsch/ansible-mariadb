@@ -263,7 +263,8 @@ class PackageVersion(object):
 
         if rc == 0:
             pattern = re.compile(
-                r'^(?P<repository>core|extra|community|world|local)\/{}[0-9\s]*(?P<version>\d\.\d).*-.*'.format(self.package_name),
+                # r'^(?P<repository>core|extra|community|world|local)\/{}[0-9\s]*(?P<version>\d\.\d).*-.*'.format(self.package_name),
+                r'^(?P<repository>core|extra|community|world|local)\/{} (?P<version>\d+(\.\d+){{0,2}}(\.\*)?)-.*'.format(self.package_name),
                 re.MULTILINE
             )
 
