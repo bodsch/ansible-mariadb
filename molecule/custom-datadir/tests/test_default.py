@@ -44,11 +44,11 @@ def get_vars(host):
     operation_system = None
 
     if distribution in ['debian', 'ubuntu']:
-        os = "debian"
+        operation_system = "debian"
     elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        os = "redhat"
+        operation_system = "redhat"
     elif distribution in ['arch', 'artix']:
-        os = "archlinux"
+        operation_system = "archlinux"
 
     file_defaults = f"file={base_dir}/defaults/main.yml name=role_defaults"
     file_vars = f"file={base_dir}/vars/main.yml name=role_vars"
@@ -120,6 +120,8 @@ def test_directories(host, get_vars):
         get_vars.get("mariadb_config_dir"),
         get_vars.get("mariadb_config_include_dir")
     ]
+
+    print(directories)
 
     for dirs in directories:
         d = host.file(dirs)

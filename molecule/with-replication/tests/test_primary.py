@@ -42,15 +42,16 @@ def get_vars(host):
     base_dir, molecule_dir = base_directory()
     distribution = host.system_info.distribution
     release = host.system_info.release
+    operation_system = None
 
     if distribution in ['debian', 'ubuntu']:
-        os = "debian"
+        operation_system = "debian"
     elif distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
-        os = "redhat"
+        operation_system = "redhat"
     elif distribution in ['arch', 'artix']:
         operation_system = "archlinux"
 
-    print(" -> distibution {} / os {} / release {}".format(distribution, os, release))
+    print(" -> distibution {} / os {} / release {}".format(distribution, operation_system, release))
 
     file_defaults = f"file={base_dir}/defaults/main.yml name=role_defaults"
     file_vars = f"file={base_dir}/vars/main.yml name=role_vars"
