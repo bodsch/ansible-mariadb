@@ -12,6 +12,11 @@ mariadb_packages:
   - python{{ '3' if ansible_python.version.major | int == 3 else '' }}-mysqldb
   - python{{ '3' if ansible_python.version.major | int == 3 else '' }}-pymysql
 
+mariadb_build_packages:
+  - libmariadbclient-dev
+  - python3-dev
+  - gcc
+
 mariadb_config_file: /etc/mysql/my.cnf
 
 mariadb_config_dir: /etc/mysql

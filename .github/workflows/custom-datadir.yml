@@ -2,54 +2,35 @@
 name: custom datadir
 
 on:
-  pull_request:
-  push:
+  schedule:
+    - cron: "30 2 * * 0"
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "code linter"
     branches:
       - main
-      - development
-  schedule:
-    - cron: "0 3 * * 0"
+      - feature
+    types:
+      - completed
 
 defaults:
   run:
     working-directory: 'ansible-mariadb'
 
 jobs:
-
-  lint:
-    name: linting
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: lint
-        uses: docker://ghcr.io/github/super-linter:slim-v4
-        env:
-          DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GH_REGISTRY_TOKEN }}
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_ANSIBLE: true
-          # VALIDATE_MARKDOWN: true
-          VALIDATE_YAML: true
-
   arch:
-    name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
-    needs:
-      - lint
-    runs-on: ubuntu-18.04
+    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
         image:
           - archlinux:latest
-        python-version:
-          - '3.9'
         ansible-version:
-          - '4.1.0'
-          - '5.1.0'
+          - '5.1'
+          - '6.1'
 
     steps:
       - name: check out the codebase.
@@ -57,10 +38,10 @@ jobs:
         with:
           path: 'ansible-mariadb'
 
-      - name: set up python ${{ matrix.python-version }}
+      - name: 🐍 set up python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
 
       - name: install dependencies
         run: |
@@ -77,7 +58,7 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') \
+          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
             -- molecule test --scenario-name custom-datadir
         env:
           PY_COLORS: '1'
@@ -85,10 +66,9 @@ jobs:
           DISTRIBUTION: ${{ matrix.image }}
 
   deb:
-    name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
-    needs:
-      - lint
-    runs-on: ubuntu-18.04
+    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -96,8 +76,6 @@ jobs:
           - debian:10
           - debian:11
           - ubuntu:20.04
-        python-version:
-          - '3.9'
         ansible-version:
           - '4.1.0'
           - '5.1.0'
@@ -108,10 +86,10 @@ jobs:
         with:
           path: 'ansible-mariadb'
 
-      - name: set up python ${{ matrix.python-version }}
+      - name: 🐍 set up python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
 
       - name: install dependencies
         run: |
@@ -128,7 +106,7 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') \
+          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
             -- molecule test --scenario-name custom-datadir
         env:
           PY_COLORS: '1'
@@ -136,10 +114,9 @@ jobs:
           DISTRIBUTION: ${{ matrix.image }}
 
   rpm:
-    name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
-    needs:
-      - lint
-    runs-on: ubuntu-18.04
+    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -147,10 +124,7 @@ jobs:
           - oraclelinux:8
           - rockylinux:8
           - almalinux:8
-        python-version:
-          - '3.9'
         ansible-version:
-          - '4.1.0'
           - '5.1.0'
 
     steps:
@@ -159,10 +133,10 @@ jobs:
         with:
           path: 'ansible-mariadb'
 
-      - name: set up python ${{ matrix.python-version }}
+      - name: 🐍 set up python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
 
       - name: install dependencies
         run: |
@@ -179,7 +153,7 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') \
+          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
             -- molecule test --scenario-name custom-datadir
         env:
           PY_COLORS: '1'
