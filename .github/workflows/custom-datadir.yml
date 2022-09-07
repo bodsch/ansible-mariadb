@@ -29,7 +29,6 @@ jobs:
         image:
           - archlinux:latest
         ansible-version:
-          - '5.1'
           - '6.1'
 
     steps:
@@ -73,12 +72,9 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - debian:10
           - debian:11
-          - ubuntu:20.04
         ansible-version:
-          - '4.1.0'
-          - '5.1.0'
+          - '6.1'
 
     steps:
       - name: check out the codebase.
@@ -122,10 +118,8 @@ jobs:
       matrix:
         image:
           - oraclelinux:8
-          - rockylinux:8
-          - almalinux:8
         ansible-version:
-          - '5.1.0'
+          - '5.1'
 
     steps:
       - name: check out the codebase.
