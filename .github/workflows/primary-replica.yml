@@ -120,7 +120,7 @@ jobs:
         image:
           - oraclelinux:8
         ansible-version:
-          - '5.1.0'
+          - '5.1'
 
     steps:
       - name: check out the codebase.
