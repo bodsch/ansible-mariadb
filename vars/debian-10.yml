@@ -13,7 +13,6 @@ mariadb_packages:
   - python3-pymysql
 
 mariadb_build_packages:
-  - libmariadbclient-dev
   - python3-dev
   - gcc
 
