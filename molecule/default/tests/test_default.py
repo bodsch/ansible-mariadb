@@ -24,7 +24,7 @@ def pp_json(json_thing, sort=True, indents=2):
 def base_directory():
     cwd = os.getcwd()
 
-    if('group_vars' in os.listdir(cwd)):
+    if ('group_vars' in os.listdir(cwd)):
         directory = "../.."
         molecule_directory = "."
     else:
@@ -205,4 +205,3 @@ def test_listening_socket(host, get_vars):
     for spec in listen:
         socket = host.socket(spec)
         assert socket.is_listening
-

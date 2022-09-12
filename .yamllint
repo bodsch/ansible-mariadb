@@ -4,22 +4,18 @@ rules:
   line-length:
     max: 195
     level: warning
-  braces:
-    min-spaces-inside: 0
-    max-spaces-inside: 1
-  brackets:
-    min-spaces-inside: 0
-    max-spaces-inside: 1
-  indentation:
-    spaces: 2
-  comments: disable
+#  braces:
+#    min-spaces-inside: 0
+#    max-spaces-inside: 1
+#  brackets:
+#    min-spaces-inside: 0
+#    max-spaces-inside: 1
+#  indentation:
+#    spaces: 2
+  comments: enable
   comments-indentation: disable
-  truthy: disable
+#  truthy: disable
 
 ignore: |
-  tests/
   molecule/
-  .molecule/
-  .travis.yml
-  .tox
   .github

@@ -5,100 +5,98 @@ systemd_lib_directory: /lib/systemd/system
 mariadb_config_defaults_server: {}
 
 mariadb_config_defaults_client:
-  # Default is Latin1, if you need UTF-8 set this (also in server section)
+  ## Default is Latin1, if you need UTF-8 set this (also in server section)
   default-character-set: utf8mb4
-  # socket location
+  ## socket location
   socket: "{{ mariadb_socket }}"
 
-  # Example of client certificate usage
+  ## Example of client certificate usage
   # ssl-cert: /etc/mysql/client-cert.pem
   # ssl-key: /etc/mysql/client-key.pem
   #
-  # Allow only TLS encrypted connections
-  # ssl-verify-server-cert: on
+  ## Allow only TLS encrypted connections
+  ## ssl-verify-server-cert: on
 
 mariadb_config_defaults_mysql:
-  # Default is Latin1, if you need UTF-8 set this (also in server section)
+  ## Default is Latin1, if you need UTF-8 set this (also in server section)
   default-character-set: utf8mb4
 
 mariadb_config_defaults_mysqld:
-  # * Basic Settings
-  #
+  ## * Basic Settings
+  ##
   user: mysql
   pid-file: /run/mysqld/mysqld.pid
   socket: "{{ mariadb_socket }}"
-  #port: 3306
+  # port: 3306
   # basedir: /usr
   datadir: /var/lib/mysql
   tmpdir: /tmp
   lc-messages-dir: /usr/share/mysql
-  #skip-external-locking
-  # Instead of skip-networking the default is now to listen only on
-  # localhost which is more compatible and is not less secure.
+  # skip-external-locking
+  ## Instead of skip-networking the default is now to listen only on
+  ## localhost which is more compatible and is not less secure.
   bind-address: 127.0.0.1
-
   lower_case_table_names: "1"
-  # Possible values are ON, OFF, and DISABLED
+  ## Possible values are ON, OFF, and DISABLED
   event_scheduler: "ON"
-  # The number of seconds the server waits for activity on a connection before closing it
+  ## The number of seconds the server waits for activity on a connection before closing it
   wait_timeout: 320
-
-  # * Fine Tuning
+  ## * Fine Tuning
   #
-  #key_buffer_size: 16M
-  #max_allowed_packet: 16M
-  #thread_stack: 192K
-  #thread_cache_size: 8
-  # This replaces the startup script and checks MyISAM tables if needed
-  # the first time they are touched
-  #myisam_recover_options: BACKUP
-  #max_connections: 100
-  #table_cache: 64
-  #thread_concurrency: 10
+  # key_buffer_size: 16M
+  # max_allowed_packet: 16M
+  # thread_stack: 192K
+  # thread_cache_size: 8
+  ## This replaces the startup script and checks MyISAM tables if needed
+  ## the first time they are touched
+  # myisam_recover_options: BACKUP
+  # max_connections: 100
+  # table_cache: 64
+  # thread_concurrency: 10
 
-  # * Query Cache Configuration
-  #
-  #query_cache_limit: 1M
+  ## * Query Cache Configuration
+  ##
+  # query_cache_limit: 1M
   query_cache_type: "0"
   query_cache_limit: 3M
   query_cache_size: 16M
-  # The largest size for temporary tables in memory
-  # https://mariadb.com/kb/en/library/server-system-variables/#tmp_table_size
+  ## The largest size for temporary tables in memory
+  ## https://mariadb.com/kb/en/library/server-system-variables/#tmp_table_size
   tmp_table_size: "1024"
-  # Maximum size in bytes for user-created MEMORY tables
-  # https://mariadb.com/kb/en/library/server-system-variables/#max_heap_table_size
+  ## Maximum size in bytes for user-created MEMORY tables
+  ## https://mariadb.com/kb/en/library/server-system-variables/#max_heap_table_size
   max_heap_table_size: 64M
-  # https://mariadb.com/kb/en/server-system-variables/#join_buffer_size
+  ## https://mariadb.com/kb/en/server-system-variables/#join_buffer_size
   join_buffer_size: 262144
 
-  # * Logging and Replication
-  #
-  # Both location gets rotated by the cronjob.
-  # Be aware that this log type is a performance killer.
-  # As of 5.1 you can enable the log at runtime!
-  #general_log_file: /var/log/mysql/mysql.log
-  #general_log: 1
-  #
-  # Error log - should be very few entries.
-  #
+  ## * Logging and Replication
+  ##
+  ## Both location gets rotated by the cronjob.
+  ## Be aware that this log type is a performance killer.
+  ## As of 5.1 you can enable the log at runtime!
+  # general_log_file: /var/log/mysql/mysql.log
+  # general_log: 1
+  ##
+  ## Error log - should be very few entries.
+  ##
   log_error: /var/log/mysql/error.log
 
-  # Enable the slow query log to see queries with especially long duration
-  #slow_query_log_file: /var/log/mysql/mariadb-slow.log
-  #long_query_time: 10
-  #log_slow_rate_limit: 1000
-  #log_slow_verbosity: query_plan
-  #log-queries-not-using-indexes:
+  ## Enable the slow query log to see queries with especially long duration
+  # slow_query_log_file: /var/log/mysql/mariadb-slow.log
+  # long_query_time: 10
+  # log_slow_rate_limit: 1000
+  # log_slow_verbosity: query_plan
+  # log-queries-not-using-indexes:
 
-  # The following can be used as easy to replay backup logs or for replication.
-  # note: if you are setting up a replication slave, see README.Debian about
-  #       other settings you may need to change.
+  ## The following can be used as easy to replay backup logs or for replication.
+  ## note: if you are setting up a replication slave, see README.Debian about
+  ##       other settings you may need to change.
   server-id: "{{ mariadb_server_id }}"
-  # https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#relay_log_basename
+  ## https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#relay_log_basename
   # relay_log_basename
   relay_log: "{{ ansible_hostname }}-relay-bin"
   relay_log_index: "{{ ansible_hostname }}-relay-bin.index"
-  # https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#log_bin_basename
+  ## https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#log_bin_basename
   # log_bin_basename:
   log_bin: "{{ ansible_hostname }}-log-bin"
   log_bin_index: "{{ ansible_hostname }}-log-bin.index"
@@ -109,68 +107,68 @@ mariadb_config_defaults_mysqld:
   # binlog_do_db: include_database_name
   binlog_ignore_db: monitoring
 
-  # * Security Features
+  ## * Security Features
+  ##
+  ## Read the manual, too, if you want chroot!
+  # chroot: /var/lib/mysql/
+  ##
+  ## For generating SSL certificates you can use for example the GUI tool "tinyca".
+  ##
+  # ssl-ca: /etc/mysql/cacert.pem
+  # ssl-cert: /etc/mysql/server-cert.pem
+  # ssl-key: /etc/mysql/server-key.pem
   #
-  # Read the manual, too, if you want chroot!
-  #chroot: /var/lib/mysql/
-  #
-  # For generating SSL certificates you can use for example the GUI tool "tinyca".
-  #
-  #ssl-ca: /etc/mysql/cacert.pem
-  #ssl-cert: /etc/mysql/server-cert.pem
-  #ssl-key: /etc/mysql/server-key.pem
-  #
-  # Accept only connections using the latest and most secure TLS protocol version.
-  # ..when MariaDB is compiled with OpenSSL:
-  #ssl-cipher: TLSv1.2
-  # ..when MariaDB is compiled with YaSSL (default in Debian):
-  #ssl: on
+  ## Accept only connections using the latest and most secure TLS protocol version.
+  ## ..when MariaDB is compiled with OpenSSL:
+  # ssl-cipher: TLSv1.2
+  ## ..when MariaDB is compiled with YaSSL (default in Debian):
+  # ssl: on
 
-  #
-  # * Character sets
-  #
-  # MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
-  # utf8 4-byte character set. See also client.cnf
-  #
+  ##
+  ## * Character sets
+  ##
+  ## MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
+  ## utf8 4-byte character set. See also client.cnf
+  ##
   character-set-server: utf8mb4
   collation-server: utf8mb4_general_ci
 
-  #
-  # * InnoDB
-  #
-  # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
-  # Read the manual for more InnoDB related options. There are many!
+  ##
+  ## * InnoDB
+  ##
+  ## InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
+  ## Read the manual for more InnoDB related options. There are many!
 
   # innodb_large_prefix: "1"
 
-  # The parameter innodb_file_format is deprecated and has no effect.
-  # It may be removed in future releases.
-  # See https://mariadb.com/kb/en/library/xtradbinnodb-file-format/
+  ## The parameter innodb_file_format is deprecated and has no effect.
+  ## It may be removed in future releases.
+  ## See https://mariadb.com/kb/en/library/xtradbinnodb-file-format/
   # innodb_file_format: barracuda
   # innodb_file_per_table: "1"
-  # Set .._buffer_pool_size up to 80% of RAM but beware of setting too high.
+  ## Set .._buffer_pool_size up to 80% of RAM but beware of setting too high.
   # innodb_buffer_pool_size: 256M
-  # Set .._log_file_size to 25% of buffer pool size.
+  ## Set .._log_file_size to 25% of buffer pool size.
   # innodb_log_file_size: 32M
   # innodb_log_buffer_size: 8M
   # innodb_flush_log_at_trx_commit: "1"
   # innodb_lock_wait_timeout: 50
   # innodb_data_file_path: ibdata1:10M:autoextend:max:128M
 
-  #
-  # * Unix socket authentication plugin is built-in since 10.0.22-6
-  #
-  # Needed so the root database user can authenticate without a password but
-  # only when running as the unix root user.
-  #
-  # Also available for other users if required.
-  # See https://mariadb.com/kb/en/unix_socket-authentication-plugin/
+  ##
+  ## * Unix socket authentication plugin is built-in since 10.0.22-6
+  ##
+  ## Needed so the root database user can authenticate without a password but
+  ## only when running as the unix root user.
+  ##
+  ## Also available for other users if required.
+  ## See https://mariadb.com/kb/en/unix_socket-authentication-plugin/
 
 mariadb_config_defaults_mysqld_safe:
-  # This will be passed to all mysql clients
-  # It has been reported that passwords should be enclosed with ticks/quotes
-  # especially if they contain "#" chars...
-  # Remember to edit /etc/mysql/debian.cnf when changing the socket location.
+  ## This will be passed to all mysql clients
+  ## It has been reported that passwords should be enclosed with ticks/quotes
+  ## especially if they contain "#" chars...
+  ## Remember to edit /etc/mysql/debian.cnf when changing the socket location.
   socket: "{{ mariadb_socket }}"
   nice: "0"
   skip_log_error:
@@ -182,26 +180,26 @@ mariadb_config_defaults_mysqldump:
   max_allowed_packet: 16M
 
 mariadb_config_defaults_galera: {}
-  # # Mandatory settings
+  ##  Mandatory settings
   # wsrep_on=ON
   # wsrep_provider=
   # wsrep_cluster_address=
   # binlog_format=row
   # default_storage_engine=InnoDB
   # innodb_autoinc_lock_mode=2
-  # # Allow server to accept connections on all interfaces.
+  ##  Allow server to accept connections on all interfaces.
   # bind-address=0.0.0.0
   #
-  # # Optional setting
+  ##  Optional setting
   # wsrep_slave_threads=1
-  #   innodb_flush_log_at_trx_commit=0
+  # innodb_flush_log_at_trx_commit=0
 
 mariadb_config_defaults_embedded: {}
 
 mariadb_config_defaults_custom:
   mariadb: {}
   mariadb-10.3:
-    # mariadb > 10.1
+    ## mariadb > 10.1
     log_bin_compress: "1"
   client-mariadb: {}
   mysql_upgrade: {}
@@ -214,12 +212,13 @@ mariadb_config_defaults_custom:
 
 mariadb_defaults_replication:
   enabled: false
-  role: '' # primary or replica
+  ## primary or replica
+  role: ''
   primary: ''
-  # Same keys as `mariadb_users` above.
+  ## Same keys as `mariadb_users` above.
   user:
     name: replication
-    # The password must not be longer than 32 characters!
+    ## The password must not be longer than 32 characters!
     # password: ""
     encrypted: false
 
@@ -231,10 +230,10 @@ mariadb_python_packages:
   - name: mysqlclient
     version: 2.1.0
 
-# package name
+## package name
 mariadb_server: "mariadb-server"
 
-# service name
+## service name
 mariadb_service: mariadb
 
 mariadb_socket: /run/mysqld/mysqld.sock

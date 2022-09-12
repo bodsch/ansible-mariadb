@@ -59,8 +59,8 @@ mariadb_config_custom:
   # This group is only read by MariaDB servers, not by MySQL.
   mariadb: {}
   # This group is only read by MariaDB-$VERSION servers.
-  #mariadb-10.1: {}
-  #mariadb-10.5: {}
+  # mariadb-10.1: {}
+  # mariadb-10.5: {}
   # This group is *never* read by mysql client library
   client-mariadb: {}
   mysql_upgrade: {}
