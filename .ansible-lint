@@ -1,9 +1,9 @@
 ---
 
 skip_list:
-  - role-name                 # '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern
-  - no-changed-when           # '301'  # Commands should not change things if nothing needs doing
-  - command-instead-of-module # '303'  # Using command rather than module
-  - risky-shell-pipe          # '306'  # Shells that use pipes should set the pipefail option
-
+  - name[template]      # Jinja templates should only be at the end of 'name'
+  - name[casing]        # All names should start with an uppercase letter.
+  - fqcn[action-core]   # Use FQCN for builtin module actions
+  - fqcn[action]        # Use FQCN for module actions
+  - no-changed-when     # Commands should not change things if nothing needs doing.
 ...

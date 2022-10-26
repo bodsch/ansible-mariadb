@@ -33,6 +33,9 @@
     - ansible_os_family | lower != 'archlinux'
 
 - name: python support
+  when:
+    - mariadb_python_packages is defined
+    - mariadb_python_packages | length > 0
   block:
     - name: create requirements.txt
       template:
@@ -49,7 +52,10 @@
       ignore_errors: true
       no_log: true
 
-    - block:
+    - name: use build tools
+      when:
+        - pip_install.failed
+      block:
         - name: install build essentials
           package:
             name: "{{ mariadb_build_packages }}"
@@ -65,11 +71,6 @@
           package:
             name: "{{ mariadb_build_packages }}"
             state: absent
-      when:
-        - pip_install.failed
-  when:
-    - mariadb_python_packages is defined
-    - mariadb_python_packages | length > 0
 
 - name: install mysqltuner
   get_url:

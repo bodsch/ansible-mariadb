@@ -1,0 +1,49 @@
+---
+
+mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+
+mariadb_databases:
+  - name: molecule
+    collation: utf8mb4_bin
+    encoding: utf8mb4
+
+mariadb_users:
+  - name: molecule
+    host: '%'
+    password: molecule
+    priv: "molecule.*:ALL"
+    encrypted: false
+
+mariadb_tls_certificate:
+  source_files:
+    cert: "/etc/snakeoil/molecule.lan/molecule.lan.pem"
+    ca: "/etc/snakeoil/molecule.lan/molecule.lan.pem"
+    key: "/etc/snakeoil/molecule.lan/molecule.lan.key"
+
+mariadb_config_client:
+  ## Example of client certificate usage
+  ssl-cert: /etc/mysql/certificates/molecule.lan.pem
+  ssl-key: /etc/mysql/certificates/molecule.lan.key
+  #
+  ## Allow only TLS encrypted connections
+  ## ssl-verify-server-cert: on
+
+
+mariadb_config_mysqld:
+  bind-address: 127.0.0.1
+  socket: "{{ mariadb_socket }}"
+  skip-external-locking:
+  skip-name-resolve: 1
+  performance_schema: 1
+  expire_logs_days: 2
+  max_connections: 20
+  # TLS
+  ssl-ca: /etc/mysql/certificates/molecule.lan.pem
+  ssl-cert: /etc/mysql/certificates/molecule.lan.pem
+  ssl-key: /etc/mysql/certificates/molecule.lan.key
+  ## Accept only connections using the latest and most secure TLS protocol version.
+  ## ..when MariaDB is compiled with OpenSSL:
+  ssl-cipher: TLSv1.2
+  ## ..when MariaDB is compiled with YaSSL (default in Debian):
+  ssl:
+  tls_version: TLSv1.2,TLSv1.3

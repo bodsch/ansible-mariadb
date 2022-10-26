@@ -1,6 +1,8 @@
 ---
 
 - name: use external repository
+  when:
+    - mariadb_use_external_repo | bool
   block:
     - name: create mariadb repository
       template:
@@ -10,7 +12,10 @@
       when:
         - ansible_os_family | lower == 'redhat'
 
-    - block:
+    - name: debian
+      when:
+        - ansible_os_family | lower == 'debian'
+      block:
         - name: add apt signing key
           apt_key:
             url: https://mariadb.org/mariadb_release_signing_key.asc
@@ -29,14 +34,8 @@
           args:
             warn: false
 
-      when:
-        - ansible_os_family | lower == 'debian'
-
     - name: update package cache
       package:
         update_cache: true
-
-  when:
-    - mariadb_use_external_repo | bool
 
 ...

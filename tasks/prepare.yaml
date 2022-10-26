@@ -20,20 +20,22 @@
         - default.yml
       skip: true
 
-- block:
-    - name: set python interpreter
-      set_fact:
-        ansible_python_interpreter: /usr/bin/python3
-
-    - name: update facts to get latest information
-      setup:
-        gather_subset:
-          - '!all'
-          - '!any'
-          - facter
-  when:
-    - ansible_distribution | lower == 'debian'
-    - ansible_distribution_major_version | int == 9
+# OBSOLETE
+# - name: python support for debian 9
+#   block:
+#     - name: set python interpreter
+#       set_fact:
+#         ansible_python_interpreter: /usr/bin/python3
+#
+#     - name: update facts to get latest information
+#       setup:
+#         gather_subset:
+#           - '!all'
+#           - '!any'
+#           - facter
+#   when:
+#     - ansible_distribution | lower == 'debian'
+#     - ansible_distribution_major_version | int == 9
 
 - name: validate mariadb users
   fail:
@@ -46,7 +48,7 @@
     - mariadb_users | count > 0
     - (not item.name is defined or item.name | length == 0) or
       (not item.password is defined or item.password | length == 0)
-  loop: "{{ mariadb_users  }}"
+  loop: "{{ mariadb_users }}"
   loop_control:
     label: "{{ item.name | default('undefined') }}"
 
@@ -64,16 +66,17 @@
 
 - name: merge mariadb configuration segment for server between defaults and custom
   set_fact:
-    mariadb_config_server: "{{ mariadb_config_defaults_server | combine( mariadb_config_server, recursive=True ) }}"
-    mariadb_config_client: "{{ mariadb_config_defaults_client | combine( mariadb_config_client, recursive=True ) }}"
-    mariadb_config_mysql: "{{ mariadb_config_defaults_mysql | combine( mariadb_config_mysql, recursive=True ) }}"
-    mariadb_config_mysqld: "{{ mariadb_config_defaults_mysqld | combine( mariadb_config_mysqld, recursive=True ) }}"
-    mariadb_config_mysqld_safe: "{{ mariadb_config_defaults_mysqld_safe | combine( mariadb_config_mysqld_safe, recursive=True ) }}"
-    mariadb_config_mysqldump: "{{ mariadb_config_defaults_mysqldump | combine( mariadb_config_mysqldump, recursive=True ) }}"
-    mariadb_config_galera: "{{ mariadb_config_defaults_galera | combine( mariadb_config_galera, recursive=True ) }}"
-    mariadb_config_embedded: "{{ mariadb_config_defaults_embedded | combine( mariadb_config_embedded, recursive=True ) }}"
-    mariadb_config_custom: "{{ mariadb_config_defaults_custom | combine( mariadb_config_custom, recursive=True ) }}"
-    mariadb_replication: "{{ mariadb_defaults_replication | combine( mariadb_replication, recursive=True ) }}"
+    mariadb_config_server: "{{ mariadb_config_defaults_server | combine(mariadb_config_server, recursive=True) }}"
+    mariadb_config_client: "{{ mariadb_config_defaults_client | combine(mariadb_config_client, recursive=True) }}"
+    mariadb_config_mysql: "{{ mariadb_config_defaults_mysql | combine(mariadb_config_mysql, recursive=True) }}"
+    mariadb_config_mysqld: "{{ mariadb_config_defaults_mysqld | combine(mariadb_config_mysqld, recursive=True) }}"
+    mariadb_config_mysqld_safe: "{{ mariadb_config_defaults_mysqld_safe | combine(mariadb_config_mysqld_safe, recursive=True) }}"
+    mariadb_config_mysqldump: "{{ mariadb_config_defaults_mysqldump | combine(mariadb_config_mysqldump, recursive=True) }}"
+    mariadb_config_galera: "{{ mariadb_config_defaults_galera | combine(mariadb_config_galera, recursive=True) }}"
+    mariadb_config_embedded: "{{ mariadb_config_defaults_embedded | combine(mariadb_config_embedded, recursive=True) }}"
+    mariadb_config_custom: "{{ mariadb_config_defaults_custom | combine(mariadb_config_custom, recursive=True) }}"
+    mariadb_replication: "{{ mariadb_defaults_replication | combine(mariadb_replication, recursive=True) }}"
+    mariadb_tls_certificate: "{{ mariadb_defaults_tls_certificate | combine(mariadb_tls_certificate, recursive=True) }}"
 
 - name: repositories
   include_tasks: repositories.yml
