@@ -24,6 +24,12 @@ mariadb_user_password_update: false
 
 mariadb_enabled_on_startup: true
 
+mariadb_tls_certificate:
+  source_files:
+    cert: ""
+    ca: ""
+    key: ""
+
 # config settings
 # every ini part like [mysqld, galera, embedded, ...] becomes an own segment
 

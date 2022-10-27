@@ -1,6 +1,14 @@
 ---
 
-- block:
+- name: create monitoring database and user
+  when:
+    - mariadb_monitoring is defined
+    - mariadb_monitoring.enabled | bool
+    - mariadb_monitoring.system_user is defined
+    - mariadb_monitoring.system_user | length != 0
+    - mariadb_monitoring.username is defined
+    - mariadb_monitoring.username | length != 0
+  block:
     - name: create monitoring database
       mysql_db:
         name: monitoring
@@ -27,12 +35,5 @@
         owner: '{{ mariadb_monitoring.system_user }}'
         mode: 0644
         backup: true
-  when:
-    - mariadb_monitoring is defined
-    - mariadb_monitoring.enabled | bool
-    - mariadb_monitoring.system_user is defined
-    - mariadb_monitoring.system_user | length != 0
-    - mariadb_monitoring.username is defined
-    - mariadb_monitoring.username | length != 0
 
 ...

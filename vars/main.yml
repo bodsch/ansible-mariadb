@@ -1,6 +1,10 @@
 ---
 
-systemd_lib_directory: /lib/systemd/system
+mariadb_defaults_tls_certificate:
+  source_files:
+    cert: ""
+    ca: ""
+    key: ""
 
 mariadb_config_defaults_server: {}
 
@@ -239,5 +243,7 @@ mariadb_service: mariadb
 mariadb_socket: /run/mysqld/mysqld.sock
 
 mariadb_installed: false
+
+systemd_lib_directory: /lib/systemd/system
 
 ...

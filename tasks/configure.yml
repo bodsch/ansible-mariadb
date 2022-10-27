@@ -13,6 +13,20 @@
     path: "{{ mariadb_config_dir }}/mariadb.conf.d"
     state: absent
 
+- name: TLS support
+  when:
+    - mariadb_config_mysqld | support_tls
+  block:
+    - name: copy certificates
+      mariadb_tls_certificates:
+        source:
+          ssl_cert: "{{ mariadb_tls_certificate.source_files.cert | default(omit) }}"
+          ssl_key: "{{ mariadb_tls_certificate.source_files.key | default(omit) }}"
+          ssl_ca: "{{ mariadb_tls_certificate.source_files.ca | default(omit) }}"
+        destination: "{{ mariadb_config_mysqld | tls_directory }}"
+        owner: mysql
+        group: mysql
+
 - name: create main configuration file
   template:
     src: "etc/my.cnf.j2"
@@ -67,7 +81,11 @@
     - mariadb_config_mysqld['pid-file'] is defined
     - mariadb_config_mysqld['pid-file'] | length > 0
 
-- block:
+- name: handle mariadb slow query log
+  when:
+    - mariadb_config_mysqld.slow_query_log_file is defined
+    - mariadb_config_mysqld.slow_query_log_file | length > 0
+  block:
     - name: create log directory '{{ mariadb_config_mysqld.slow_query_log_file | dirname }}'
       file:
         path: "{{ mariadb_config_mysqld.slow_query_log_file | dirname }}"
@@ -92,11 +110,12 @@
         owner: mysql
         group: mysql
         mode: 0666
-  when:
-    - mariadb_config_mysqld.slow_query_log_file is defined
-    - mariadb_config_mysqld.slow_query_log_file | length > 0
 
-- block:
+- name: handle mariadb error log
+  when:
+    - mariadb_config_mysqld.log_error is defined
+    - mariadb_config_mysqld.log_error | length > 0
+  block:
     - name: create log directory '{{ mariadb_config_mysqld.log_error | dirname }}'
       file:
         path: "{{ mariadb_config_mysqld.log_error | dirname }}"
@@ -121,9 +140,6 @@
         owner: mysql
         group: mysql
         mode: 0666
-  when:
-    - mariadb_config_mysqld.log_error is defined
-    - mariadb_config_mysqld.log_error | length > 0
 
 - name: configure swappiness
   sysctl:

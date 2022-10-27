@@ -10,7 +10,7 @@ import testinfra.utils.ansible_runner
 
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('replica_2')
+    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
 
 
 def pp_json(json_thing, sort=True, indents=2):
@@ -41,7 +41,6 @@ def get_vars(host):
     """
     base_dir, molecule_dir = base_directory()
     distribution = host.system_info.distribution
-    release = host.system_info.release
     operation_system = None
 
     if distribution in ['debian', 'ubuntu']:
@@ -50,8 +49,6 @@ def get_vars(host):
         operation_system = "redhat"
     elif distribution in ['arch', 'artix']:
         operation_system = "archlinux"
-
-    print(" -> distibution {} / os {} / release {}".format(distribution, operation_system, release))
 
     file_defaults = f"file={base_dir}/defaults/main.yml name=role_defaults"
     file_vars = f"file={base_dir}/vars/main.yml name=role_vars"
@@ -117,12 +114,14 @@ def test_directories(host, get_vars):
       redhat based: /etc/my.cnf.d
       arch based  : /etc/my.cnf.d
     """
-    pp_json(get_vars)
+    # pp_json(get_vars)
 
     directories = [
         get_vars.get("mariadb_config_dir"),
         get_vars.get("mariadb_config_include_dir")
     ]
+
+    pp_json(directories)
 
     for dirs in directories:
         d = host.file(dirs)
@@ -135,7 +134,7 @@ def test_files(host, get_vars):
     """
     files = [
         get_vars.get("mariadb_config_file"),
-        "{}/mysql.cnf".format(get_vars.get("mariadb_config_include_dir"))
+        f"{get_vars.get('mariadb_config_include_dir')}/mysql.cnf"
     ]
 
     for _file in files:
@@ -153,7 +152,7 @@ def test_user(host, get_vars):
 
     if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
         shell = "/sbin/nologin"
-    elif distribution == "arch":
+    elif distribution  == 'arch':
         shell = "/usr/bin/nologin"
     elif distribution  == 'artix':
         shell = "/bin/nologin"
@@ -177,3 +176,32 @@ def test_service_running_and_enabled(host, get_vars):
     service = host.service(service_name)
     assert service.is_running
     assert service.is_enabled
+
+
+def test_listening_socket(host, get_vars):
+    """
+    """
+    listening = host.socket.get_listening_sockets()
+
+    for i in listening:
+        print(i)
+
+    distribution = host.system_info.distribution
+    release = host.system_info.release
+
+    bind_address = get_vars.get("mariadb_config_mysqld").get("bind-address", "127.0.0.1")
+    bind_port = get_vars.get("mariadb_config_mysqld").get("port", 3306)
+    socket_name = get_vars.get("mariadb_socket")
+
+    f = host.file(socket_name)
+    assert f.exists
+
+    listen = []
+    listen.append("tcp://{}:{}".format(bind_address, bind_port))
+
+    if not (distribution == 'ubuntu' and release == '18.04'):
+        listen.append("unix://{}".format(socket_name))
+
+    for spec in listen:
+        socket = host.socket(spec)
+        assert socket.is_listening
