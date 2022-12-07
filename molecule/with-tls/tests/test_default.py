@@ -93,11 +93,11 @@ def test_tmp_directory(host, get_vars):
     dir = host.file(directory)
     assert dir.is_directory
 
+
 def test_certificate_directory(host, get_vars):
     """
       configured certificates directory
     """
-
     config = get_vars.get("mariadb_config_client", {})
 
     directories = [
@@ -110,6 +110,7 @@ def test_certificate_directory(host, get_vars):
     for directory in directories:
         dir = host.file(directory)
         assert dir.is_directory
+
 
 def test_log_directory(host, get_vars):
     """
@@ -158,6 +159,7 @@ def test_files(host, get_vars):
         f = host.file(_file)
         assert f.is_file
 
+
 def test_certificates(host, get_vars):
     """
       configured certificates directory
@@ -170,6 +172,7 @@ def test_certificates(host, get_vars):
     for file in files:
         f = host.file(file)
         assert f.is_file
+
 
 def test_user(host, get_vars):
     """
