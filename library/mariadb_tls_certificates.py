@@ -155,21 +155,24 @@ class MariadbDataDirectories(object):
     def copy_files(self):
         """
         """
-        changed = True
+        changed = False
         failed = False
+        differ = False
 
         for f in self.ssl_files:
             s = f
             d = os.path.join(self.destination, os.path.basename(f))
 
             if os.path.isfile(d):
-                changed = self.verify(s, d)
+                differ = self.verify(s, d)
 
-            # self.module.log(msg=f" - {s} -> {d} : {changed}")
-            if not changed:
+            # self.module.log(msg=f" - {s} -> {d}, differ: {differ}")
+
+            if differ:
                 shutil.copyfile(s, d)
+                changed = True
             else:
-                changed = False
+                differ = False
 
             os.chmod(d, 0o0440)
 
@@ -185,6 +188,7 @@ class MariadbDataDirectories(object):
     def verify(self, source_file, destination_file):
         """
         """
+        # self.module.log(msg=f"verify({source_file} : {destination_file})")
         s_checksum = None
         d_checksum = None
 
@@ -248,6 +252,8 @@ def main():
 
     helper = MariadbDataDirectories(module)
     result = helper.run()
+
+    module.log(msg="= result: {}".format(result))
 
     module.exit_json(**result)
 

@@ -1,7 +1,7 @@
 ---
 
 - name: include OS specific configuration ({{ ansible_distribution }} ({{ ansible_os_family }}) {{ ansible_distribution_major_version }})
-  include_vars: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
       paths:
@@ -38,7 +38,7 @@
 #     - ansible_distribution_major_version | int == 9
 
 - name: validate mariadb users
-  fail:
+  ansible.builtin.fail:
     msg: "your users definition is not valid!\n
           The following parameters are required:\n
           - name\n
@@ -53,19 +53,19 @@
     label: "{{ item.name | default('undefined') }}"
 
 - name: update package cache
-  package:
+  ansible.builtin.package:
     update_cache: true
 
 - name: install dependecies
-  package:
+  ansible.builtin.package:
     name: "{{ mariadb_dependencies }}"
     state: present
 
 - name: update facts to get latest information
-  setup:
+  ansible.builtin.setup:
 
 - name: merge mariadb configuration segment for server between defaults and custom
-  set_fact:
+  ansible.builtin.set_fact:
     mariadb_config_server: "{{ mariadb_config_defaults_server | combine(mariadb_config_server, recursive=True) }}"
     mariadb_config_client: "{{ mariadb_config_defaults_client | combine(mariadb_config_client, recursive=True) }}"
     mariadb_config_mysql: "{{ mariadb_config_defaults_mysql | combine(mariadb_config_mysql, recursive=True) }}"
@@ -79,24 +79,24 @@
     mariadb_tls_certificate: "{{ mariadb_defaults_tls_certificate | combine(mariadb_tls_certificate, recursive=True) }}"
 
 - name: repositories
-  include_tasks: repositories.yml
+  ansible.builtin.include_tasks: repositories.yml
   when:
     - mariadb_use_external_repo | bool
 
 - name: detect if mariadb installed
-  stat:
+  ansible.builtin.stat:
     path: /usr/bin/mysqld_safe
   register: mysqld_binary_file
 
 - name: detect if mariadb installed
-  set_fact:
+  ansible.builtin.set_fact:
     mariadb_installed: "{{ mysqld_binary_file.stat.exists }}"
   when:
     - mysqld_binary_file is defined
     - mysqld_binary_file.stat is defined
 
 - name: update facts to get latest information
-  setup:
+  ansible.builtin.setup:
     gather_subset:
       - '!all'
       - '!any'

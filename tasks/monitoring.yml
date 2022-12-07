@@ -10,14 +10,14 @@
     - mariadb_monitoring.username | length != 0
   block:
     - name: create monitoring database
-      mysql_db:
+      community.mysql.mysql_db:
         name: monitoring
         collation: 'utf8_general_ci'
         encoding: 'utf8'
         state: present
 
     - name: create monitoring user
-      mysql_user:
+      community.mysql.mysql_user:
         name: "{{ mariadb_monitoring.username }}"
         host: '%'
         password: "{{ mariadb_monitoring.password }}"
@@ -29,7 +29,7 @@
       no_log: true
 
     - name: create my.cnf file with password credentials
-      template:
+      ansible.builtin.template:
         src: monitoring-my.cnf.j2
         dest: /usr/local/etc/.my.cnf
         owner: '{{ mariadb_monitoring.system_user }}'

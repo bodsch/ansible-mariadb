@@ -3,17 +3,17 @@
 - name: define network adresses for replicas
   delegate_to: localhost
   run_once: true
-  set_fact:
+  ansible.builtin.set_fact:
     list_of_ips: "{{ mariadb_instances }}"
   when:
     - mariadb_replication.role == 'primary'
 
 - name: flush handlers at this point to avoid double restart
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: ensure replication user exists
   delegate_to: "{{ mariadb_replication.primary }}"
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ mariadb_replication.user.name }}"
     host: "{{ item | default('%') }}"
     password: "{{ mariadb_replication.user.password }}"

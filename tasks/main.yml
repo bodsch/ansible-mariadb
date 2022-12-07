@@ -1,37 +1,37 @@
 ---
 
 - name: prepare
-  include_tasks: prepare.yaml
+  ansible.builtin.include_tasks: prepare.yaml
 
 - name: detect mariadb version
-  include_tasks: detect_mariadb_version.yml
+  ansible.builtin.include_tasks: detect_mariadb_version.yml
 
 - name: install
-  include_tasks: installation.yml
+  ansible.builtin.include_tasks: installation.yml
 
 - name: configure
-  include_tasks: configure.yml
+  ansible.builtin.include_tasks: configure.yml
 
 - name: secure installation
-  include_tasks: secure-installation.yml
+  ansible.builtin.include_tasks: secure-installation.yml
 
 - name: monitoring
-  include_tasks: monitoring.yml
+  ansible.builtin.include_tasks: monitoring.yml
 
 - name: databases
-  include_tasks: databases.yml
+  ansible.builtin.include_tasks: databases.yml
 
 - name: users
-  include_tasks: users.yml
+  ansible.builtin.include_tasks: users.yml
 
 - name: replication
-  include_tasks: replication.yml
+  ansible.builtin.include_tasks: replication.yml
   when:
     - (mariadb_replication.enabled is defined and mariadb_replication.enabled)
     - (mariadb_replication.role is defined and mariadb_replication.role | length > 0)
     - mariadb_replication.role in ['primary', 'replica']
 
 - name: service
-  include_tasks: service.yml
+  ansible.builtin.include_tasks: service.yml
 
 ...

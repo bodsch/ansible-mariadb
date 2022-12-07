@@ -236,13 +236,13 @@ def main():
         supports_check_mode=False,
     )
 
-    module.log(msg="-------------------------------------------------------------")
+    # module.log(msg="-------------------------------------------------------------")
 
     client = MariaDBRootPassword(module)
     result = client.run()
 
     module.log(msg="= result: {}".format(result))
-    module.log(msg="-------------------------------------------------------------")
+    # module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 

@@ -8,7 +8,7 @@
   register: package_version
 
 - name: define mariadb version
-  set_fact:
+  ansible.builtin.set_fact:
     mariadb_version: "{{ package_version.available.full_version }}"
   when:
     - package_version is defined
@@ -16,7 +16,7 @@
     - package_version.available.full_version is defined
 
 - name: define mariadb short version
-  set_fact:
+  ansible.builtin.set_fact:
     mariadb_short_version: "{{ package_version.available.platform_version }}"
   when:
     - package_version is defined
@@ -24,14 +24,14 @@
     - package_version.available.platform_version is defined
 
 - name: assert missing mariadb_version
-  assert:
+  ansible.builtin.assert:
     that:
       - mariadb_version | default("") | string | length != 0
     msg: mariadb_version is missing
     quiet: true
 
 - name: mariadb version
-  debug:
+  ansible.builtin.debug:
     msg:
       - "mariadb version: {{ mariadb_short_version }} - {{ mariadb_version }}"
 

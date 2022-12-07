@@ -5,7 +5,7 @@
     - mariadb_use_external_repo | bool
   block:
     - name: create mariadb repository
-      template:
+      ansible.builtin.template:
         src: etc/yum/mariadb.repo.j2
         dest: /etc/yum.repos.d/MariaDB.repo
         mode: 0750
@@ -17,12 +17,12 @@
         - ansible_os_family | lower == 'debian'
       block:
         - name: add apt signing key
-          apt_key:
+          ansible.builtin.apt_key:
             url: https://mariadb.org/mariadb_release_signing_key.asc
             state: present
 
         - name: install mariadb repositories for debian based
-          template:
+          ansible.builtin.template:
             src: etc/apt/mariadb.list.j2
             dest: /etc/apt/sources.list.d/mariadb.list
             mode: 0644
@@ -30,12 +30,11 @@
             group: root
 
         - name: clean apt cache
-          command: apt-get clean
-          args:
-            warn: false
+          ansible.builtin.apt:
+            clean: true
 
     - name: update package cache
-      package:
+      ansible.builtin.package:
         update_cache: true
 
 ...

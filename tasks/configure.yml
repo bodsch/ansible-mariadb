@@ -1,7 +1,7 @@
 ---
 
 - name: create neccessary directories
-  file:
+  ansible.builtin.file:
     path: '{{ mariadb_config_dir }}/conf.d'
     state: directory
     owner: root
@@ -9,7 +9,7 @@
     mode: 0755
 
 - name: remove distribution directories
-  file:
+  ansible.builtin.file:
     path: "{{ mariadb_config_dir }}/mariadb.conf.d"
     state: absent
 
@@ -18,6 +18,7 @@
     - mariadb_config_mysqld | support_tls
   block:
     - name: copy certificates
+      become: true
       mariadb_tls_certificates:
         source:
           ssl_cert: "{{ mariadb_tls_certificate.source_files.cert | default(omit) }}"
@@ -28,7 +29,7 @@
         group: mysql
 
 - name: create main configuration file
-  template:
+  ansible.builtin.template:
     src: "etc/my.cnf.j2"
     dest: "{{ mariadb_config_file }}"
     owner: root
@@ -37,7 +38,7 @@
     backup: true
 
 - name: create configuration files
-  template:
+  ansible.builtin.template:
     src: "etc/mysql/conf.d/mysql.cnf.j2"
     dest: "{{ mariadb_config_include_dir }}/mysql.cnf"
     owner: root
@@ -48,7 +49,7 @@
     - restart mariadb
 
 - name: create data directory '{{ mariadb_config_mysqld.datadir }}'
-  file:
+  ansible.builtin.file:
     path: "{{ mariadb_config_mysqld.datadir }}"
     state: directory
     owner: mysql
@@ -59,7 +60,7 @@
     - mariadb_config_mysqld.datadir != "/var/lib/mysql"
 
 - name: create tmp directory '{{ mariadb_config_mysqld.tmpdir }}'
-  file:
+  ansible.builtin.file:
     path: "{{ mariadb_config_mysqld.tmpdir }}"
     state: directory
     owner: mysql
@@ -71,7 +72,7 @@
     - mariadb_config_mysqld.tmpdir | length > 0
 
 - name: create pid directory '{{ mariadb_config_mysqld["pid-file"] | dirname }}'
-  file:
+  ansible.builtin.file:
     path: "{{ mariadb_config_mysqld['pid-file'] | dirname }}"
     state: directory
     owner: mysql
@@ -87,7 +88,7 @@
     - mariadb_config_mysqld.slow_query_log_file | length > 0
   block:
     - name: create log directory '{{ mariadb_config_mysqld.slow_query_log_file | dirname }}'
-      file:
+      ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.slow_query_log_file | dirname }}"
         state: directory
         owner: mysql
@@ -95,7 +96,7 @@
         mode: 0775
 
     - name: create slow query log file '{{ mariadb_config_mysqld.slow_query_log_file }}'
-      file:
+      ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.slow_query_log_file }}"
         state: touch
         owner: mysql
@@ -104,7 +105,7 @@
       changed_when: false
 
     - name: set ownership on slow query log file
-      file:
+      ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.slow_query_log_file }}"
         state: file
         owner: mysql
@@ -117,7 +118,7 @@
     - mariadb_config_mysqld.log_error | length > 0
   block:
     - name: create log directory '{{ mariadb_config_mysqld.log_error | dirname }}'
-      file:
+      ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.log_error | dirname }}"
         state: directory
         owner: mysql
@@ -125,7 +126,7 @@
         mode: 0775
 
     - name: create error log file '{{ mariadb_config_mysqld.log_error }}'
-      file:
+      ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.log_error }}"
         state: touch
         owner: mysql
@@ -134,7 +135,7 @@
       changed_when: false
 
     - name: set ownership on error log file
-      file:
+      ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.log_error }}"
         state: file
         owner: mysql
@@ -142,7 +143,7 @@
         mode: 0666
 
 - name: configure swappiness
-  sysctl:
+  ansible.posix.sysctl:
     name: vm.swappiness
     value: "{{ mariadb_swappiness | int }}"
     state: present
@@ -166,7 +167,7 @@
     - mariadb_config_mysqld.datadir != "/var/lib/mysql"
 
 - name: start mariadb first time
-  service:
+  ansible.builtin.service:
     name: '{{ mariadb_service }}'
     state: started
   register: service_status

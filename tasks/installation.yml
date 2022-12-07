@@ -1,7 +1,7 @@
 ---
 
 - name: create policy-rc.d
-  copy:
+  ansible.builtin.copy:
     dest: /usr/sbin/policy-rc.d
     content: |
       #!/bin/sh
@@ -12,13 +12,13 @@
     - ansible_os_family | lower != 'archlinux'
 
 - name: ensure mariadb packages are installed
-  package:
+  ansible.builtin.package:
     name: "{{ mariadb_packages }}"
     state: present
   register: mariadb_install_packages
 
 - name: fix debian specific debian-start file
-  template:
+  ansible.builtin.template:
     src: etc/mysql/debian-start.j2
     dest: "{{ mariadb_config_dir }}/debian-start"
     mode: 0755
@@ -26,7 +26,7 @@
     - ansible_os_family | lower == 'debian'
 
 - name: remove policy-rc.d
-  file:
+  ansible.builtin.file:
     path: /usr/sbin/policy-rc.d
     state: absent
   when:
@@ -38,13 +38,13 @@
     - mariadb_python_packages | length > 0
   block:
     - name: create requirements.txt
-      template:
+      ansible.builtin.template:
         src: requirements.txt.j2
         dest: /tmp/mariadb-requirements.txt
         mode: 0660
 
     - name: ensure python bindings for mariadb packages 1st
-      pip:
+      ansible.builtin.pip:
         requirements: /tmp/mariadb-requirements.txt
         state: present
         executable: pip{{ '3' if ansible_python.version.major | int == 3 else '' }}
@@ -57,23 +57,23 @@
         - pip_install.failed
       block:
         - name: install build essentials
-          package:
+          ansible.builtin.package:
             name: "{{ mariadb_build_packages }}"
             state: present
 
         - name: ensure python bindings for mariadb packages 2nd
-          pip:
+          ansible.builtin.pip:
             requirements: /tmp/mariadb-requirements.txt
             state: present
             executable: pip{{ '3' if ansible_python.version.major | int == 3 else '' }}
 
         - name: uninstall build essentials
-          package:
+          ansible.builtin.package:
             name: "{{ mariadb_build_packages }}"
             state: absent
 
 - name: install mysqltuner
-  get_url:
+  ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/major/MySQLTuner-perl/master/{{ item.name }}"
     dest: /usr/local/bin/{{ item.name }}
     mode: "{{ item.mode }}"

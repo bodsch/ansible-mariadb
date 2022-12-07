@@ -1,7 +1,7 @@
 ---
 
 - name: create or remove mariadb users
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ item.name }}"
     password: "{{ item.password }}"
     host: "{{ item.host | default('localhost') }}"

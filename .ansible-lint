@@ -1,9 +1,5 @@
 ---
 
 skip_list:
-  - name[template]      # Jinja templates should only be at the end of 'name'
-  - name[casing]        # All names should start with an uppercase letter.
-  - fqcn[action-core]   # Use FQCN for builtin module actions
-  - fqcn[action]        # Use FQCN for module actions
-  - no-changed-when     # Commands should not change things if nothing needs doing.
-...
+  - name[casing]
+  - name[template]
