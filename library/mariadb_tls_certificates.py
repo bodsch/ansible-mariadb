@@ -157,9 +157,9 @@ class MariadbDataDirectories(object):
         """
         changed = False
         failed = False
-        differ = False
 
         for f in self.ssl_files:
+            differ = True
             s = f
             d = os.path.join(self.destination, os.path.basename(f))
 
@@ -170,11 +170,8 @@ class MariadbDataDirectories(object):
 
             if differ:
                 shutil.copyfile(s, d)
+                os.chmod(d, 0o0440)
                 changed = True
-            else:
-                differ = False
-
-            os.chmod(d, 0o0440)
 
         for root, dirs, files in os.walk(self.destination):
             shutil.chown(root, self.owner, self.group)

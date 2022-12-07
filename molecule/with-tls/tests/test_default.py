@@ -93,6 +93,23 @@ def test_tmp_directory(host, get_vars):
     dir = host.file(directory)
     assert dir.is_directory
 
+def test_certificate_directory(host, get_vars):
+    """
+      configured certificates directory
+    """
+
+    config = get_vars.get("mariadb_config_client", {})
+
+    directories = [
+        os.path.dirname(config.get("ssl-cert", "/etc/mysql/certificates/molecule.lan.pem")),
+        os.path.dirname(config.get("ssl-key", "/etc/mysql/certificates/molecule.lan.key")),
+    ]
+
+    directories = list(set(directories))
+
+    for directory in directories:
+        dir = host.file(directory)
+        assert dir.is_directory
 
 def test_log_directory(host, get_vars):
     """
@@ -141,6 +158,18 @@ def test_files(host, get_vars):
         f = host.file(_file)
         assert f.is_file
 
+def test_certificates(host, get_vars):
+    """
+      configured certificates directory
+    """
+    files = [
+        get_vars.get("mariadb_config_client", {}).get("ssl-cert", "/etc/mysql/certificates"),
+        get_vars.get("mariadb_config_client", {}).get("ssl-key", "/etc/mysql/certificates"),
+    ]
+
+    for file in files:
+        f = host.file(file)
+        assert f.is_file
 
 def test_user(host, get_vars):
     """
