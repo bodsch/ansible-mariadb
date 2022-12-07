@@ -1,5 +1,13 @@
 ---
 
+- name: d
+  hosts: localhost
+  pre_tasks:
+    - debug:
+        msg:
+          - "ansible version      : {{ ansible_version }}"
+
+
 - name: prepare container
   hosts: all
   gather_facts: true

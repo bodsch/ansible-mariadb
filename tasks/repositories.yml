@@ -30,8 +30,14 @@
             group: root
 
         - name: clean apt cache
+          ansible.builtin.command: |
+            apt-get clean
+          when: "ansible_version.full is version_compare('2.13', '<')"
+
+        - name: clean apt cache
           ansible.builtin.apt:
             clean: true
+          when: "ansible_version.full is version_compare('2.13', '>=')"
 
     - name: update package cache
       ansible.builtin.package:

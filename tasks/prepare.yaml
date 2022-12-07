@@ -20,23 +20,6 @@
         - default.yml
       skip: true
 
-# OBSOLETE
-# - name: python support for debian 9
-#   block:
-#     - name: set python interpreter
-#       set_fact:
-#         ansible_python_interpreter: /usr/bin/python3
-#
-#     - name: update facts to get latest information
-#       setup:
-#         gather_subset:
-#           - '!all'
-#           - '!any'
-#           - facter
-#   when:
-#     - ansible_distribution | lower == 'debian'
-#     - ansible_distribution_major_version | int == 9
-
 - name: validate mariadb users
   ansible.builtin.fail:
     msg: "your users definition is not valid!\n
