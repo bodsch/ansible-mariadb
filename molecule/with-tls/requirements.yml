@@ -2,15 +2,11 @@
 
 - name: snapd
   src: bodsch.snapd
-  version: 1.1.2
+  version: 1.2.1
 
 - name: apparmor
   src: bodsch.apparmor
   version: 1.0.1
-
-#- name: syslog-ng
-#  src: bodsch.syslog_ng
-#  version: 1.4.1
 
 - name: snakeoil
   src: bodsch.snakeoil
