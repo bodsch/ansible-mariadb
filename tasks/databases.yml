@@ -1,6 +1,6 @@
 ---
 
-- name: ensure mariadb databases are present.
+- name: ensure mariadb databases are present.  # noqa args[module]
   community.mysql.mysql_db:
     name: "{{ item.name }}"
     collation: "{{ item.collation | default('utf8_general_ci') }}"
