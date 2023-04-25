@@ -17,6 +17,19 @@ Implement also an monitoring user with own table.
 [releases]: https://github.com/bodsch/ansible-mariadb/releases
 [quality]: https://galaxy.ansible.com/bodsch/mariadb
 
+## Requirements & Dependencies
+
+Ansible Collections
+
+- [bodsch.core](https://github.com/bodsch/ansible-collection-core)
+
+```bash
+ansible-galaxy collection install bodsch.core
+```
+or
+```bash
+ansible-galaxy collection install --requirements-file collections.yml
+```
 
 ## tested operating systems
 

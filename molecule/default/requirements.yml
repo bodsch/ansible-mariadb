@@ -6,6 +6,6 @@
 
 - name: apparmor
   src: bodsch.apparmor
-  version: 1.0.1
+  version: 1.0.2
 
 ...

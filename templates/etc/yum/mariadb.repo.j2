@@ -1,3 +1,5 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 [MariaDB]
 
 name = MariaDB {{ mariadb_version }} CentOS repository {{ ansible_distribution_major_version }} - amd64

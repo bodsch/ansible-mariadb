@@ -12,7 +12,7 @@ lint: |
   flake8 .
 
 platforms:
-  - name: instance
+  - name: database
     image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
@@ -25,12 +25,16 @@ provisioner:
   name: ansible
   ansible_args:
     - --diff
-    # - -vvv
+    - -v
   config_options:
     defaults:
       deprecation_warnings: true
       stdout_callback: yaml
       callbacks_enabled: profile_tasks
+      gathering: smart
+      fact_caching: jsonfile
+      fact_caching_timeout: 8640
+      fact_caching_connection: ansible_facts
 
 scenario:
   test_sequence:

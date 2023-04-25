@@ -2,15 +2,9 @@
 name: CI
 
 on:
-  schedule:
-    - cron: "0 2 * * 0"
-  workflow_dispatch:
   workflow_run:
     workflows:
       - "code linter"
-    branches:
-      - main
-      - feature
     types:
       - completed
 
@@ -30,9 +24,10 @@ jobs:
           - archlinux:latest
           - artixlinux:latest
         ansible-version:
-          - '5.10'
           - '6.7'
           - '7.0'
+        scenario:
+          - default
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v3
@@ -50,17 +45,20 @@ jobs:
           pip install -r test-requirements.txt
 
       # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
-      - name: Disable AppArmor
-        run: |
-            set -x
-            sudo apt-get install apparmor-profiles
-            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+      # - name: Disable AppArmor
+      #   run: |
+      #       set -x
+      #       sudo apt-get install apparmor-profiles
+      #       sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+      #       sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
 
       - name: test with tox
         run: |
-          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name default
+          make \
+            test \
+            -e TOX_SCENARIO="${{ matrix.scenario }}" \
+            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+            -e DISTRIBUTION="${{ matrix.image }}"
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -78,9 +76,10 @@ jobs:
           - debian:11
           - ubuntu:20.04
         ansible-version:
-          - '5.10'
           - '6.7'
           - '7.0'
+        scenario:
+          - default
 
     steps:
       - name: check out the codebase.
@@ -99,17 +98,20 @@ jobs:
           pip install -r test-requirements.txt
 
       # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
-      - name: Disable AppArmor
-        run: |
-            set -x
-            sudo apt-get install apparmor-profiles
-            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+      # - name: Disable AppArmor
+      #   run: |
+      #       set -x
+      #       sudo apt-get install apparmor-profiles
+      #       sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+      #       sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
 
       - name: test with tox
         run: |
-          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name default
+          make \
+            test \
+            -e TOX_SCENARIO="${{ matrix.scenario }}" \
+            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+            -e DISTRIBUTION="${{ matrix.image }}"
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -128,6 +130,8 @@ jobs:
           - almalinux:8
         ansible-version:
           - '4.10'
+        scenario:
+          - default
 
     steps:
       - name: check out the codebase.
@@ -146,17 +150,20 @@ jobs:
           pip install -r test-requirements.txt
 
       # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
-      - name: Disable AppArmor
-        run: |
-            set -x
-            sudo apt-get install apparmor-profiles
-            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+      # - name: Disable AppArmor
+      #   run: |
+      #       set -x
+      #       sudo apt-get install apparmor-profiles
+      #       sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+      #       sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
 
       - name: test with tox
         run: |
-          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name default
+          make \
+            test \
+            -e TOX_SCENARIO="${{ matrix.scenario }}" \
+            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+            -e DISTRIBUTION="${{ matrix.image }}"
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

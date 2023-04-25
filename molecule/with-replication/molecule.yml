@@ -26,11 +26,11 @@ platforms:
     docker_networks:
       - name: database
         ipam_config:
-          - subnet: "10.16.0.0/16"
-            gateway: "10.16.0.254"
+          - subnet: "10.29.0.0/24"
+            gateway: "10.29.0.254"
     networks:
       - name: database
-        ipv4_address: "10.16.0.10"
+        ipv4_address: "10.29.0.10"
 
   - name: replica_1
     image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
@@ -45,7 +45,7 @@ platforms:
       - replica
     networks:
       - name: database
-        ipv4_address: "10.16.0.21"
+        ipv4_address: "10.29.0.21"
 
   - name: replica_2
     image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
@@ -60,18 +60,22 @@ platforms:
       - replica
     networks:
       - name: database
-        ipv4_address: "10.16.0.22"
+        ipv4_address: "10.29.0.22"
 
 provisioner:
   name: ansible
   ansible_args:
     - --diff
-    # - -vvv
+    - -v
   config_options:
     defaults:
       deprecation_warnings: true
       stdout_callback: yaml
       callbacks_enabled: profile_tasks
+      gathering: smart
+      fact_caching: jsonfile
+      fact_caching_timeout: 8640
+      fact_caching_connection: "${MOLECULE_EPHEMERAL_DIRECTORY}/ansible_facts"
 
 scenario:
   test_sequence:
