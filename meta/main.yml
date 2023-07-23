@@ -6,9 +6,8 @@ galaxy_info:
 
   author: Bodo Schulz
   description: MariaDB Server for debian (Ubuntu), RedHat (CentOS) and Arch Linux.
-  company: ""
 
-  license: "Apache"
+  license: Apache
   min_ansible_version: "2.10"
 
   platforms:
@@ -19,13 +18,16 @@ galaxy_info:
         - buster
         # 11
         - bullseye
+        # 12
+        - bookworm
     - name: Ubuntu
       versions:
-        # 20.04
+        # 20.04 LTS (Focal Fossa)
         - focal
-    - name: EL
-      versions:
-        - "8"
+        # 22.04 LTS (Jammy Jellyfish)
+        - jammy
+        # 22.10 (Kinetic Kudu)
+        # - kinetic
 
   galaxy_tags:
     - sql

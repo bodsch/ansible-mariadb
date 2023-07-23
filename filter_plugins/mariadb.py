@@ -27,7 +27,7 @@ class FilterModule(object):
     def support_tls(self, data):
         """
         """
-        display.v(f"support_tls({data})")
+        # display.v(f"support_tls({data})")
 
         ssl_ca   = data.get("ssl-ca", None)
         ssl_cert = data.get("ssl-cert", None)
@@ -41,7 +41,7 @@ class FilterModule(object):
     def tls_directory(self, data):
         """
         """
-        display.v(f"tls_directory({data})")
+        # display.v(f"tls_directory({data})")
 
         directory = []
 
