@@ -4,14 +4,6 @@
   when:
     - mariadb_use_external_repo | bool
   block:
-    - name: create mariadb repository
-      ansible.builtin.template:
-        src: etc/yum/mariadb.repo.j2
-        dest: /etc/yum.repos.d/MariaDB.repo
-        mode: 0750
-      when:
-        - ansible_os_family | lower == 'redhat'
-
     - name: debian
       when:
         - ansible_os_family | lower == 'debian'
@@ -39,8 +31,15 @@
             clean: true
           when: "ansible_version.full is version_compare('2.13', '>=')"
 
-    - name: update package cache
-      ansible.builtin.package:
-        update_cache: true
+- name: remove external repository
+  when:
+    - not mariadb_use_external_repo | bool
+  ansible.builtin.file:
+    state: absent
+    path: /etc/apt/sources.list.d/mariadb.list
+
+# - name: update package cache
+#   ansible.builtin.package:
+#     update_cache: true
 
 ...

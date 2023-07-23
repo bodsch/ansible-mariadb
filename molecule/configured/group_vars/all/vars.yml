@@ -1,4 +1,5 @@
 ---
+mariadb_use_external_repo: false
 
 mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
 
@@ -15,10 +16,10 @@ mariadb_users:
     encrypted: false
 
 mariadb_config_mysqld:
-  bind-address: 127.0.0.1
+  bind_address: 127.0.0.1
   socket: "{{ mariadb_socket }}"
-  skip-external-locking:
-  skip-name-resolve: 1
+  skip_external_locking:
+  skip_name_resolve: 1
   performance_schema: 1
   expire_logs_days: 2
   max_connections: 20

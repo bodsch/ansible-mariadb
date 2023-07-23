@@ -28,6 +28,25 @@
         owner: mysql
         group: mysql
 
+- name: detect '{{ mariadb_config_file }}'
+  ansible.builtin.stat:
+    path: "{{ mariadb_config_file }}"
+  register: stat_mariadb_config_file
+
+- name: d
+  debug:
+    msg: "{{ stat_mariadb_config_file.stat | default({}) }}"
+
+# https://github.com/bodsch/ansible-mariadb/issues/20
+- name: remove symlink to '{{ mariadb_config_file }}'
+  ansible.builtin.file:
+    state: absent
+    path: "{{ mariadb_config_file }}"
+  when:
+    - stat_mariadb_config_file.stat is defined
+    - stat_mariadb_config_file.stat.exists | default('false')
+    - stat_mariadb_config_file.stat.islnk | default('false')
+
 - name: create main configuration file
   ansible.builtin.template:
     src: "etc/my.cnf.j2"
@@ -172,6 +191,6 @@
     state: started
   register: service_status
   notify:
-    - wait 2 seconds for clean startup
+    - check if mariadb are available
 
 ...

@@ -10,7 +10,7 @@ mariadb_config_defaults_server: {}
 
 mariadb_config_defaults_client:
   ## Default is Latin1, if you need UTF-8 set this (also in server section)
-  default-character-set: utf8mb4
+  default_character_set: utf8mb4
   ## socket location
   socket: "{{ mariadb_socket }}"
 
@@ -23,23 +23,23 @@ mariadb_config_defaults_client:
 
 mariadb_config_defaults_mysql:
   ## Default is Latin1, if you need UTF-8 set this (also in server section)
-  default-character-set: utf8mb4
+  default_character_set: utf8mb4
 
 mariadb_config_defaults_mysqld:
   ## * Basic Settings
   ##
   user: mysql
-  pid-file: /run/mysqld/mysqld.pid
+  pid_file: /run/mysqld/mysqld.pid
   socket: "{{ mariadb_socket }}"
   # port: 3306
   # basedir: /usr
   datadir: /var/lib/mysql
   tmpdir: /tmp
-  lc-messages-dir: /usr/share/mysql
+  lc_messages_dir: /usr/share/mysql
   # skip-external-locking
   ## Instead of skip-networking the default is now to listen only on
   ## localhost which is more compatible and is not less secure.
-  bind-address: 127.0.0.1
+  bind_address: 127.0.0.1
   lower_case_table_names: "1"
   ## Possible values are ON, OFF, and DISABLED
   event_scheduler: "ON"
@@ -95,7 +95,7 @@ mariadb_config_defaults_mysqld:
   ## The following can be used as easy to replay backup logs or for replication.
   ## note: if you are setting up a replication slave, see README.Debian about
   ##       other settings you may need to change.
-  server-id: "{{ mariadb_server_id }}"
+  server_id: "{{ mariadb_server_id }}"
   ## https://mariadb.com/kb/en/replication-and-binary-log-system-variables/#relay_log_basename
   # relay_log_basename
   relay_log: "{{ ansible_hostname }}-relay-bin"
@@ -134,8 +134,8 @@ mariadb_config_defaults_mysqld:
   ## MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
   ## utf8 4-byte character set. See also client.cnf
   ##
-  character-set-server: utf8mb4
-  collation-server: utf8mb4_general_ci
+  character_set_server: utf8mb4
+  collation_server: utf8mb4_general_ci
 
   ##
   ## * InnoDB
@@ -180,7 +180,7 @@ mariadb_config_defaults_mysqld_safe:
 
 mariadb_config_defaults_mysqldump:
   quick:
-  quote-names:
+  quote_names:
   max_allowed_packet: 16M
 
 mariadb_config_defaults_galera: {}
@@ -205,8 +205,8 @@ mariadb_config_defaults_custom:
   mariadb-10.3:
     ## mariadb > 10.1
     log_bin_compress: "1"
-  client-mariadb: {}
-  mysql_upgrade: {}
+  client_mariadb: {}
+  mysql-upgrade: {}
   mysqladmin: {}
   mysqlbinlog: {}
   mysqlcheck: {}

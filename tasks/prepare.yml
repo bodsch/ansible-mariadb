@@ -35,6 +35,11 @@
   loop_control:
     label: "{{ item.name | default('undefined') }}"
 
+- name: repositories
+  ansible.builtin.include_tasks: repositories.yml
+  when:
+    - ansible_os_family | lower == 'debian'
+
 - name: update package cache
   ansible.builtin.package:
     update_cache: true
@@ -60,11 +65,6 @@
     mariadb_config_custom: "{{ mariadb_config_defaults_custom | combine(mariadb_config_custom, recursive=True) }}"
     mariadb_replication: "{{ mariadb_defaults_replication | combine(mariadb_replication, recursive=True) }}"
     mariadb_tls_certificate: "{{ mariadb_defaults_tls_certificate | combine(mariadb_tls_certificate, recursive=True) }}"
-
-- name: repositories
-  ansible.builtin.include_tasks: repositories.yml
-  when:
-    - mariadb_use_external_repo | bool
 
 - name: detect if mariadb installed
   ansible.builtin.stat:

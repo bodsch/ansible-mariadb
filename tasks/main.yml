@@ -1,7 +1,7 @@
 ---
 
 - name: prepare
-  ansible.builtin.include_tasks: prepare.yaml
+  ansible.builtin.include_tasks: prepare.yml
 
 - name: detect mariadb version
   ansible.builtin.include_tasks: detect_mariadb_version.yml
