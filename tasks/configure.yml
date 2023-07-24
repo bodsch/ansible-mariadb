@@ -221,6 +221,25 @@
       when:
         - mariadb_journal.stdout is defined
 
+    - name: detect error log
+      ansible.builtin.stat:
+        path: "{{ mariadb_config_mysqld.log_error }}"
+        register: stat_mariadb_error_log
+
+    - name: load error_log
+      ansible.builtin.slurp:
+        src: "{{ mariadb_config_mysqld.log_error }}"
+        register: mariadb_error_log
+      when:
+        - stat_mariadb_error_log.stat.exists
+
+    - name: error_log output
+      ansible.builtin.debug:
+        msg: "{{ mariadb_error_log.content | b64decode }}"
+      when:
+        - stat_mariadb_error_log.stat.exists
+        - mariadb_error_log.content is defined
+
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
 
