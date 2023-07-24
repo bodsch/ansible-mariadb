@@ -224,7 +224,7 @@
     - name: detect error log
       ansible.builtin.stat:
         path: "{{ mariadb_config_mysqld.log_error }}"
-        register: stat_mariadb_error_log
+      register: stat_mariadb_error_log
 
     - name: load error_log
       ansible.builtin.slurp:
