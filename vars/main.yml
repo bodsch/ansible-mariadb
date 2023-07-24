@@ -1,5 +1,25 @@
 ---
 
+mariadb_build_packages: []
+
+mariadb_dependencies: []
+
+mariadb_python_packages:
+  - name: mysqlclient
+    version: 2.1.0
+
+mariadb_run_directory: "/run/mysqld"
+
+## package name
+mariadb_server: "mariadb-server"
+
+## service name
+mariadb_service: mariadb
+
+mariadb_socket: "{{ mariadb_run_directory }}/mariadb.sock"
+
+mariadb_installed: false
+
 mariadb_defaults_tls_certificate:
   source_files:
     cert: ""
@@ -29,7 +49,7 @@ mariadb_config_defaults_mysqld:
   ## * Basic Settings
   ##
   user: mysql
-  pid_file: /run/mysqld/mariadb.pid
+  pid_file: "{{ mariadb_run_directory }}/mariadb.pid"
   socket: "{{ mariadb_socket }}"
   # port: 3306
   # basedir: /usr
@@ -226,23 +246,6 @@ mariadb_defaults_replication:
     # password: ""
     encrypted: false
 
-mariadb_build_packages: []
-
-mariadb_dependencies: []
-
-mariadb_python_packages:
-  - name: mysqlclient
-    version: 2.1.0
-
-## package name
-mariadb_server: "mariadb-server"
-
-## service name
-mariadb_service: mariadb
-
-mariadb_socket: /run/mysqld/mysqld.sock
-
-mariadb_installed: false
 
 systemd_lib_directory: /lib/systemd/system
 

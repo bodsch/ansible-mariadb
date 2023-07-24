@@ -99,8 +99,8 @@
     # group: mysql
     mode: 0755
   when:
-    - mariadb_config_mysqld['pid-file'] is defined
-    - mariadb_config_mysqld['pid-file'] | length > 0
+    - mariadb_config_mysqld['pid_file'] is defined
+    - mariadb_config_mysqld['pid_file'] | length > 0
 
 - name: handle mariadb slow query log
   when:
