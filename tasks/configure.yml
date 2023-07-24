@@ -91,7 +91,8 @@
     path: "{{ mariadb_config_mysqld.pid_file | dirname }}"
     state: directory
     owner: mysql
-    mode: 0755
+    group: mysql
+    mode: 0775
   when:
     - mariadb_config_mysqld.pid_file is defined
     - mariadb_config_mysqld.pid_file | string | length > 0
@@ -231,7 +232,7 @@
 
     - name: get journal log
       bodsch.core.journalctl:
-        unit: "{{ mariadb_service }}"
+        # unit: "{{ mariadb_service }}"
         lines: 250
       register: mariadb_journal
 

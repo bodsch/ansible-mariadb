@@ -22,7 +22,8 @@
     path: "{{ mariadb_config_mysqld.pid_file | dirname }}"
     state: directory
     owner: mysql
-    mode: 0755
+    group: mysql
+    mode: 0775
   when:
     - mariadb_config_mysqld.pid_file is defined
     - mariadb_config_mysqld.pid_file | string | length > 0
