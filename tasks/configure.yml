@@ -190,9 +190,36 @@
   ansible.builtin.service:
     name: '{{ mariadb_service }}'
     state: started
+  ignore_errors: true
   register: service_status
   notify:
     - check if mariadb are available
+
+- name: detect error
+  when:
+    - service_status is defined
+    - service_status.failed
+    - ansible_service_mgr == 'systemd'
+  block:
+    - name: systemd unit
+      ansible.builtin.debug:
+        msg: "{{ service_status }}"
+
+    - name: wait 2 seconds
+      ansible.builtin.pause:
+        seconds: 2
+
+    - name: get journal log
+      bodsch.core.journalctl:
+        unit: "{{ mariadb_service }}"
+        lines: 250
+      register: mariadb_journal
+
+    - name: journalctl output
+      ansible.builtin.debug:
+        msg: "{{ mariadb_journal.stdout }}"
+      when:
+        - mariadb_journal.stdout is defined
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
