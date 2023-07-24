@@ -1,5 +1,13 @@
 # {{ ansible_managed }}
 
 [client]
-user = {{ mariadb_monitoring.username }}
+user     = {{ mariadb_monitoring.username }}
 password = {{ mariadb_monitoring.password | default(mariadb_monitoring.username, true) }}
+{% if mariadb_config_client.socket is defined and
+      mariadb_config_client.socket | string | length > 0 %}
+socket   = {{ mariadb_config_client.socket }}
+{% endif %}
+{% if mariadb_config_mysqld.bind_address is defined and
+      mariadb_config_mysqld.bind_address | string | length > 0 %}
+host     = {{ mariadb_config_mysqld.bind_address }}
+{% endif %}
