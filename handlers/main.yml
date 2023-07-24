@@ -21,5 +21,6 @@
     path: "{{ mariadb_config_mysqld.pid_file }}"
     state: present
     delay: 2
+    # sleep: 2
     msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
   ignore_errors: false

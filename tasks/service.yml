@@ -1,5 +1,8 @@
 ---
 
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: ensure mariadb is enabled on boot
   ansible.builtin.service:
     name: '{{ mariadb_service }}'

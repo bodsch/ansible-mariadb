@@ -66,6 +66,7 @@
     backup: true
   notify:
     - restart mariadb
+    - check if mariadb are available
 
 - name: create data directory '{{ mariadb_config_mysqld.datadir }}'
   ansible.builtin.file:
@@ -90,9 +91,9 @@
     - mariadb_config_mysqld.tmpdir != "/tmp"
     - mariadb_config_mysqld.tmpdir | length > 0
 
-- name: create pid directory '{{ mariadb_config_mysqld["pid-file"] | dirname }}'
+- name: create pid directory '{{ mariadb_config_mysqld["pid_file"] | dirname }}'
   ansible.builtin.file:
-    path: "{{ mariadb_config_mysqld['pid-file'] | dirname }}"
+    path: "{{ mariadb_config_mysqld['pid_file'] | dirname }}"
     state: directory
     owner: mysql
     # group: mysql
@@ -192,5 +193,8 @@
   register: service_status
   notify:
     - check if mariadb are available
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
 
 ...
