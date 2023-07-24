@@ -229,7 +229,7 @@
     - name: load error_log
       ansible.builtin.slurp:
         src: "{{ mariadb_config_mysqld.log_error }}"
-        register: mariadb_error_log
+      register: mariadb_error_log
       when:
         - stat_mariadb_error_log.stat.exists
 
