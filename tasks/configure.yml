@@ -33,11 +33,6 @@
     path: "{{ mariadb_config_file }}"
   register: stat_mariadb_config_file
 
-- name: d
-  debug:
-    msg: "{{ stat_mariadb_config_file.stat | default({}) }}"
-
-# https://github.com/bodsch/ansible-mariadb/issues/20
 - name: remove symlink to '{{ mariadb_config_file }}'
   ansible.builtin.file:
     state: absent
@@ -88,26 +83,25 @@
     mode: 0755
   when:
     - mariadb_config_mysqld.tmpdir is defined
+    - mariadb_config_mysqld.tmpdir | string | length > 0
     - mariadb_config_mysqld.tmpdir != "/tmp"
-    - mariadb_config_mysqld.tmpdir | length > 0
 
-- name: create pid directory '{{ mariadb_config_mysqld["pid_file"] | dirname }}'
+- name: create directory for pid file '{{ mariadb_config_mysqld.pid_file | dirname }}'
   ansible.builtin.file:
-    path: "{{ mariadb_config_mysqld['pid_file'] | dirname }}"
+    path: "{{ mariadb_config_mysqld.pid_file | dirname }}"
     state: directory
     owner: mysql
-    # group: mysql
     mode: 0755
   when:
-    - mariadb_config_mysqld['pid_file'] is defined
-    - mariadb_config_mysqld['pid_file'] | length > 0
+    - mariadb_config_mysqld.pid_file is defined
+    - mariadb_config_mysqld.pid_file | string | length > 0
 
 - name: handle mariadb slow query log
   when:
     - mariadb_config_mysqld.slow_query_log_file is defined
-    - mariadb_config_mysqld.slow_query_log_file | length > 0
+    - mariadb_config_mysqld.slow_query_log_file | string | length > 0
   block:
-    - name: create log directory '{{ mariadb_config_mysqld.slow_query_log_file | dirname }}'
+    - name: create directory for slow query log file '{{ mariadb_config_mysqld.slow_query_log_file | dirname }}'
       ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.slow_query_log_file | dirname }}"
         state: directory
@@ -135,9 +129,9 @@
 - name: handle mariadb error log
   when:
     - mariadb_config_mysqld.log_error is defined
-    - mariadb_config_mysqld.log_error | length > 0
+    - mariadb_config_mysqld.log_error | string | length > 0
   block:
-    - name: create log directory '{{ mariadb_config_mysqld.log_error | dirname }}'
+    - name: create directory for error log file '{{ mariadb_config_mysqld.log_error | dirname }}'
       ansible.builtin.file:
         path: "{{ mariadb_config_mysqld.log_error | dirname }}"
         state: directory
@@ -239,6 +233,13 @@
       when:
         - stat_mariadb_error_log.stat.exists
         - mariadb_error_log.content is defined
+
+    - name: list /run
+      ansible.builtin.shell:
+        cmd: |
+          ls -lth /run/
+          ls -lth /run/mysqld/*
+        chdir: /run
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
