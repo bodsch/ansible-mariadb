@@ -16,7 +16,7 @@ mariadb_server: "mariadb-server"
 ## service name
 mariadb_service: mariadb
 
-mariadb_socket: "{{ mariadb_run_directory }}/mariadb.sock"
+mariadb_socket: "{{ mariadb_run_directory }}/mysqld.sock"
 
 mariadb_installed: false
 
