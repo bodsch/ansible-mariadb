@@ -5,7 +5,7 @@ galaxy_info:
   namespace: bodsch
 
   author: Bodo Schulz
-  description: MariaDB Server for debian (Ubuntu), RedHat (CentOS) and Arch Linux.
+  description: MariaDB Server for debian (Ubuntu) and Arch Linux.
 
   license: Apache
   min_ansible_version: "2.10"
@@ -14,16 +14,12 @@ galaxy_info:
     - name: ArchLinux
     - name: Debian
       versions:
-        # 10
-        - buster
         # 11
         - bullseye
         # 12
         - bookworm
     - name: Ubuntu
       versions:
-        # 20.04 LTS (Focal Fossa)
-        - focal
         # 22.04 LTS (Jammy Jellyfish)
         - jammy
         # 22.10 (Kinetic Kudu)

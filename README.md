@@ -35,8 +35,8 @@ ansible-galaxy collection install --requirements-file collections.yml
 
 * ArchLinux
 * Debian based
-    - Debian 10 / 11
-    - Ubuntu 20.04
+    - Debian 11 / 12
+    - Ubuntu 22.04
 
 > **RedHat-based systems are no longer officially supported! May work, but does not have to.**
 
@@ -135,7 +135,7 @@ mariadb_mysqltuner: true
 see [default/main.yml](default/main.yml):
 
 ```yaml
-mariadb_use_external_repo: true
+mariadb_use_external_repo: false
 mariadb_version: 10.4
 
 mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
@@ -259,4 +259,4 @@ If you want to use something stable, please use a [Tagged Version](https://githu
 
 [Apache](LICENSE)
 
-`FREE SOFTWARE, HELL YEAH!`
+**FREE SOFTWARE, HELL YEAH!**
