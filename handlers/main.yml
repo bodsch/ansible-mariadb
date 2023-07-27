@@ -9,18 +9,19 @@
     name: '{{ mariadb_service }}'
     state: restarted
   notify:
-    - check if mariadb are available
+    - check mariadb pid file
     # - wait 2 seconds for clean startup
 
 - name: wait 2 seconds for clean startup
   ansible.builtin.pause:
     seconds: 2
 
-- name: check if mariadb are available
+- name: check mariadb pid file
   ansible.builtin.wait_for:
     path: "{{ mariadb_config_mysqld.pid_file }}"
     state: present
     delay: 2
+    timeout: 60
     # sleep: 2
     msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
   ignore_errors: false

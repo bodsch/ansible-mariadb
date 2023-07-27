@@ -61,7 +61,7 @@
     backup: true
   notify:
     - restart mariadb
-    - check if mariadb are available
+    - check mariadb pid file
 
 - name: create data directory '{{ mariadb_config_mysqld.datadir }}'
   ansible.builtin.file:
@@ -188,18 +188,13 @@
   ignore_errors: true
   register: service_status
   notify:
-    - check if mariadb are available
+    - check mariadb pid file
 
 - name: detect error
   when:
     - service_status is defined
     - service_status.failed
-    - ansible_service_mgr == 'systemd'
   block:
-    - name: systemd unit
-      ansible.builtin.debug:
-        msg: "{{ service_status }}"
-
     - name: detect error log
       ansible.builtin.stat:
         path: "{{ mariadb_config_mysqld.log_error }}"
@@ -222,25 +217,33 @@
     - name: list /run
       ansible.builtin.shell:
         cmd: |
-          ls -lth /run/
-          ls -lth /run/mysqld
+          ls -lth /run/ ;
+          ls -lth /run/mysqld ;
         chdir: /run
 
-    - name: wait 2 seconds
-      ansible.builtin.pause:
-        seconds: 2
-
-    - name: get journal log
-      bodsch.core.journalctl:
-        # unit: "{{ mariadb_service }}"
-        lines: 250
-      register: mariadb_journal
-
-    - name: journalctl output
-      ansible.builtin.debug:
-        msg: "{{ mariadb_journal.stdout }}"
+    - name: detect error
       when:
-        - mariadb_journal.stdout is defined
+        - ansible_service_mgr == 'systemd'
+      block:
+        - name: systemd unit
+          ansible.builtin.debug:
+            msg: "{{ service_status }}"
+
+        - name: wait 2 seconds
+          ansible.builtin.pause:
+            seconds: 2
+
+        - name: get journal log
+          bodsch.core.journalctl:
+            # unit: "{{ mariadb_service }}"
+            lines: 250
+          register: mariadb_journal
+
+        - name: journalctl output
+          ansible.builtin.debug:
+            msg: "{{ mariadb_journal.stdout }}"
+          when:
+            - mariadb_journal.stdout is defined
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers

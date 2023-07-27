@@ -45,9 +45,9 @@ mariadb_config_mysql: {}
 # this is only for the mysqld standalone daemon
 mariadb_config_mysqld:
   socket: "{{ mariadb_socket }}"
-  skip-external-locking:
+  skip_external_locking:
   # Skip reverse DNS lookup of clients
-  skip-name-resolve: 1
+  skip_name_resolve: 1
   # enable performance schema
   performance_schema: 1
 

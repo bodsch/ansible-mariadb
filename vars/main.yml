@@ -17,6 +17,7 @@ mariadb_server: "mariadb-server"
 mariadb_service: mariadb
 
 mariadb_socket: "{{ mariadb_run_directory }}/mysqld.sock"
+mariadb_pid_file: "{{ mariadb_run_directory }}/mysqld.pid"
 
 mariadb_installed: false
 
@@ -49,7 +50,7 @@ mariadb_config_defaults_mysqld:
   ## * Basic Settings
   ##
   user: mysql
-  pid_file: "{{ mariadb_run_directory }}/mysqld.pid"
+  pid_file: "{{ mariadb_pid_file }}"
   socket: "{{ mariadb_socket }}"
   # port: 3306
   # basedir: /usr

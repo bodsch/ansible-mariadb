@@ -16,6 +16,8 @@ mariadb_config_file: /etc/my.cnf
 mariadb_config_dir: /etc/my.cnf.d
 mariadb_config_include_dir: "{{ mariadb_config_dir }}"
 
+mariadb_pid_file: "{{ mariadb_run_directory }}/mysqld.pid"
+
 # package name
 mariadb_server: mariadb
 
