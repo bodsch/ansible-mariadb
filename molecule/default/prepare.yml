@@ -42,4 +42,8 @@
 
   roles:
     - role: apparmor
+      when:
+        - ansible_os_family | lower == 'debian'
     - role: snapd
+      when:
+        - ansible_os_family | lower == 'debian'
