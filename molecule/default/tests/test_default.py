@@ -29,7 +29,7 @@ def base_directory():
         molecule_directory = "."
     else:
         directory = "."
-        molecule_directory = f"molecule/{os.environ.get('MOLECULE_SCENARIO_NAME'}")
+        molecule_directory = f"molecule/{os.environ.get('MOLECULE_SCENARIO_NAME')}"
 
     return directory, molecule_directory
 
