@@ -26,6 +26,8 @@ jobs:
           - archlinux:latest
         ansible-version:
           - '6.7'
+        python_version:
+          - "3.10"
         scenario:
           - with-replication
 
@@ -69,7 +71,7 @@ jobs:
         ansible-version:
           - '6.7'
         python_version:
-          - "3.10.11"
+          - "3.10"
         scenario:
           - with-replication
 
