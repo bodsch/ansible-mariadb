@@ -20,11 +20,28 @@ then
   DEFAULTS_FILE=/root/.my.cnf
 fi
 
-MYSQL="/usr/bin/mysql --defaults-file=${DEFAULTS_FILE}"
-MYADMIN="/usr/bin/mysqladmin --defaults-file=${DEFAULTS_FILE}"
+# detect mariadb binary
+
+MARIADB_BIN=$(command -v mariadb)
+
+if [ -n "${MARIADB_BIN}" ]
+then
+  MYSQL_BIN="${MARIADB_BIN}"
+  MYSQLADMIN_BIN="$(command -v mariadb-admin)"
+  MYUPGRADE_BIN="$(command -v mariadb-upgrade)"
+  MYCHECK_BIN="$(command -v mariadb-check)"
+else
+  MYSQL_BIN="$(command -v mysql)"
+  MYSQLADMIN_BIN="$(command -v mysqladmin)"
+  MYUPGRADE_BIN="$(command -v mysql_upgrade)"
+  MYCHECK_BIN="$(command -v mysqlcheck)"
+fi
+
+MYSQL="${MYSQL_BIN} --defaults-file=${DEFAULTS_FILE}"
+MYADMIN="${MYSQLADMIN_BIN} --defaults-file=${DEFAULTS_FILE}"
 # Don't run full mysql_upgrade on every server restart, use --version-check to do it only once
-MYUPGRADE="/usr/bin/mysql_upgrade --defaults-extra-file=${DEFAULTS_FILE} --version-check"
-MYCHECK="/usr/bin/mysqlcheck --defaults-file=${DEFAULTS_FILE}"
+MYUPGRADE="${MYUPGRADE_BIN} --defaults-extra-file=${DEFAULTS_FILE} --version-check"
+MYCHECK="${MYCHECK_BIN} --defaults-file=${DEFAULTS_FILE}"
 MYCHECK_SUBJECT="WARNING: mysqlcheck has found corrupt tables"
 MYCHECK_PARAMS="--all-databases --fast --silent"
 MYCHECK_RCPT="${MYCHECK_RCPT:-root}"
