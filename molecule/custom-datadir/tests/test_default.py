@@ -152,10 +152,8 @@ def test_user(host, get_vars):
 
     if distribution in ['redhat', 'ol', 'centos', 'rocky', 'almalinux']:
         shell = "/sbin/nologin"
-    elif distribution == "arch":
+    elif distribution in ['arch', 'artix']:
         shell = "/usr/bin/nologin"
-    elif distribution  == 'artix':
-        shell = "/bin/nologin"
 
     user_name = "mysql"
     u = host.user(user_name)

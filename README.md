@@ -10,12 +10,12 @@ Implement also an monitoring user with own table.
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-mariadb/main.yml?branch=main)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-mariadb)][issues]
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-mariadb)][releases]
-[![Ansible Quality Score](https://img.shields.io/ansible/quality/50067?label=role%20quality)][quality]
+[![Ansible Downloads](https://img.shields.io/ansible/role/d/bodsch/mariadb?logo=ansible)][galaxy]
 
 [ci]: https://github.com/bodsch/ansible-mariadb/actions
 [issues]: https://github.com/bodsch/ansible-mariadb/issues?q=is%3Aopen+is%3Aissue
 [releases]: https://github.com/bodsch/ansible-mariadb/releases
-[quality]: https://galaxy.ansible.com/bodsch/mariadb
+[galaxy]: https://galaxy.ansible.com/ui/standalone/roles/bodsch/mariadb/
 
 ## Requirements & Dependencies
 

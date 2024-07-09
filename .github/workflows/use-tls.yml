@@ -13,16 +13,20 @@ defaults:
   run:
     working-directory: 'ansible-mariadb'
 
+env:
+  PY_COLORS: '1'
+  ANSIBLE_FORCE_COLOR: '1'
+
 jobs:
-  deb:
-    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+  debian:
+    name: "${{ matrix.image }} / ansible ${{ matrix.ansible-version }} / python ${{ matrix.python }}"
     runs-on: ubuntu-20.04
     if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
         image:
-          - debian:11
+          - debian:12
         python_version:
           - "3.11.3"
         ansible-version:
@@ -32,13 +36,13 @@ jobs:
 
     steps:
       - name: check out the codebase.
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: 'ansible-mariadb'
           ref: ${{ github.event.workflow_run.head_branch }}
 
       - name: 🐍 set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python_version }}"
 
@@ -47,6 +51,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r test-requirements.txt
 
+      - name: force reinstall of community.docker
+        run: |
+          mkdir -p /home/runner/.ansible/collections
+          ansible-galaxy collection install community.docker --force
+
       - name: test with tox
         run: |
           make \
@@ -54,7 +63,3 @@ jobs:
             -e TOX_SCENARIO="${{ matrix.scenario }}" \
             -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
             -e DISTRIBUTION="${{ matrix.image }}"
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          DISTRIBUTION: ${{ matrix.image }}

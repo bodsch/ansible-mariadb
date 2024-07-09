@@ -8,15 +8,9 @@ dependency:
 driver:
   name: docker
 
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
-  flake8 .
-
 platforms:
   - name: database
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+    image: "bodsch/ansible-${DISTRIBUTION:-debian:12}"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
     privileged: true
@@ -35,7 +29,7 @@ provisioner:
   name: ansible
   ansible_args:
     - --diff
-    - -v
+    - -vv
   config_options:
     defaults:
       deprecation_warnings: true
@@ -48,7 +42,6 @@ provisioner:
 
 scenario:
   test_sequence:
-    # - lint
     - destroy
     - dependency
     - syntax

@@ -2,6 +2,7 @@
 
 galaxy_info:
   role_name: mariadb
+  namespace: bodsch
 
   author: Bodo Schulz
   description: MariaDB Server for debian (Ubuntu) and Arch Linux.
@@ -30,3 +31,5 @@ galaxy_info:
     - mariadb
 
 dependencies: []
+
+...
