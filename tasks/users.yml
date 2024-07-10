@@ -13,6 +13,6 @@
     '{{ mariadb_users }}'
   loop_control:
     label: "{{ item.name }}, state: {{ item.state | default('present') }}"
-  no_log: true
+  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
 
 ...

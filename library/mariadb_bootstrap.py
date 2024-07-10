@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
-# BSD 2-clause (see LICENSE or https://opensource.org/licenses/BSD-2-Clause)
+# (c) 2020-2024, Bodo Schulz <bodo@boone-schulz.de>
+# Apache (see LICENSE or https://opensource.org/licenses/Apache-2.0)
 
 from __future__ import absolute_import, print_function
 import os
@@ -169,13 +169,10 @@ def main():
         supports_check_mode = False,
     )
 
-    module.log(msg="-------------------------------------------------------------")
-
     helper = MariadbBootstrap(module)
     result = helper.run()
 
-    module.log(msg="= result: {}".format(result))
-    module.log(msg="-------------------------------------------------------------")
+    module.log(msg=f"= result: {result}")
 
     module.exit_json(**result)
 

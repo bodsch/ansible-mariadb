@@ -35,6 +35,11 @@
   loop_control:
     label: "{{ item.name | default('undefined') }}"
 
+- name: install dependecies
+  ansible.builtin.package:
+    name: "{{ mariadb_dependencies }}"
+    state: present
+
 - name: repositories
   ansible.builtin.include_tasks: repositories.yml
   when:
@@ -43,11 +48,6 @@
 - name: update package cache
   ansible.builtin.package:
     update_cache: true
-
-- name: install dependecies
-  ansible.builtin.package:
-    name: "{{ mariadb_dependencies }}"
-    state: present
 
 - name: update facts to get latest information
   ansible.builtin.setup:

@@ -6,7 +6,7 @@
     content: |
       #!/bin/sh
       exit 101
-    mode: 0755
+    mode: "0755"
   when:
     - not mariadb_installed
     - ansible_os_family | lower != 'archlinux'
@@ -23,7 +23,7 @@
     state: directory
     owner: mysql
     group: mysql
-    mode: 0775
+    mode: "0775"
   when:
     - mariadb_config_mysqld.pid_file is defined
     - mariadb_config_mysqld.pid_file | string | length > 0
@@ -32,7 +32,7 @@
   ansible.builtin.template:
     src: etc/mysql/debian-start.j2
     dest: "{{ mariadb_config_dir }}/debian-start"
-    mode: 0755
+    mode: "0755"
   when:
     - ansible_os_family | lower == 'debian'
 

@@ -17,13 +17,16 @@
           ansible.builtin.template:
             src: etc/apt/mariadb.list.j2
             dest: /etc/apt/sources.list.d/mariadb.list
-            mode: 0644
+            mode: "0644"
             owner: root
             group: root
 
         - name: clean apt cache   # noqa command-instead-of-module
           ansible.builtin.command: |
             apt-get clean
+          register: bash_output
+          changed_when: bash_output.rc != 0
+          failed_when: bash_output.rc != 0
           when: "ansible_version.full is version_compare('2.13', '<')"
 
         - name: clean apt cache

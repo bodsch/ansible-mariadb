@@ -33,7 +33,7 @@
         src: monitoring-my.cnf.j2
         dest: /usr/local/etc/.my.cnf
         owner: '{{ mariadb_monitoring.system_user }}'
-        mode: 0644
+        mode: "0644"
         backup: true
 
 ...

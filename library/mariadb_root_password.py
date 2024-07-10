@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
-# BSD 2-clause (see LICENSE or https://opensource.org/licenses/BSD-2-Clause)
+# (c) 2020-2024, Bodo Schulz <bodo@boone-schulz.de>
+# Apache (see LICENSE or https://opensource.org/licenses/Apache-2.0)
 
 from __future__ import absolute_import, division, print_function
 import os
@@ -57,7 +57,7 @@ class MariaDBRootPassword(object):
         self.dba_root_username = module.params.get("dba_root_username")
         self.dba_root_password = module.params.get("dba_root_password")
         self.dba_socket = module.params.get("dba_socket")
-        self.dba_hostname = module.params.get("dba_hostname")
+        # self.dba_hostname = module.params.get("dba_hostname")
         self.dba_config_directory = module.params.get("dba_config_directory")
         self.mycnf_file = module.params.get("mycnf_file")
 
@@ -92,11 +92,7 @@ class MariaDBRootPassword(object):
             with open(self.checksum_file) as f:
                 old_checksum = f.readline()
 
-            # self.module.log(msg="  hash         : {}".format(old_checksum))
-
         new_checksum = self._checksum(self.dba_root_password)
-
-        # self.module.log(msg="  hash         : {}".format(new_checksum))
 
         if old_checksum == new_checksum:
             return dict(
@@ -117,7 +113,7 @@ class MariaDBRootPassword(object):
         if rc != 0:
             return dict(
                 failed=True,
-                msg="{} / {}".format(out, err)
+                msg=f"{out} / {err}"
             )
 
         """
@@ -192,8 +188,8 @@ class MariaDBRootPassword(object):
             if self.dba_socket:
                 config.set('client', 'socket', self.dba_socket)
 
-            if self.dba_hostname:
-                config.set('client', 'host', self.dba_hostname)
+            # if self.dba_hostname:
+            #     config.set('client', 'host', self.dba_hostname)
 
             with open(self.mycnf_file, 'w') as configfile:    # save
                 config.write(configfile)
@@ -223,16 +219,35 @@ class MariaDBRootPassword(object):
 #
 
 def main():
-    ''' ... '''
-    module = AnsibleModule(
-        argument_spec=dict(
-            dba_root_username=dict(required=True, type='str'),
-            dba_root_password=dict(required=True, type='str', no_log=True),
-            dba_socket=dict(required=True, type='str'),
-            dba_hostname=dict(required=False, type='str'),
-            dba_config_directory=dict(required=True, type='path'),
-            mycnf_file=dict(required=False, type="str", default="/root/.my.cnf"),
+    """
+    """
+    specs = dict(
+        dba_root_username=dict(
+            required=True,
+            type='str'
         ),
+        dba_root_password=dict(
+            required=True, type='str',
+            no_log=True
+        ),
+        dba_socket=dict(
+            required=True,
+            type='str'
+        ),
+        # dba_hostname=dict(required=False, type='str'),
+        dba_config_directory=dict(
+            required=True,
+            type='path'
+        ),
+        mycnf_file=dict(
+            required=False,
+            type="str",
+            default="/root/.my.cnf"
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec=specs,
         supports_check_mode=False,
     )
 

@@ -6,7 +6,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: remove distribution directories
   ansible.builtin.file:
@@ -48,7 +48,7 @@
     dest: "{{ mariadb_config_file }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     backup: true
 
 - name: create configuration files
@@ -57,7 +57,7 @@
     dest: "{{ mariadb_config_include_dir }}/mysql.cnf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     backup: true
   notify:
     - restart mariadb
@@ -69,7 +69,7 @@
     state: directory
     owner: mysql
     group: mysql
-    mode: 0755
+    mode: "0755"
   when:
     - mariadb_config_mysqld.datadir is defined
     - mariadb_config_mysqld.datadir != "/var/lib/mysql"
@@ -80,7 +80,7 @@
     state: directory
     owner: mysql
     group: mysql
-    mode: 0755
+    mode: "0755"
   when:
     - mariadb_config_mysqld.tmpdir is defined
     - mariadb_config_mysqld.tmpdir | string | length > 0
@@ -92,7 +92,7 @@
     state: directory
     owner: mysql
     group: mysql
-    mode: 0775
+    mode: "0775"
   when:
     - mariadb_config_mysqld.pid_file is defined
     - mariadb_config_mysqld.pid_file | string | length > 0
@@ -108,7 +108,7 @@
         state: directory
         owner: mysql
         group: adm
-        mode: 0775
+        mode: "0775"
 
     - name: create slow query log file '{{ mariadb_config_mysqld.slow_query_log_file }}'
       ansible.builtin.file:
@@ -116,7 +116,7 @@
         state: touch
         owner: mysql
         group: mysql
-        mode: 0666
+        mode: "0666"
       changed_when: false
 
     - name: set ownership on slow query log file
@@ -125,7 +125,7 @@
         state: file
         owner: mysql
         group: mysql
-        mode: 0666
+        mode: "0666"
 
 - name: handle mariadb error log
   when:
@@ -138,7 +138,7 @@
         state: directory
         owner: mysql
         group: adm
-        mode: 0775
+        mode: "0775"
 
     - name: create error log file '{{ mariadb_config_mysqld.log_error }}'
       ansible.builtin.file:
@@ -146,7 +146,7 @@
         state: touch
         owner: mysql
         group: mysql
-        mode: 0666
+        mode: "0666"
       changed_when: false
 
     - name: set ownership on error log file
@@ -155,7 +155,7 @@
         state: file
         owner: mysql
         group: mysql
-        mode: 0666
+        mode: "0666"
 
 - name: configure swappiness
   ansible.posix.sysctl:
@@ -220,6 +220,9 @@
           ls -lth /run/ ;
           ls -lth /run/mysqld ;
         chdir: /run
+      register: bash_output
+      changed_when: bash_output.rc != 0
+      failed_when: bash_output.rc != 0
 
     - name: detect error
       when:

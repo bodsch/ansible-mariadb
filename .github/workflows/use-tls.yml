@@ -28,7 +28,7 @@ jobs:
         image:
           - debian:12
         python_version:
-          - "3.11.3"
+          - "3.11"
         ansible-version:
           - "6.7"
         scenario:
