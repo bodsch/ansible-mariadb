@@ -12,11 +12,11 @@ from ansible.module_utils.basic import AnsibleModule
 
 try:
     from configparser import ConfigParser, DuplicateSectionError
-    # from configparser import NoSectionError, NoOptionError
+    from configparser import NoSectionError, NoOptionError
 except ImportError:
     # ver. < 3.0
     from ConfigParser import ConfigParser, DuplicateSectionError
-    # from ConfigParser import NoSectionError, NoOptionError
+    from ConfigParser import NoSectionError, NoOptionError
 
 
 DOCUMENTATION = """
@@ -84,8 +84,6 @@ class MariaDBRootPassword(object):
         old_checksum = ""
         new_checksum = ""
 
-        self._write_mycnf()
-
         if checksum_file_exists:
             """
             """
@@ -108,6 +106,8 @@ class MariaDBRootPassword(object):
         args.append("password")
         args.append(self.dba_root_password)
 
+        self.module.log(msg=f" - args: {args}")
+
         rc, out, err = self._exec(args)
 
         if rc != 0:
@@ -115,6 +115,8 @@ class MariaDBRootPassword(object):
                 failed=True,
                 msg=f"{out} / {err}"
             )
+
+        self._write_mycnf()
 
         """
           persist checksum
@@ -130,10 +132,10 @@ class MariaDBRootPassword(object):
     def _write_mycnf(self):
         """
         """
-        # ini_password = None
-        # ini_username = None
-        # ini_socket = None
-        # ini_hostname = None
+        ini_password = None
+        ini_username = None
+        ini_socket = None
+        ini_hostname = None
 
         if ConfigParser:
             """
@@ -143,38 +145,39 @@ class MariaDBRootPassword(object):
 
             try:
                 config.read(self.mycnf_file)
-            except Exception:
-                # self.module.log(msg=" ERROR : {}".format(str(e)))
+            except Exception as e:
+                self.module.log(msg=f" ERROR : {e}")
                 return
 
-            # try:
-            #     ini_username = config.get('client', 'user')
-            # except NoOptionError:
-            #     # self.module.log(msg=" WARNING : {}".format(e))
-            #     pass
-            #
-            # try:
-            #     ini_password = config.get('client', 'password')
-            # except NoOptionError:
-            #     # self.module.log(msg=" WARNING : {}".format(e))
-            #     pass
-            #
-            # try:
-            #     ini_socket = config.get('client', 'socket')
-            # except NoOptionError:
-            #     # self.module.log(msg=" WARNING : {}".format(e))
-            #     pass
-            #
-            # try:
-            #     ini_hostname = config.get('client', 'host')
-            # except NoOptionError:
-            #     # self.module.log(msg=" WARNING : {}".format(e))
-            #     pass
+            try:
+                ini_username = config.get('client', 'user')
 
-            # self.module.log(msg="  - username: {}".format(ini_username))
-            # self.module.log(msg="  - password: {}".format(ini_password))
-            # self.module.log(msg="  - socket  : {}".format(ini_socket))
-            # self.module.log(msg="  - hostname: {}".format(ini_hostname))
+                try:
+                    ini_password = config.get('client', 'password')
+                except NoOptionError:
+                    # self.module.log(msg=" WARNING : {}".format(e))
+                    pass
+
+                try:
+                    ini_socket = config.get('client', 'socket')
+                except NoOptionError:
+                    # self.module.log(msg=" WARNING : {}".format(e))
+                    pass
+
+                try:
+                    ini_hostname = config.get('client', 'host')
+                except NoOptionError:
+                    # self.module.log(msg=" WARNING : {}".format(e))
+                    pass
+
+            except NoSectionError:
+                # self.module.log(msg=" WARNING : {}".format(e))
+                pass
+
+            # self.module.log(msg=f"  - username: {ini_username}")
+            # self.module.log(msg=f"  - password: {ini_password}")
+            # self.module.log(msg=f"  - socket  : {ini_socket}")
+            # self.module.log(msg=f"  - hostname: {ini_hostname}")
 
             try:
                 config.add_section('client')
@@ -191,19 +194,23 @@ class MariaDBRootPassword(object):
             # if self.dba_hostname:
             #     config.set('client', 'host', self.dba_hostname)
 
-            with open(self.mycnf_file, 'w') as configfile:    # save
+            # config_content = {section: dict(config[section]) for section in config.sections()}
+            # self.module.log(msg=f" config: {config_content}")
+
+            with open(self.mycnf_file, 'w') as configfile:
                 config.write(configfile)
 
-    def _exec(self, command):
+    def _exec(self, command, check_rc=True):
         """
           execute commands
         """
-        # self.module.log(msg="command: {}".format(command))
+        rc, out, err = self.module.run_command(command, check_rc=check_rc)
+        self.module.log(msg=f"  rc : '{rc}'")
 
-        rc, out, err = self.module.run_command(command, check_rc=True)
-        # self.module.log(msg="  rc : '{}'".format(rc))
-        # self.module.log(msg="  out: '{}'".format(out))
-        # self.module.log(msg="  err: '{}'".format(err))
+        if rc != 0:
+            self.module.log(msg=f"  out: '{out}'")
+            self.module.log(msg=f"  err: '{err}'")
+
         return rc, out, err
 
     def _checksum(self, plaintext):

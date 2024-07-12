@@ -1,14 +1,22 @@
 ---
 
-- name: check if a custom root password is specified
-  ansible.builtin.debug:
-    msg: >
-      Warning!!
-      The MariaDB root password was left empty.
-      Please set a custom password with role variable mariadb_root_password
-      to secure your database server!
+- name: validate custom root password
   when:
     - mariadb_root_password | length == 0
+  block:
+    - name: warn if a custom root password is not specified
+      ansible.builtin.fail:
+        msg: |
+          - WARNING -
+          The MariaDB root password was left empty.
+          Please set a custom password with role variable 'mariadb_root_password'
+          to secure your database server!
+      ignore_errors: true
+
+    - name: wait 10 seconds to realise the message
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        timeout: 10
 
 - name: set database root password
   mariadb_root_password:

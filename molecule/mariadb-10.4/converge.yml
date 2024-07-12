@@ -1,0 +1,9 @@
+---
+
+- name: converge
+  hosts: database
+  any_errors_fatal: false
+  become: false
+
+  roles:
+    - role: ansible-mariadb

@@ -1,0 +1,73 @@
+---
+
+mariadb_use_external_repo: true
+mariadb_version: 10.4
+
+mariadb_root_password: "Y5FZfKXzCeOWGf4kBOiFSp6Il--XXX"
+
+mariadb_monitoring:
+  enabled: false
+
+mariadb_mysqltuner: false
+
+# mariadb_databases:
+#   - name: molecule
+#     collation: utf8mb4_bin
+#     encoding: utf8mb4
+#
+# mariadb_users:
+#   - name: molecule
+#     host: '%'
+#     password: molecule
+#     priv: "molecule.*:ALL"
+#     encrypted: false
+#
+# mariadb_config_mysqld:
+#   bind_address: 127.0.0.1
+#   socket: "{{ mariadb_socket }}"
+#   skip_external_locking:
+#   skip_name_resolve: 1
+#   performance_schema: 1
+#   expire_logs_days: 2
+#   max_connections: 20
+
+mariadb_config_mysqld:
+  # basic
+  user: mysql
+  # pid_file: "{{ mariadb_pid_file }}"
+  # socket: "{{ mariadb_socket }}"
+  # datadir: /var/lib/mysql
+  # tmpdir: /tmp
+  # lc_messages_dir: /usr/share/mysql
+  skip-external-locking:
+  bind_address: 127.0.0.1
+  lower_case_table_names: "1"
+  event_scheduler: "ON"
+  # Query Cache
+  query_cache_type: "0"
+  query_cache_limit: 3M
+  query_cache_size: 16M
+  tmp_table_size: "1024"
+  max_heap_table_size: 64M
+  join_buffer_size: 262144
+  # Logging
+  log_error: /var/log/mysql/error.log
+  # server_id: "{{ mariadb_server_id }}"
+  relay_log: "{{ ansible_hostname }}-relay-bin"
+  relay_log_index: "{{ ansible_hostname }}-relay-bin.index"
+  # required for Wsrep GTID Mode, needs to be same path on all nodes
+  # log_bin: "{{ mariadb.galera.cluster_name }}-log-bin"
+  # log_bin_index: "{{ mariadb.galera.cluster_name }}-log-bin.index"
+  log_bin_trust_function_creators: "1"
+  expire_logs_days: 10
+  max_relay_log_size: 100M
+  max_binlog_size: 100M
+  binlog_ignore_db: monitoring
+  # Character sets
+  character_set_server: utf8mb4
+  collation_server: utf8mb4_general_ci
+  # required for Wsrep GTID Mode
+  log_slave_updates: true
+  # timeouts
+  wait_timeout: 28800
+  interactive_timeout: 28800
