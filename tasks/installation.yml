@@ -28,13 +28,38 @@
     - mariadb_config_mysqld.pid_file is defined
     - mariadb_config_mysqld.pid_file | string | length > 0
 
-- name: fix debian specific debian-start file
-  ansible.builtin.template:
-    src: etc/mysql/debian-start.j2
-    dest: "{{ mariadb_config_dir }}/debian-start"
-    mode: "0755"
+- name: handle debian specific tasks
   when:
     - ansible_os_family | lower == 'debian'
+  block:
+    - name: fix debian specific debian-start file
+      ansible.builtin.template:
+        src: etc/mysql/debian-start.j2
+        dest: "{{ mariadb_config_dir }}/debian-start"
+        mode: "0755"
+
+    - name: detect mysql apparmor prifile
+      ansible.builtin.stat:
+        path: /etc/apparmor.d/usr.sbin.mysqld
+      register: apparmor_mysql_profile
+
+    - name: apparmor stuff
+      when:
+        - apparmor_mysql_profile.stat.exists
+      block:
+        - name: create apparmor disable directory
+          ansible.builtin.file:
+            path: /etc/apparmor.d/disable
+            state: directory
+            mode: "0755"
+
+        - name: disable profile
+          ansible.builtin.file:
+            src: /etc/apparmor.d/usr.sbin.mysqld
+            dest: /etc/apparmor.d/disable/usr.sbin.mysqld
+            mode: "0755"
+            state: link
+            force: true
 
 - name: remove policy-rc.d
   ansible.builtin.file:
