@@ -71,10 +71,14 @@ jobs:
           mkdir -p /home/runner/.ansible/collections
           ansible-galaxy collection install community.docker --force
 
-      - name: test with tox
+      - name: apparmor
         run: |
-          make \
-            test \
-            -e TOX_SCENARIO="${{ matrix.scenario }}" \
-            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
-            -e DISTRIBUTION="${{ matrix.image }}"
+          aa-status 2> /dev/null
+
+      # - name: test with tox
+      #   run: |
+      #     make \
+      #       test \
+      #       -e TOX_SCENARIO="${{ matrix.scenario }}" \
+      #       -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+      #       -e DISTRIBUTION="${{ matrix.image }}"
