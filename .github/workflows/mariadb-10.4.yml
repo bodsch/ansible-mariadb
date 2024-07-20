@@ -73,7 +73,8 @@ jobs:
 
       - name: apparmor
         run: |
-          aa-status 2> /dev/null
+          command -v aa-status
+          aa-status
 
       # - name: test with tox
       #   run: |
