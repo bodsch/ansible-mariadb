@@ -19,7 +19,7 @@ env:
 
 jobs:
   debian:
-    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+    name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python }}"
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
@@ -70,7 +70,7 @@ jobs:
             -e DISTRIBUTION="${{ matrix.image }}"
 
   ubuntu:
-    name: "${{ matrix.image }} / ansible ${{ matrix.ansible-version }} / python ${{ matrix.python }}"
+    name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python }}"
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
@@ -121,7 +121,7 @@ jobs:
             -e DISTRIBUTION="${{ matrix.image }}"
 
   scenarios:
-    name: "${{ matrix.scenario }} / ansible ${{ matrix.ansible-version }} / python ${{ matrix.python_version }}"
+    name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python }}"
     runs-on: ubuntu-22.04
     needs:
       - debian
@@ -177,12 +177,8 @@ jobs:
             -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
             -e DISTRIBUTION="${{ matrix.image }}"
 
-
-
-
-
   old_versions:
-    name: "${{ matrix.scenario }} / ansible ${{ matrix.ansible-version }} / python ${{ matrix.python_version }}"
+    name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python }}"
     runs-on: ubuntu-22.04
     needs:
       - debian
