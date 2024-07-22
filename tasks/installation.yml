@@ -38,45 +38,6 @@
         dest: "{{ mariadb_config_dir }}/debian-start"
         mode: "0755"
 
-    - name: detect mysql apparmor prifile
-      ansible.builtin.stat:
-        path: /etc/apparmor.d/usr.sbin.mysqld
-      register: apparmor_mysql_profile
-
-    - name: apparmor stuff
-      when:
-        - apparmor_mysql_profile.stat.exists
-      block:
-        - name: create apparmor disable directory
-          ansible.builtin.file:
-            path: /etc/apparmor.d/disable
-            state: directory
-            mode: "0755"
-
-        - name: disable profile
-          ansible.builtin.file:
-            src: /etc/apparmor.d/usr.sbin.mysqld
-            dest: /etc/apparmor.d/disable/usr.sbin.mysqld
-            mode: "0755"
-            state: link
-            force: true
-
-        - name: reload apparmor
-          ansible.builtin.command: |
-            apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-          register: apparmor
-          changed_when: apparmor.rc != 0
-          failed_when: apparmor.rc != 0
-          ignore_errors: true
-
-        - name: apparmor status
-          ansible.builtin.command: |
-            aa-status
-          register: apparmor
-          changed_when: apparmor.rc != 0
-          failed_when: apparmor.rc != 0
-          ignore_errors: true
-
 - name: remove policy-rc.d
   ansible.builtin.file:
     path: /usr/sbin/policy-rc.d

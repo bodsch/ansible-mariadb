@@ -1,0 +1,9 @@
+---
+
+- name: snapd
+  src: bodsch.snapd
+  version: 1.2.1
+
+- name: apparmor
+  src: bodsch.apparmor
+  version: 1.0.2

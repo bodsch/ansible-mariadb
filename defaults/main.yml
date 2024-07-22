@@ -1,5 +1,6 @@
 ---
 
+# only useable with debian
 mariadb_use_external_repo: false
 mariadb_version: 10.6
 
@@ -11,7 +12,7 @@ mariadb_monitoring:
   username: 'monitoring'
   password: '8WOMmRWWYHPR'
 
-mariadb_mysqltuner: true
+mariadb_mysqltuner: false
 
 # The default root user installed by mysql - almost always root
 mariadb_root_home: /root
