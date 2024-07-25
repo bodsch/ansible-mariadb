@@ -10,7 +10,7 @@
   ansible.builtin.include_tasks: installation.yml
 
 - name: configure
-  ansible.builtin.include_tasks: configure.yml
+  ansible.builtin.include_tasks: configure/main.yml
 
 - name: secure installation
   ansible.builtin.include_tasks: secure-installation.yml

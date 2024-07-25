@@ -1,0 +1,145 @@
+---
+
+# TEST
+# - name: cluster mode
+#   when:
+#     - mariadb_galera_cluster
+#     - mariadb_galera_primary
+#   block:
+#     - name: detect {{  mariadb_config_mysqld.datadir }}/grastate.dat
+#       ansible.builtin.stat:
+#         path: "{{ mariadb_config_mysqld.datadir }}/grastate.dat"
+#       register: stat_mariadb_grastate
+#       ignore_errors: true
+#       no_log: true
+#
+#     - name: load {{  mariadb_config_mysqld.datadir }}/grastate.dat
+#       ansible.builtin.slurp:
+#         src: "{{ mariadb_config_mysqld.datadir }}/grastate.dat"
+#       register: mariadb_grastate
+#       no_log: true
+#       when:
+#         - stat_mariadb_grastate.stat.exists | default('false')
+#
+#     - name: detect {{ mariadb_config_mysqld.datadir }}/gvwstate.dat
+#       ansible.builtin.stat:
+#         path: "{{ mariadb_config_mysqld.datadir }}/gvwstate.dat"
+#       register: stat_mariadb_gvwstate
+#       ignore_errors: true
+#       no_log: true
+#
+#     - name: load {{ mariadb_config_mysqld.datadir }}/gvwstate.dat
+#       ansible.builtin.slurp:
+#         src: "{{ mariadb_config_mysqld.datadir }}/gvwstate.dat"
+#       register: mariadb_gvwstate
+#       no_log: true
+#       when:
+#         - stat_mariadb_gvwstate.stat.exists | default('false')
+#
+#     - name: grastate output
+#       ansible.builtin.debug:
+#         msg: "{{ mariadb_grastate.content | b64decode }}"
+#       when:
+#         - stat_mariadb_grastate.stat.exists | default('false')
+#         - mariadb_grastate.content is defined
+#
+#     - name: gvwstate output
+#       ansible.builtin.debug:
+#         msg: "{{ mariadb_gvwstate.content | b64decode }}"
+#       when:
+#         - stat_mariadb_gvwstate.stat.exists | default('false')
+#         - mariadb_gvwstate.content is defined
+
+- name: galera cluster mode
+  when:
+    - mariadb_galera_cluster
+  block:
+    - name: primary
+      when:
+        - mariadb_galera_primary
+      block:
+        - name: flush handlers
+          ansible.builtin.meta: flush_handlers
+
+        # - name: start mariadb first time
+        #   ansible.builtin.service:
+        #     name: '{{ mariadb_service }}'
+        #     state: started
+        #   # ignore_errors: false
+        #   register: service_status
+        #
+        # - name: check mariadb pid file
+        #   ansible.builtin.wait_for:
+        #     path: "{{ mariadb_config_mysqld.pid_file }}"
+        #     state: present
+        #     delay: 4
+        #     timeout: 120
+        #     msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+
+      rescue:
+
+        - name: stop mariadb service bootstrap mode
+          ansible.builtin.service:
+            name: "{{ mariadb_service }}"
+            state: stopped
+
+        - name: remove {{ mariadb_config_mysqld.datadir }}/gvwstate.dat
+          ansible.builtin.file:
+            state: absent
+            path: "{{ mariadb_config_mysqld.datadir }}/gvwstate.dat"
+
+        - name: remove {{ mariadb_config_mysqld.datadir }}/grastate.dat
+          ansible.builtin.file:
+            state: absent
+            path: "{{ mariadb_config_mysqld.datadir }}/grastate.dat"
+
+        - name: exit with fail
+          ansible.builtin.fail:
+            msg: "Error while creating the initial database structure!"
+
+    - name: replicas
+      when:
+        - not mariadb_galera_primary
+      block:
+        - name: flush handlers
+          ansible.builtin.meta: flush_handlers
+
+        # - name: start mariadb first time
+        #   ansible.builtin.service:
+        #     name: '{{ mariadb_service }}'
+        #     state: started
+        #   # ignore_errors: false
+        #   register: service_status
+        #   #notify:
+        #   #  - check mariadb pid file
+        #
+        # - name: check mariadb pid file
+        #   ansible.builtin.wait_for:
+        #     path: "{{ mariadb_config_mysqld.pid_file }}"
+        #     state: present
+        #     delay: 2
+        #     timeout: 120
+        #     msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+        #   # ignore_errors: false
+      rescue:
+
+        - name: stop mariadb service bootstrap mode
+          ansible.builtin.service:
+            name: "{{ mariadb_service }}"
+            state: stopped
+
+        - name: remove {{ mariadb_config_mysqld.datadir }}/gvwstate.dat
+          ansible.builtin.file:
+            state: absent
+            path: "{{ mariadb_config_mysqld.datadir }}/gvwstate.dat"
+
+        - name: remove {{ mariadb_config_mysqld.datadir }}/grastate.dat
+          ansible.builtin.file:
+            state: absent
+            path: "{{ mariadb_config_mysqld.datadir }}/grastate.dat"
+
+        - name: exit with fail
+          ansible.builtin.fail:
+            msg: "Error while creating the initial database structure!"
+
+...

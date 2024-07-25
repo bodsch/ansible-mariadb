@@ -54,6 +54,7 @@ mariadb_config_galera:
   # Mandatory settings
   # unix_socket: "OFF"    # from https://mariadb.com/kb/en/mariadb-galera-cluster-known-limitations/#comment_4558
   wsrep_on: "ON"
+  wsrep_notify_cmd: "/bin/wsrep_notify.sh"
   wsrep_cluster_name: "{{ mariadb.galera.cluster_name }}"
   wsrep_provider: "/usr/lib/libgalera_smm.so"
   wsrep_cluster_address: "gcomm://{{ mariadb_galera_node_addresses }}"

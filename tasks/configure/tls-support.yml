@@ -1,0 +1,18 @@
+---
+
+- name: TLS support
+  when:
+    - mariadb_config_mysqld | support_tls
+  block:
+    - name: copy certificates
+      become: true
+      mariadb_tls_certificates:
+        source:
+          ssl_cert: "{{ mariadb_tls_certificate.source_files.cert | default(omit) }}"
+          ssl_key: "{{ mariadb_tls_certificate.source_files.key | default(omit) }}"
+          ssl_ca: "{{ mariadb_tls_certificate.source_files.ca | default(omit) }}"
+        destination: "{{ mariadb_config_mysqld | tls_directory }}"
+        owner: mysql
+        group: mysql
+
+...

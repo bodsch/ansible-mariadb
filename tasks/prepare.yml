@@ -31,6 +31,7 @@
     - mariadb_users | count > 0
     - (not item.name is defined or item.name | length == 0) or
       (not item.password is defined or item.password | length == 0)
+  run_once: true
   loop: "{{ mariadb_users }}"
   loop_control:
     label: "{{ item.name | default('undefined') }}"
@@ -77,6 +78,22 @@
   when:
     - mysqld_binary_file is defined
     - mysqld_binary_file.stat is defined
+
+- name: detect galera cluster
+  ansible.builtin.set_fact:
+    _mariadb_galera_cluster: "{{ mariadb_config_galera | detect_galera() }}"
+
+- name: define mariadb_galera and mariadb_galera_primary
+  ansible.builtin.set_fact:
+    mariadb_galera_cluster: "{{ _mariadb_galera_cluster.galera }}"
+    mariadb_galera_primary: "{{ _mariadb_galera_cluster.primary }}"
+
+- name: galera packages
+  when:
+    - mariadb_galera_cluster
+    - ansible_distribution | lower == 'archlinux'
+  ansible.builtin.set_fact:
+    mariadb_packages: "{{ mariadb_packages + ['galera'] }}"
 
 - name: update facts to get latest information
   ansible.builtin.setup:
