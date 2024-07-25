@@ -140,6 +140,8 @@ jobs:
           - custom-datadir
           # primary with replica
           - with-replication
+          # galera cluster
+          - galera-cluster
           # single instance with TLS
           - with-tls
 

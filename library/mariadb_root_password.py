@@ -33,7 +33,8 @@ EXAMPLES = """
   mariadb_root_password:
     dba_root_username: "{{ mariadb_root_username }}"
     dba_root_password: "{{ mariadb_root_password }}"
-    dba_socket: "{{ mariadb_socket }}"
+    dba_bind_address: "{{ mariadb_bind_address | default(omit) }}
+    dba_socket: "{{ mariadb_socket | default(omit) }}"
     dba_config_directory: "{{ mariadb_config_dir }}"
     mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
 
@@ -57,20 +58,20 @@ class MariaDBRootPassword(object):
         self.dba_root_username = module.params.get("dba_root_username")
         self.dba_root_password = module.params.get("dba_root_password")
         self.dba_socket = module.params.get("dba_socket")
-        # self.dba_hostname = module.params.get("dba_hostname")
+        self.dba_bind_address = module.params.get("dba_bind_address")  # TODO: rename to bind_address
         self.dba_config_directory = module.params.get("dba_config_directory")
         self.mycnf_file = module.params.get("mycnf_file")
 
         self.checksum_file = os.path.join(self.dba_config_directory, ".rootpw_configured")
 
         # self.module.log(msg="-------------------------------------------------------------")
-        # self.module.log(msg="username      : {}".format(self.dba_root_username))
-        # self.module.log(msg="password      : {}".format(self.dba_root_password))
-        # self.module.log(msg="socket        : {}".format(self.dba_socket))
-        # self.module.log(msg="hostname      : {}".format(self.dba_hostname))
-        # self.module.log(msg="config dir    : {}".format(self.dba_config_directory))
-        # self.module.log(msg="checksum file : {}".format(self.checksum_file))
-        # self.module.log(msg="mycnf_file    : {}".format(self.mycnf_file))
+        # self.module.log(msg=f"username      : {self.dba_root_username}")
+        # self.module.log(msg=f"password      : {self.dba_root_password}")
+        # self.module.log(msg=f"socket        : {self.dba_socket}")
+        # self.module.log(msg=f"bind_address  : {self.dba_bind_address}")
+        # self.module.log(msg=f"config dir    : {self.dba_config_directory}")
+        # self.module.log(msg=f"checksum file : {self.checksum_file}")
+        # self.module.log(msg=f"mycnf_file    : {self.mycnf_file}")
         # self.module.log(msg="------------------------------")
 
         # self.db_connect_timeout = 30
@@ -98,25 +99,30 @@ class MariaDBRootPassword(object):
                 msg="password was not changed"
             )
 
+        self._write_mycnf()
+
         mysqladmin_binary = self.module.get_bin_path("mysqladmin", False)
 
         args = [mysqladmin_binary]
         args.append("--user")
         args.append("root")
+
+        if self.dba_bind_address:
+            args.append("--host")
+            args.append(self.dba_bind_address)
+
         args.append("password")
         args.append(self.dba_root_password)
 
         self.module.log(msg=f" - args: {args}")
 
-        rc, out, err = self._exec(args)
+        rc, out, err = self._exec(command=args, check_rc=False)
 
         if rc != 0:
             return dict(
                 failed=True,
                 msg=f"{out} / {err}"
             )
-
-        self._write_mycnf()
 
         """
           persist checksum
@@ -191,8 +197,8 @@ class MariaDBRootPassword(object):
             if self.dba_socket:
                 config.set('client', 'socket', self.dba_socket)
 
-            # if self.dba_hostname:
-            #     config.set('client', 'host', self.dba_hostname)
+            if self.dba_bind_address:
+                config.set('client', 'host', self.dba_bind_address)
 
             # config_content = {section: dict(config[section]) for section in config.sections()}
             # self.module.log(msg=f" config: {config_content}")
@@ -241,7 +247,10 @@ def main():
             required=True,
             type='str'
         ),
-        # dba_hostname=dict(required=False, type='str'),
+        dba_bind_address=dict(
+            required=False,
+            type='str'
+        ),
         dba_config_directory=dict(
             required=True,
             type='path'
@@ -258,13 +267,10 @@ def main():
         supports_check_mode=False,
     )
 
-    # module.log(msg="-------------------------------------------------------------")
-
     client = MariaDBRootPassword(module)
     result = client.run()
 
-    module.log(msg="= result: {}".format(result))
-    # module.log(msg="-------------------------------------------------------------")
+    module.log(msg=f"= result: {result}")
 
     module.exit_json(**result)
 

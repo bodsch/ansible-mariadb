@@ -22,8 +22,8 @@
   mariadb_root_password:
     dba_root_username: "{{ mariadb_root_username }}"
     dba_root_password: "{{ mariadb_root_password }}"
-    # dba_hostname: "{{ mariadb_hostname | default(omit) }}"
-    dba_socket: "{{ mariadb_socket }}"
+    dba_bind_address: "{{ mariadb_bind_address | default(omit) }}"
+    dba_socket: "{{ mariadb_socket | default(omit) }}"
     dba_config_directory: "{{ mariadb_config_dir }}"
     mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
 
