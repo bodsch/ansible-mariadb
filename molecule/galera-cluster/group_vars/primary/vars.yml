@@ -1,0 +1,15 @@
+---
+
+mariadb_replication_role: primary
+
+mariadb_databases:
+  - name: molecule
+    collation: utf8mb4_bin
+    encoding: utf8mb4
+    replication: false
+  - name: replication_test
+    collation: utf8mb4_bin
+    encoding: utf8mb4
+    replication: true
+
+...

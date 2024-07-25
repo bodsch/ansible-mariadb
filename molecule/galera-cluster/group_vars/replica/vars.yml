@@ -1,0 +1,7 @@
+---
+
+mariadb_replication_role: replica
+
+mariadb_galera_node_addresses: "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list | join(',') }}"
+
+...
