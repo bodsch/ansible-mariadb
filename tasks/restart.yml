@@ -3,16 +3,17 @@
 - name: update facts to get latest information
   ansible.builtin.setup:
 
-- name: informations
-  ansible.builtin.debug:
-    msg: "{{ _mysql_cnf_changed }}"
-
 - name: reconfigure
   when:
     - _mysql_cnf_changed is defined
     - _mysql_cnf_changed.changed is defined
     - not _mysql_cnf_changed.changed | bool
   block:
+
+    - name: informations about config changes
+      ansible.builtin.debug:
+        msg: "{{ _mysql_cnf_changed }}"
+
     - name: restart galera cluster after reconfigure
       when:
         - mariadb_galera_cluster

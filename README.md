@@ -123,6 +123,44 @@ mariadb_replication:
 mariadb_server_id: 2
 ```
 
+### galera cluster
+
+With a gallery cluster, starting the individual instances correctly is extremely important!  
+One of the instances must be started first as the primary node. All subsequent nodes then replicate the information.  
+A restart of the mariadb service must not destroy the cluster status, so they must be restarted **serially** and **not in parallel**!
+
+Example configuration:
+
+```yaml
+mariadb_galera:
+  node_addresses:
+    - address: "10.29.0.10"
+    - address: "10.29.0.21"
+    - address: "10.29.0.22"
+  sst:
+    method: rsync
+    auth:
+      username: "sstuser"
+      password: ""
+  node:
+    name: "{{ ansible_hostname }}"
+    id: "{{ mariadb_server_id | default('1') }}"
+    address: "{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+  gtid_domain_id: "{{ mariadb_server_id | default('1') }}"
+
+  provider_options:
+    - debug=yes
+    - gcache.size=512M
+    - gcache.page_size=128M
+    - gcache.recover=yes
+    - gmcast.peer_timeout=PT10S
+    - pc.announce_timeout=PT10S
+
+```
+
+(A fully functional configuration can be found under [molecule/galera-cluster](molecule/galera-cluster).)
+
+
 ### mysql tuner
 
 ```yaml
@@ -228,6 +266,20 @@ mariadb_replication:
   primary: ''
   # Same keys as `mariadb_users` above.
   user: []
+  
+mariadb_galera:
+  node_addresses: []
+  sst:
+    method: rsync
+    auth:
+      username: "sstuser"
+      password: ""
+  node:
+    name: "{{ ansible_hostname }}"
+    id: "{{ mariadb_server_id | default('1') }}"
+    address: "{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+  gtid_domain_id: "{{ mariadb_server_id | default('1') }}"
+  provider_options: []
 ```
 
 ## Tests

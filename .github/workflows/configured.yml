@@ -2,12 +2,25 @@
 name: mariadb with various  configuration
 
 on:
+  #schedule:
+  #  - cron: "45 3 * * 0"
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "CI"
-    types:
-      - completed
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+  # workflow_dispatch:
+  # workflow_run:
+  #   workflows:
+  #     - "CI"
+  #   types:
+  #     - completed
 
 defaults:
   run:
@@ -21,7 +34,7 @@ jobs:
   debian:
     name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python_version }}"
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -72,7 +85,7 @@ jobs:
   ubuntu:
     name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python_version }}"
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -179,57 +192,57 @@ jobs:
             -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
             -e DISTRIBUTION="${{ matrix.image }}"
 
-  old_versions:
-    name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python_version }}"
-    runs-on: ubuntu-22.04
-    needs:
-      - debian
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          - debian:10
-        python_version:
-          - "3.11"
-        ansible-version:
-          - "6.7"
-        scenario:
-          - "mariadb-10.4"
-          - "mariadb-10.4-without-root-password"
-          - "mariadb-10.5"
-
-    steps:
-      - name: check out the codebase.
-        uses: actions/checkout@v4
-        with:
-          path: 'ansible-mariadb'
-          ref: ${{ github.event.workflow_run.head_branch }}
-
-      - name: 🐍 set up python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "${{ matrix.python_version }}"
-
-      - name: install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r test-requirements.txt
-
-      - name: force reinstall of community.docker
-        run: |
-          mkdir -p /home/runner/.ansible/collections
-          ansible-galaxy collection install community.docker --force
-
-      - name: apparmor
-        run: |
-          sudo aa-status
-          sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-          sudo apparmor_parser -R /etc/apparmor.d/disable/usr.sbin.mysqld
-
-      - name: test with tox
-        run: |
-          make \
-            test \
-            -e TOX_SCENARIO="${{ matrix.scenario }}" \
-            -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
-            -e DISTRIBUTION="${{ matrix.image }}"
+  # old_versions:
+  #   name: "${{ matrix.scenario }} / ${{ matrix.image }}, ansible ${{ matrix.ansible-version }}, python ${{ matrix.python_version }}"
+  #   runs-on: ubuntu-22.04
+  #   needs:
+  #     - debian
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       image:
+  #         - debian:10
+  #       python_version:
+  #         - "3.11"
+  #       ansible-version:
+  #         - "6.7"
+  #       scenario:
+  #         - "mariadb-10.4"
+  #         - "mariadb-10.4-without-root-password"
+  #         - "mariadb-10.5"
+  #
+  #   steps:
+  #     - name: check out the codebase.
+  #       uses: actions/checkout@v4
+  #       with:
+  #         path: 'ansible-mariadb'
+  #         ref: ${{ github.event.workflow_run.head_branch }}
+  #
+  #     - name: 🐍 set up python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "${{ matrix.python_version }}"
+  #
+  #     - name: install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r test-requirements.txt
+  #
+  #     - name: force reinstall of community.docker
+  #       run: |
+  #         mkdir -p /home/runner/.ansible/collections
+  #         ansible-galaxy collection install community.docker --force
+  #
+  #     - name: apparmor
+  #       run: |
+  #         sudo aa-status
+  #         sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+  #         sudo apparmor_parser -R /etc/apparmor.d/disable/usr.sbin.mysqld
+  #
+  #     - name: test with tox
+  #       run: |
+  #         make \
+  #           test \
+  #           -e TOX_SCENARIO="${{ matrix.scenario }}" \
+  #           -e TOX_ANSIBLE="ansible_${{ matrix.ansible-version }}" \
+  #           -e DISTRIBUTION="${{ matrix.image }}"

@@ -1,7 +1,6 @@
 ---
 
 mariadb_galera:
-  # node_addresses: "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list | join(',') }}"
   cluster_name: molecule-cluster
   node_addresses:
     - address: "10.29.0.10"
@@ -13,9 +12,6 @@ mariadb_galera:
     - address: "10.29.0.22"
       port: ""
       #name: "replica_2"
-      # "{{ mariadb_instances | default([]) }}"
-      # parameters:
-      # "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
   sst:
     method: rsync
     auth:
@@ -28,13 +24,12 @@ mariadb_galera:
   gtid_domain_id: "{{ mariadb_server_id }}"
 
   provider_options:
-    - debug=yes
-    # - gcache.size=512M
-    # - gcache.page_size=128M
-    # - gcache.recover=yes
-    # - gmcast.peer_timeout=PT10S
-    # - pc.announce_timeout=PT10S
-
+    - debug=no
+    - gcache.size=512M
+    - gcache.page_size=128M
+    - gcache.recover=yes
+    - gmcast.peer_timeout=PT10S
+    - pc.announce_timeout=PT10S
 
 mariadb:
   proxy_protocol_networks:
