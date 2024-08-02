@@ -1,0 +1,56 @@
+---
+
+- name: reconfigure primary cluster node
+  block:
+
+    - name: remove wsrep.cnf (was only needed for the bootstrap)
+      ansible.builtin.file:
+        state: absent
+        path: "{{ mariadb_config_include_dir }}/99-wsrep.cnf"
+
+    - name: stop galera bootstrap service
+      service:
+        name: "{{ mariadb_service }}.service"
+        state: stopped
+
+    - name: wait for stopped service
+      delegate_to: "{{ inventory_hostname }}"
+      wait_for:
+        host: "{{ mariadb_config_mysqld.bind_address | default('127.0.0.1') }}"
+        port: 3306
+        delay: 10
+        timeout: 120
+        state: stopped
+      register: _stopped_service
+
+    - name: reset environment variable
+      ansible.builtin.shell: |
+          systemctl set-environment _WSREP_NEW_CLUSTER=''
+      register: systemctl
+      changed_when: systemctl.rc != 0
+      failed_when: systemctl.rc != 0
+
+    - name: restart galera primary cluster node
+      ansible.builtin.service:
+        name: "{{ mariadb_service }}.service"
+        state: started
+
+    - name: check mariadb pid file
+      ansible.builtin.wait_for:
+        path: "{{ mariadb_config_mysqld.pid_file }}"
+        state: present
+        delay: 4
+        timeout: 120
+        msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+
+    - name: tag bootstrapped
+      ansible.builtin.file:
+        state: touch
+        path: "{{ mariadb_galera_states.wsrep_bootstrapped }}"
+        mode: 0640
+
+    - name: reset variable to suppress restarts
+      ansible.builtin.set_fact:
+        _mysql_cnf_changed: ""
+
+...

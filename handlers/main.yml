@@ -5,12 +5,21 @@
     daemon_reload: true
 
 - name: restart mariadb
+  listen: restart mariadb
   ansible.builtin.service:
     name: '{{ mariadb_service }}'
     state: restarted
   notify:
     - check mariadb pid file
-    # - wait 2 seconds for clean startup
+  when:
+    - not mariadb_galera_cluster
+
+- name: restart galera cluster
+  listen: restart mariadb
+  include_tasks: handlers/galera.yml
+  when:
+    - mariadb_galera_cluster
+    - _mysql_cnf_changed.changed | default('false')
 
 - name: wait 2 seconds for clean startup
   ansible.builtin.pause:
@@ -22,6 +31,5 @@
     state: present
     delay: 2
     timeout: 60
-    # sleep: 2
     msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
   ignore_errors: false

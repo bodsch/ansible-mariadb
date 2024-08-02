@@ -68,6 +68,9 @@ def get_vars(host):
     ansible_vars.update(distibution_vars)
     ansible_vars.update(molecule_vars)
 
+    # print(pp_json(ansible_vars))
+    _ = ansible_vars.get("mariadb_config_galera",{}).pop("wsrep_cluster_address")
+
     templar = Templar(loader=DataLoader(), variables=ansible_vars)
     result = templar.template(ansible_vars, fail_on_undefined=False)
 
@@ -175,3 +178,33 @@ def test_service_running_and_enabled(host, get_vars):
     service = host.service(service_name)
     assert service.is_running
     assert service.is_enabled
+
+
+def test_listening_socket(host, get_vars):
+    """
+    """
+    listening = host.socket.get_listening_sockets()
+
+    for i in listening:
+        print(i)
+
+    distribution = host.system_info.distribution
+    release = host.system_info.release
+
+    socket_name = get_vars.get("mariadb_socket", None)
+
+    f = host.file(socket_name)
+    assert f.exists
+
+    listen = []
+    # mariadb
+    listen.append("tcp://10.29.0.21:3306")
+    # wsrep
+    listen.append("tcp://0.0.0.0:4567")
+
+    if socket_name and not (distribution == 'ubuntu' and release == '18.04'):
+        listen.append(f"unix://{socket_name}")
+
+    for spec in listen:
+        socket = host.socket(spec)
+        assert socket.is_listening

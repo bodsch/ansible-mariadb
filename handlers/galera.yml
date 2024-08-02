@@ -1,0 +1,31 @@
+---
+
+- name: restart galera primary cluster node
+  when:
+    - mariadb_galera_primary
+    - _mysql_cnf_changed.changed | default('false')
+  block:
+    - name: restart galera primary cluster node
+      ansible.builtin.service:
+        name: "{{ mariadb_service }}.service"
+        state: restarted
+
+    - name: check mariadb pid file
+      ansible.builtin.wait_for:
+        path: "{{ mariadb_config_mysqld.pid_file }}"
+        state: present
+        delay: 10
+        timeout: 60
+        msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+
+- name: restart galera secondary cluster nodes ({{ item }})
+  include_tasks: handlers/galera_secondary.yml
+  loop: "{{ mariadb_galera_replica_nodes }}"
+  loop_control:
+    label: "{{ item }}"
+  when:
+    - not mariadb_galera_primary
+    - _mysql_cnf_changed.changed | default('false')
+    - inventory_hostname == item
+
+...

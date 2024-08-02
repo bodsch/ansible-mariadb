@@ -100,4 +100,33 @@ mariadb_replication:
   # Same keys as `mariadb_users` above.
   user: []
 
+mariadb_galera:
+  node_addresses: []
+    # - address: "10.29.0.10"
+    #   port: ""
+  sst:
+    method: rsync
+    auth:
+      username: "sstuser"
+      password: ""
+  node:
+    name: "{{ ansible_hostname }}"
+    id: "{{ mariadb_server_id | default('1') }}"
+    address: "{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+  gtid_domain_id: "{{ mariadb_server_id | default('1') }}"
+
+  provider_options: []
+    # - debug=yes
+    # - gcache.size=512M
+    # - gcache.page_size=128M
+    # - gcache.recover=yes
+    # - gmcast.peer_timeout=PT10S
+    # - pc.announce_timeout=PT10S
+
+# mariadb_galera_cluster_user:
+#   username: sstuser
+#   password: "{{ mariadb_galera.sst.auth.username }}"
+#   priv:
+#     "*.*": "PROCESS,RELOAD,LOCK TABLES,REPLICATION CLIENT"
+
 ...

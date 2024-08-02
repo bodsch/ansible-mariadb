@@ -18,9 +18,6 @@
   when:
     - mariadb_config_mysqld | support_tls
 
-- name: wsrep_notify
-  ansible.builtin.include_tasks: configure/wsrep-notify.yml
-
 - name: detect '{{ mariadb_config_file }}'
   ansible.builtin.stat:
     path: "{{ mariadb_config_file }}"
@@ -52,8 +49,7 @@
     group: root
     mode: "0644"
     backup: true
-  notify:
-    - restart mariadb
+  register: _mysql_cnf_changed
 
 - name: create data directory '{{ mariadb_config_mysqld.datadir }}'
   ansible.builtin.file:

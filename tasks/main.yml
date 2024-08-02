@@ -7,7 +7,7 @@
   ansible.builtin.include_tasks: detect_mariadb_version.yml
 
 - name: install
-  ansible.builtin.include_tasks: installation.yml
+  ansible.builtin.include_tasks: install/main.yml
 
 - name: configure
   ansible.builtin.include_tasks: configure/main.yml
@@ -33,5 +33,12 @@
 
 - name: service
   ansible.builtin.include_tasks: service.yml
+
+- name: restart after config changes
+  ansible.builtin.include_tasks: restart.yml
+  when:
+    - _mysql_cnf_changed is defined
+    - _mysql_cnf_changed.changed is defined
+    - not _mysql_cnf_changed.changed | bool
 
 ...

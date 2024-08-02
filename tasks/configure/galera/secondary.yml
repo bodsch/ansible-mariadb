@@ -1,0 +1,45 @@
+---
+
+# secondary nodes
+- name: bootstrap secondary cluster nodes
+  block:
+
+    - name: start galera secondary cluster nodes
+      ansible.builtin.service:
+        name: "{{ mariadb_service }}"
+        state: started
+
+    - name: check mariadb pid file
+      ansible.builtin.wait_for:
+        path: "{{ mariadb_config_mysqld.pid_file }}"
+        state: present
+        delay: 2
+        timeout: 120
+        msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+
+    - name: tag bootstrapped
+      ansible.builtin.file:
+        state: touch
+        path: "{{ mariadb_galera_states.wsrep_bootstrapped }}"
+        mode: 0640
+
+    - name: reset variable to suppress restarts
+      ansible.builtin.set_fact:
+        _mysql_cnf_changed: ""
+
+  rescue:
+    - name: stop mariadb service bootstrap mode
+      ansible.builtin.service:
+        name: "{{ mariadb_service }}"
+        state: stopped
+
+    - name: remove bootstraped tag
+      ansible.builtin.file:
+        state: absent
+        path: "{{ mariadb_galera_states.wsrep_bootstrapped }}"
+
+    - name: exit with fail
+      ansible.builtin.fail:
+        msg: "Error while creating the initial database structure!"
+
+...

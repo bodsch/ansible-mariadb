@@ -1,0 +1,40 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
+{% from "macros/macros.j2" import print_segment %}
+{% from "macros/macros.j2" import print_key_value %}
+
+[galera]
+# server_id                           = {{ mariadb_server_id }}
+#
+# binlog_format                       = ROW
+# default_storage_engine              = InnoDB
+# innodb_autoinc_lock_mode            = 2
+# bind-address                        = 10.29.0.10
+#
+# wsrep-on                            = ON
+# wsrep-notify-cmd                    = /bin/wsrep_notify.sh
+# wsrep_cluster_name                  = {{ mariadb_galera.cluster_name }}
+# wsrep_provider                      = /usr/lib/libgalera_smm.so
+# Cluster connection URL contains IPs of nodes
+# If no IP is found, this implies that a new cluster needs to be created,
+# in order to do that you need to bootstrap this node
+{% if bootstrap_primary is defined and
+      bootstrap_primary %}
+# wsrep_cluster_address               = gcomm://
+{% else %}
+# wsrep_cluster_address               = gcomm://{{ mariadb_galera.node_addresses | default([]) | join(',') }}
+# ?gmcast.listen_addr=tcp://{{ ansible_default_ipv4.address }}:4567
+{% endif %}
+# wsrep_node_address                  = {{ mariadb_galera.node.address }}
+# wsrep_node_name                     = {{ mariadb_galera.node.name }}
+# wsrep_sst_method                    = {{ mariadb_galera.sst.method }}
+# wsrep_sst_auth                      = {{ mariadb_galera.sst.auth.username }}:{{ mariadb_galera.sst.auth.password }}
+{% if mariadb_galera.sst.donor is defined and
+      mariadb_galera.sst.donor != inventory_hostname %}
+# wsrep_sst_donor                     = {{ mariadb_galera.sst.donor }}
+{% else %}
+# wsrep_sst_donor
+{% endif %}
+wsrep_provider_options              = "{{ mariadb_galera.provider_options | default([]) | join(';') }}"
+# wsrep_slave_threads                 = 4
+# wsrep_log_conflicts

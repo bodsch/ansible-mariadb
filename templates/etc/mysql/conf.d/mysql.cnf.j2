@@ -48,7 +48,9 @@
 
 [galera]
   {% for k, v in mariadb_config_galera.items() %}
+    {% if k != "provider_options" %}
 {{ print_key_value(k, v) }}
+    {% endif %}
   {% endfor %}
 {% endif %}
 {% if mariadb_config_embedded is defined %}

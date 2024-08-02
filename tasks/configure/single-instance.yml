@@ -80,5 +80,4 @@
 #           when:
 #             - mariadb_journal.stdout is defined
 
-
 ...

@@ -2,7 +2,7 @@
 
 - name: converge
   hosts: all
-  # serial: 1
+
   any_errors_fatal: false
   become: false
   gather_facts: true

@@ -1,0 +1,20 @@
+---
+
+- name: restart galera secondary cluster nodes
+  when:
+    - not mariadb_galera_primary
+  block:
+    - name: restart galera secondary cluster nodes ({{ item }})
+      ansible.builtin.service:
+        name: "{{ mariadb_service }}"
+        state: restarted
+
+    - name: check mariadb pid file
+      ansible.builtin.wait_for:
+        path: "{{ mariadb_config_mysqld.pid_file }}"
+        state: present
+        delay: 10
+        timeout: 60
+        msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+
+...

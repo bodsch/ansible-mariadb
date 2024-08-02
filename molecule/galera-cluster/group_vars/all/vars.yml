@@ -4,8 +4,8 @@
 
 mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
 
-mariadb_instances: "{{ groups['replica'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
-mariadb_galera_node_addresses: ""
+mariadb_instances: "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+mariadb_hostnames: "{{ groups['mariadb'] | map('extract', hostname) | list }}"
 
 mariadb_databases:
   - name: molecule
@@ -32,7 +32,7 @@ mariadb_config_mysqld:
   # log_error: /opt/mariadb/log/error.log
   # slow_query_log_file: /opt/mariadb/log/mysql-slow.log
   expire_logs_days: 2
-  max_connections: 10
+  max_connections: 20
   # replication
   server-id: "{{ mariadb_server_id }}"
   relay_log: "{{ ansible_hostname }}-relay-bin"
@@ -45,57 +45,39 @@ mariadb_config_mysqld:
   wait_timeout: 28800
   interactive_timeout: 28800
   # ----------------------------------------------------
+  general_log_file: /var/log/mysql/general.log
+  general_log: 1
 
 mariadb_config_custom:
   mariadb:
     proxy_protocol_networks: "{{ mariadb.proxy_protocol_networks | join(',') }}"
 
 mariadb_config_galera:
-  # Mandatory settings
-  # unix_socket: "OFF"    # from https://mariadb.com/kb/en/mariadb-galera-cluster-known-limitations/#comment_4558
   wsrep_on: "ON"
   wsrep_notify_cmd: "/bin/wsrep_notify.sh"
-  wsrep_cluster_name: "{{ mariadb.galera.cluster_name }}"
+  wsrep_cluster_name: "{{ mariadb_galera.cluster_name }}"
   wsrep_provider: "/usr/lib/libgalera_smm.so"
-  wsrep_cluster_address: "gcomm://{{ mariadb_galera_node_addresses }}"
+  wsrep_cluster_address: "gcomm://{{ mariadb_galera.node_addresses | wsrep_cluster_address() }}"
   binlog_format: "row"
   default_storage_engine: "InnoDB"
   innodb_autoinc_lock_mode: "2"
   bind-address: "{{ ansible_default_ipv4.address }}"
   # Galera Sync Mode
-  wsrep_sst_method: "{{ mariadb.galera.sst.method }}"
-  wsrep_sst_auth: "{{ mariadb.galera.sst.auth.username }}:{{ mariadb.galera.sst.auth.password }}"
+  wsrep_sst_method: "{{ mariadb_galera.sst.method }}"
+  wsrep_sst_auth: "{{ mariadb_galera.sst.auth.username }}:{{ mariadb_galera.sst.auth.password }}"
   # galera node settings
-  wsrep_node_address: "{{ mariadb.galera.node.address }}"
-  wsrep_node_name: "{{ mariadb.galera.node.name }}"
+  wsrep_node_address: "{{ mariadb_galera.node.address }}"
+  wsrep_node_name: "{{ mariadb_galera.node.name }}"
   # GTID Mode
   wsrep_gtid_mode: "ON"
-  wsrep_gtid_domain_id: "{{ mariadb.galera.gtid_domain_id  }}"
-  gtid_domain_id: "{{ mariadb.galera.node.id }}"
+  wsrep_gtid_domain_id: "{{ mariadb_galera.gtid_domain_id  }}"
+  gtid_domain_id: "{{ mariadb_galera.node.id }}"
   gtid_strict_mode: "1"
   # Tuning:
-  wsrep_slave_threads: 4
+  wsrep_slave_threads: 8
   wsrep_log_conflicts:
   innodb_flush_log_at_trx_commit: "0"
   innodb_doublewrite: "1"
-  innodb_buffer_pool_size: "1G"
-
-
-# mariadb_replication_master: "master"
-
-# -> https://dev.mysql.com/doc/refman/5.6/en/change-master-to.html
-# The following table shows the maximum permissible length for the string-valued options.
-# | Option          | Maximum Length |
-# | :----           | :----          |
-# | MASTER_PASSWORD | 32             |
-# mariadb_replication:
-#   enabled: true
-#   primary: "primary"
-#   role: "{{ mariadb_replication_role }}"
-#   user:
-#     name: replication
-#     # The password must not be longer than 32 characters!
-#     password: "vkxHlCVMHAEtEFkEB9pspPB3N"
-#     encrypted: false
+  innodb_buffer_pool_size: "512M"
 
 ...

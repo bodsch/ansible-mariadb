@@ -1,0 +1,25 @@
+---
+
+- name: install mysqltuner
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/major/MySQLTuner-perl/master/{{ item.name }}"
+    dest: "/usr/local/bin/{{ item.name }}"
+    mode: "{{ item.mode }}"
+  register: _download_mysqltuner
+  until: _download_mysqltuner is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
+  loop:
+    - name: mysqltuner.pl
+      mode: "0750"
+    - name: basic_passwords.txt
+      mode: "0640"
+    - name: vulnerabilities.csv
+      mode: "0640"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - mariadb_mysqltuner
+
+...
