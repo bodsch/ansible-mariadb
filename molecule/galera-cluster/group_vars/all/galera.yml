@@ -1,20 +1,37 @@
 ---
 
-mariadb:
-  galera:
-    cluster_name: molecule-cluster
-    node_addresses: "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
-    sst:
-      method: "rsync"
-      auth:
-        username: "cluster-admin"
-        password: "c1ust3R"
-    node:
-      name: "{{ ansible_hostname }}"
-      id: "{{ mariadb_server_id }}"
-      address: "{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
-    gtid_domain_id: "{{ mariadb_server_id }}"
+mariadb_galera:
+  cluster_name: molecule-cluster
+  node_addresses:
+    - address: "10.29.0.10"
+      port: ""
+      #name: "primary"
+    - address: "10.29.0.21"
+      port: ""
+      #name: "replica_1"
+    - address: "10.29.0.22"
+      port: ""
+      #name: "replica_2"
+  sst:
+    method: rsync
+    auth:
+      username: "cluster-admin"
+      password: "c1ust3R"
+  node:
+    name: "{{ ansible_hostname }}"
+    id: "{{ mariadb_server_id }}"
+    address: "{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+  gtid_domain_id: "{{ mariadb_server_id }}"
 
+  provider_options:
+    - debug=no
+    - gcache.size=512M
+    - gcache.page_size=128M
+    - gcache.recover=yes
+    - gmcast.peer_timeout=PT10S
+    - pc.announce_timeout=PT10S
+
+mariadb:
   proxy_protocol_networks:
     - "127.0.0.1/32"
     - "10.29.0.0/24"

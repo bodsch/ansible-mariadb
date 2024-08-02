@@ -1,0 +1,66 @@
+---
+
+- name: create policy-rc.d
+  ansible.builtin.copy:
+    dest: /usr/sbin/policy-rc.d
+    content: |
+      #!/bin/sh
+      exit 101
+    mode: "0755"
+  when:
+    - not mariadb_installed
+    - ansible_os_family | lower != 'archlinux'
+
+- name: ensure mariadb packages are installed
+  ansible.builtin.package:
+    name: "{{ mariadb_packages }}"
+    state: present
+  register: mariadb_install_packages
+
+- name: create directory for pid file '{{ mariadb_config_mysqld.pid_file | dirname }}'
+  ansible.builtin.file:
+    path: "{{ mariadb_config_mysqld.pid_file | dirname }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: "0775"
+  when:
+    - mariadb_config_mysqld.pid_file is defined
+    - mariadb_config_mysqld.pid_file | string | length > 0
+
+- name: handle debian specific tasks
+  when:
+    - ansible_os_family | lower == 'debian'
+  block:
+    - name: fix debian specific debian-start file
+      ansible.builtin.template:
+        src: etc/mysql/debian-start.j2
+        dest: "{{ mariadb_config_dir }}/debian-start"
+        mode: "0755"
+
+- name: remove policy-rc.d
+  ansible.builtin.file:
+    path: /usr/sbin/policy-rc.d
+    state: absent
+  when:
+    - ansible_os_family | lower != 'archlinux'
+
+- name: create custom fact file
+  bodsch.core.facts:
+    name: mariadb
+    facts:
+      version: "{{ mariadb_version }}"
+      short_version: "{{ mariadb_short_version }}"
+      full_version: "{{ package_version.available.full_version }}"
+      platform_version: "{{ package_version.available.platform_version }}"
+
+- name: python support
+  ansible.builtin.include_tasks: install/python-support.yml
+  when:
+    - mariadb_python_packages is defined
+    - mariadb_python_packages | length > 0
+
+- name: mysql tuner
+  ansible.builtin.include_tasks: install/mysql-tuner.yml
+  when:
+    - mariadb_mysqltuner

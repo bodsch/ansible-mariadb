@@ -13,8 +13,13 @@ mariadb_run_directory: "/run/mysqld"
 ## package name
 mariadb_server: "mariadb-server"
 
+mariadb_galera_states:
+  dba_init: "/var/lib/mysql/dba_init"
+  wsrep_bootstrapped: "/var/lib/mysql/bootstrapped"
+
 ## service name
 mariadb_service: mariadb
+mariadb_bootstrap_service: "mariadb@bootstrap"
 
 mariadb_socket: "{{ mariadb_run_directory }}/mysqld.sock"
 mariadb_pid_file: "{{ mariadb_run_directory }}/mysqld.pid"
@@ -247,6 +252,42 @@ mariadb_defaults_replication:
     # password: ""
     encrypted: false
 
+mariadb_defaults_galera:
+  # node_addresses: "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list | join(',') }}"
+  cluster_name: galera-cluster
+  node_addresses: []
+    # - address: "10.29.0.10"
+    #   port: ""
+    #   #name: "primary"
+    # - address: "10.29.0.21"
+    #   port: ""
+    #   #name: "replica_1"
+    # - address: "10.29.0.22"
+    #   port: ""
+    #   #name: "replica_2"
+    #   # "{{ mariadb_instances | default([]) }}"
+    #   # parameters:
+    #   # "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+  sst:
+    method: rsync
+    auth:
+      username: "cluster-admin"
+      password: "c1ust3R"
+  node:
+    name: "{{ ansible_hostname }}"
+    id: "{{ mariadb_server_id }}"
+    address: "{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+  gtid_domain_id: "{{ mariadb_server_id }}"
+  provider_options: []
+    # - debug=yes
+    # - gcache.size=512M
+    # - gcache.page_size=128M
+    # - gcache.recover=yes
+    # - gmcast.peer_timeout=PT10S
+    # - pc.announce_timeout=PT10S
+
+# workaround
+_mysql_cnf_changed: {}
 
 systemd_lib_directory: /lib/systemd/system
 

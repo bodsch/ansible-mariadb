@@ -1,0 +1,19 @@
+---
+
+- name: run bootstrap for archlinux
+  mariadb_bootstrap:
+    datadir: /var/lib/mysql
+    skip_test_db: false
+  when:
+    - ansible_os_family | lower == 'archlinux' or
+      ansible_distribution | lower | replace(' ', '') == 'artixlinux'
+
+- name: run bootstrap on custom data directories '{{ mariadb_config_mysqld.datadir }}'
+  mariadb_bootstrap:
+    datadir: "{{ mariadb_config_mysqld.datadir }}"
+    skip_test_db: false
+  when:
+    - mariadb_config_mysqld.datadir is defined
+    - mariadb_config_mysqld.datadir != "/var/lib/mysql"
+
+...

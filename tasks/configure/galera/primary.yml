@@ -1,0 +1,52 @@
+---
+
+# primary node
+- name: bootstrap primary cluster node
+  block:
+    - name: create wsrep configuration
+      ansible.builtin.template:
+        src: "etc/mysql/conf.d/wsrep.cnf.j2"
+        dest: "{{ mariadb_config_include_dir }}/99-wsrep.cnf"
+        mode: 0644
+      vars:
+        bootstrap_primary: true
+
+    - name: start galera bootstrap
+      ansible.builtin.shell: |
+          systemctl set-environment _WSREP_NEW_CLUSTER='--wsrep-new-cluster' && systemctl restart {{ mariadb_service }}
+      register: systemctl
+      changed_when: systemctl.rc != 0
+      failed_when: systemctl.rc != 0
+
+    - name: check mariadb pid file
+      ansible.builtin.wait_for:
+        path: "{{ mariadb_config_mysqld.pid_file }}"
+        state: present
+        delay: 10
+        timeout: 60
+        msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+
+    - name: create sst user
+      become: true
+      community.mysql.mysql_user:
+        user: "{{ mariadb_galera.sst.auth.username }}"
+        password: "{{ mariadb_galera.sst.auth.password }}"
+        priv:
+          "*.*": "PROCESS,RELOAD,LOCK TABLES,REPLICATION CLIENT"
+        encrypted: false
+        host: localhost
+        login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+      ignore_errors: true
+
+  rescue:
+    - name: remove wsrep.cnf
+      ansible.builtin.file:
+        state: absent
+        path: "{{ mariadb_config_include_dir }}/99-wsrep.cnf"
+
+    - name: exit with fail
+      ansible.builtin.fail:
+        msg: "Error while creating the initial database structure!"
+
+    - name: full stop
+      ansible.builtin.meta: end_play

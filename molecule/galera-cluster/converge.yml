@@ -2,8 +2,13 @@
 
 - name: converge
   hosts: all
+
   any_errors_fatal: false
   become: false
+  gather_facts: true
+
+  environment:
+    ANSIBLE_DEBUG: true
 
   roles:
     - role: ansible-mariadb

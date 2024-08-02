@@ -1,0 +1,31 @@
+---
+
+- name: update facts to get latest information
+  ansible.builtin.setup:
+
+- name: reconfigure
+  when:
+    - _mysql_cnf_changed is defined
+    - _mysql_cnf_changed.changed is defined
+    - not _mysql_cnf_changed.changed | bool
+  block:
+
+    - name: informations about config changes
+      ansible.builtin.debug:
+        msg: "{{ _mysql_cnf_changed }}"
+
+    - name: restart galera cluster after reconfigure
+      when:
+        - mariadb_galera_cluster
+      include_tasks: handlers/galera.yml
+
+    - name: restart mariadb after reconfigure
+      when:
+        - not mariadb_galera_cluster
+      ansible.builtin.service:
+        name: '{{ mariadb_service }}'
+        state: restarted
+      notify:
+        - check mariadb pid file
+
+...

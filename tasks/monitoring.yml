@@ -8,6 +8,7 @@
     - mariadb_monitoring.system_user | length != 0
     - mariadb_monitoring.username is defined
     - mariadb_monitoring.username | length != 0
+    - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary)
   block:
     - name: create monitoring database
       community.mysql.mysql_db:
@@ -26,7 +27,7 @@
         append_privs: false
         encrypted: false
         update_password: on_create
-      no_log: true
+      no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
 
     - name: create my.cnf file with password credentials
       ansible.builtin.template:

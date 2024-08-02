@@ -31,6 +31,7 @@
     - mariadb_users | count > 0
     - (not item.name is defined or item.name | length == 0) or
       (not item.password is defined or item.password | length == 0)
+  run_once: true
   loop: "{{ mariadb_users }}"
   loop_control:
     label: "{{ item.name | default('undefined') }}"
@@ -44,10 +45,6 @@
   ansible.builtin.include_tasks: repositories.yml
   when:
     - ansible_os_family | lower == 'debian'
-
-- name: update package cache
-  ansible.builtin.package:
-    update_cache: true
 
 - name: update facts to get latest information
   ansible.builtin.setup:
@@ -64,11 +61,14 @@
     mariadb_config_embedded: "{{ mariadb_config_defaults_embedded | combine(mariadb_config_embedded, recursive=True) }}"
     mariadb_config_custom: "{{ mariadb_config_defaults_custom | combine(mariadb_config_custom, recursive=True) }}"
     mariadb_replication: "{{ mariadb_defaults_replication | combine(mariadb_replication, recursive=True) }}"
+    mariadb_galera: "{{ mariadb_defaults_galera | combine(mariadb_galera, recursive=True) }}"
     mariadb_tls_certificate: "{{ mariadb_defaults_tls_certificate | combine(mariadb_tls_certificate, recursive=True) }}"
 
 - name: detect if mariadb installed
   ansible.builtin.stat:
-    path: /usr/bin/mysqld_safe
+    path: /usr/bin/mariadbd-safe
+    get_checksum: false
+    get_mime: false
   register: mysqld_binary_file
 
 - name: detect if mariadb installed
@@ -77,6 +77,24 @@
   when:
     - mysqld_binary_file is defined
     - mysqld_binary_file.stat is defined
+
+- name: detect galera cluster
+  ansible.builtin.set_fact:
+    _mariadb_galera_cluster: "{{ mariadb_config_galera | detect_galera(hostvars) }}"
+
+- name: define mariadb_galera and mariadb_galera_primary
+  ansible.builtin.set_fact:
+    mariadb_galera_cluster: "{{ _mariadb_galera_cluster.galera }}"
+    mariadb_galera_primary: "{{ _mariadb_galera_cluster.primary }}"
+    mariadb_galera_primary_node: "{{ _mariadb_galera_cluster.cluster_primary_node }}"
+    mariadb_galera_replica_nodes: "{{ _mariadb_galera_cluster.cluster_replica_nodes }}"
+
+- name: galera packages
+  when:
+    - mariadb_galera_cluster
+    - ansible_distribution | lower == 'archlinux'
+  ansible.builtin.set_fact:
+    mariadb_packages: "{{ mariadb_packages + ['galera'] }}"
 
 - name: update facts to get latest information
   ansible.builtin.setup:

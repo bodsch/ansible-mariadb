@@ -1,6 +1,6 @@
 ---
 
-mariadb_replication_role: primary
+# mariadb_instances: []
 
 mariadb_databases:
   - name: molecule

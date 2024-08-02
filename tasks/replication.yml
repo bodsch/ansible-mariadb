@@ -28,7 +28,7 @@
   loop_control:
     label: "{{ mariadb_replication.user.name }}@{{ item | default('%') }},
         password encypted: {{ mariadb_replication.user.encrypted | default('true') }}"
-  no_log: true
+  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
   when:
     - mariadb_replication.role == 'primary'
     - mariadb_replication.primary is defined
@@ -66,7 +66,7 @@
     primary_log_file: "{{ state_of_primary.File }}"
     primary_log_pos: "{{ state_of_primary.Position }}"
   # failed_when: true
-  no_log: true
+  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
   register: configure_replication_on_replica
   when:
     - (state_of_replica.Is_Replica is defined and not state_of_replica.Is_Replica) or

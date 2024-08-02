@@ -1,0 +1,83 @@
+---
+
+- name: no galera cluster mode
+  when:
+    - not mariadb_galera_cluster
+  block:
+    - name: start mariadb first time
+      ansible.builtin.service:
+        name: '{{ mariadb_service }}'
+        state: started
+      ignore_errors: true
+      register: service_status
+      notify:
+        - check mariadb pid file
+
+    - name: check mariadb pid file
+      ansible.builtin.wait_for:
+        path: "{{ mariadb_config_mysqld.pid_file }}"
+        state: present
+        delay: 2
+        timeout: 120
+        msg: "Timeout to find {{ mariadb_config_mysqld.pid_file }}"
+      ignore_errors: true
+
+# - name: detect error
+#   when:
+#     - service_status is defined
+#     - service_status.failed | default('false')
+#   block:
+#     - name: detect error log
+#       ansible.builtin.stat:
+#         path: "{{ mariadb_config_mysqld.log_error }}"
+#       register: stat_mariadb_error_log
+#
+#     - name: load error_log
+#       ansible.builtin.slurp:
+#         src: "{{ mariadb_config_mysqld.log_error }}"
+#       register: mariadb_error_log
+#       when:
+#         - stat_mariadb_error_log.stat.exists
+#
+#     - name: error_log output
+#       ansible.builtin.debug:
+#         msg: "{{ mariadb_error_log.content | b64decode }}"
+#       when:
+#         - stat_mariadb_error_log.stat.exists
+#         - mariadb_error_log.content is defined
+#
+#     - name: list /run
+#       ansible.builtin.shell:
+#         cmd: |
+#           ls -lth /run/ ;
+#           ls -lth /run/mysqld ;
+#         chdir: /run
+#       register: bash_output
+#       changed_when: bash_output.rc != 0
+#       failed_when: bash_output.rc != 0
+#
+#     - name: detect error
+#       when:
+#         - ansible_service_mgr == 'systemd'
+#       block:
+#         - name: systemd unit
+#           ansible.builtin.debug:
+#             msg: "{{ service_status }}"
+#
+#         - name: wait 2 seconds
+#           ansible.builtin.pause:
+#             seconds: 2
+#
+#         - name: get journal log
+#           bodsch.core.journalctl:
+#             # unit: "{{ mariadb_service }}"
+#             lines: 250
+#           register: mariadb_journal
+#
+#         - name: journalctl output
+#           ansible.builtin.debug:
+#             msg: "{{ mariadb_journal.stdout }}"
+#           when:
+#             - mariadb_journal.stdout is defined
+
+...

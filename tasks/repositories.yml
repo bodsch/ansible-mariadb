@@ -12,6 +12,9 @@
           ansible.builtin.apt_key:
             url: https://mariadb.org/mariadb_release_signing_key.asc
             state: present
+          register: apt_key
+          changed_when: apt_key.rc != 0
+          failed_when: apt_key.rc != 0
 
         - name: install mariadb repositories for debian based
           ansible.builtin.template:
@@ -20,6 +23,9 @@
             mode: "0644"
             owner: root
             group: root
+          register: apt_repo
+          changed_when: apt_repo.rc != 0
+          failed_when: apt_repo.rc != 0
 
         - name: clean apt cache   # noqa command-instead-of-module
           ansible.builtin.command: |
@@ -27,12 +33,18 @@
           register: bash_output
           changed_when: bash_output.rc != 0
           failed_when: bash_output.rc != 0
-          when: "ansible_version.full is version_compare('2.13', '<')"
+          when:
+            - "ansible_version.full is version_compare('2.13', '<')"
+            - apt_key.changed
+            - apt_repo.changed
 
         - name: clean apt cache
           ansible.builtin.apt:
             clean: true
-          when: "ansible_version.full is version_compare('2.13', '>=')"
+          when:
+            - "ansible_version.full is version_compare('2.13', '>=')"
+            - apt_key.changed
+            - apt_repo.changed
 
 - name: remove external repository
   when:
@@ -40,9 +52,14 @@
   ansible.builtin.file:
     state: absent
     path: /etc/apt/sources.list.d/mariadb.list
+  register: apt_ext_repo
+  changed_when: apt_ext_repo.changed
+  failed_when: apt_ext_repo.failed
 
-# - name: update package cache
-#   ansible.builtin.package:
-#     update_cache: true
+- name: update package cache
+  ansible.builtin.package:
+    update_cache: true
+  when:
+    - apt_ext_repo.changed
 
 ...

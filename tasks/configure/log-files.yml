@@ -1,0 +1,63 @@
+---
+
+- name: handle mariadb slow query log
+  when:
+    - mariadb_config_mysqld.slow_query_log_file is defined
+    - mariadb_config_mysqld.slow_query_log_file | string | length > 0
+  block:
+    - name: create directory for slow query log file '{{ mariadb_config_mysqld.slow_query_log_file | dirname }}'
+      ansible.builtin.file:
+        path: "{{ mariadb_config_mysqld.slow_query_log_file | dirname }}"
+        state: directory
+        owner: mysql
+        group: adm
+        mode: "0775"
+
+    - name: create slow query log file '{{ mariadb_config_mysqld.slow_query_log_file }}'
+      ansible.builtin.file:
+        path: "{{ mariadb_config_mysqld.slow_query_log_file }}"
+        state: touch
+        owner: mysql
+        group: mysql
+        mode: "0666"
+      changed_when: false
+
+    - name: set ownership on slow query log file
+      ansible.builtin.file:
+        path: "{{ mariadb_config_mysqld.slow_query_log_file }}"
+        state: file
+        owner: mysql
+        group: mysql
+        mode: "0666"
+
+- name: handle mariadb error log
+  when:
+    - mariadb_config_mysqld.log_error is defined
+    - mariadb_config_mysqld.log_error | string | length > 0
+  block:
+    - name: create directory for error log file '{{ mariadb_config_mysqld.log_error | dirname }}'
+      ansible.builtin.file:
+        path: "{{ mariadb_config_mysqld.log_error | dirname }}"
+        state: directory
+        owner: mysql
+        group: adm
+        mode: "0775"
+
+    - name: create error log file '{{ mariadb_config_mysqld.log_error }}'
+      ansible.builtin.file:
+        path: "{{ mariadb_config_mysqld.log_error }}"
+        state: touch
+        owner: mysql
+        group: mysql
+        mode: "0666"
+      changed_when: false
+
+    - name: set ownership on error log file
+      ansible.builtin.file:
+        path: "{{ mariadb_config_mysqld.log_error }}"
+        state: file
+        owner: mysql
+        group: mysql
+        mode: "0666"
+
+...

@@ -1,0 +1,115 @@
+---
+
+- name: create neccessary directories
+  ansible.builtin.file:
+    path: '{{ mariadb_config_dir }}/conf.d'
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: remove distribution directories
+  ansible.builtin.file:
+    path: "{{ mariadb_config_dir }}/mariadb.conf.d"
+    state: absent
+
+- name: TLS support
+  ansible.builtin.include_tasks: configure/tls-support.yml
+  when:
+    - mariadb_config_mysqld | support_tls
+
+- name: detect '{{ mariadb_config_file }}'
+  ansible.builtin.stat:
+    path: "{{ mariadb_config_file }}"
+  register: stat_mariadb_config_file
+
+- name: remove symlink to '{{ mariadb_config_file }}'
+  ansible.builtin.file:
+    state: absent
+    path: "{{ mariadb_config_file }}"
+  when:
+    - stat_mariadb_config_file.stat is defined
+    - stat_mariadb_config_file.stat.exists | default('false')
+    - stat_mariadb_config_file.stat.islnk | default('false')
+
+- name: create main configuration file
+  ansible.builtin.template:
+    src: "etc/my.cnf.j2"
+    dest: "{{ mariadb_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+
+- name: create configuration files
+  ansible.builtin.template:
+    src: "etc/mysql/conf.d/mysql.cnf.j2"
+    dest: "{{ mariadb_config_include_dir }}/mysql.cnf"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+  register: _mysql_cnf_changed
+
+- name: create data directory '{{ mariadb_config_mysqld.datadir }}'
+  ansible.builtin.file:
+    path: "{{ mariadb_config_mysqld.datadir }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: "0755"
+  when:
+    - mariadb_config_mysqld.datadir is defined
+    - mariadb_config_mysqld.datadir != "/var/lib/mysql"
+
+- name: create tmp directory '{{ mariadb_config_mysqld.tmpdir }}'
+  ansible.builtin.file:
+    path: "{{ mariadb_config_mysqld.tmpdir }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: "0755"
+  when:
+    - mariadb_config_mysqld.tmpdir is defined
+    - mariadb_config_mysqld.tmpdir | string | length > 0
+    - mariadb_config_mysqld.tmpdir != "/tmp"
+
+- name: create directory for pid file '{{ mariadb_config_mysqld.pid_file | dirname }}'
+  ansible.builtin.file:
+    path: "{{ mariadb_config_mysqld.pid_file | dirname }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: "0775"
+  when:
+    - mariadb_config_mysqld.pid_file is defined
+    - mariadb_config_mysqld.pid_file | string | length > 0
+
+- name: log files
+  ansible.builtin.include_tasks: configure/log-files.yml
+
+- name: configure swappiness
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: "{{ mariadb_swappiness | int }}"
+    state: present
+  when:
+    - mariadb_configure_swappiness | bool
+
+- name: custom bootstrap
+  ansible.builtin.include_tasks: configure/custom-bootstrap.yml
+
+- name: galera cluster
+  ansible.builtin.include_tasks: configure/galera-cluster.yml
+  when:
+    - mariadb_galera_cluster
+
+- name: no cluster instance
+  ansible.builtin.include_tasks: configure/single-instance.yml
+  when:
+    - not mariadb_galera_cluster
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+...
