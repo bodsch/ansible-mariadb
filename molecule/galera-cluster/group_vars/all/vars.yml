@@ -70,8 +70,8 @@ mariadb_config_galera:
   wsrep_node_name: "{{ mariadb_galera.node.name }}"
   # GTID Mode
   wsrep_gtid_mode: "ON"
-  wsrep_gtid_domain_id: "{{ mariadb_galera.gtid_domain_id  }}"
-  gtid_domain_id: "{{ mariadb_galera.node.id }}"
+  wsrep_gtid_domain_id: "1337"
+  gtid_domain_id: "1"
   gtid_strict_mode: "1"
   # Tuning:
   wsrep_slave_threads: 8
