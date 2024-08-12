@@ -6,7 +6,9 @@ __metaclass__ = type
 
 import os
 import re
+import json
 from ansible.utils.display import Display
+from ansible.module_utils.common._collections_compat import Mapping
 
 # https://docs.ansible.com/ansible/latest/dev_guide/developing_plugins.html
 # https://blog.oddbit.com/post/2019-04-25-writing-ansible-filter-plugins/
@@ -17,6 +19,7 @@ display = Display()
 class FilterModule(object):
     """
     """
+
     def filters(self):
         return {
             'support_tls': self.support_tls,
@@ -24,7 +27,7 @@ class FilterModule(object):
             'detect_galera': self.detect_galera,
             'wsrep_cluster_address': self.wsrep_cluster_address
 
-            #'galera_node_information': self.galera_node_information,
+            # 'galera_node_information': self.galera_node_information,
         }
 
     def support_tls(self, data):
@@ -74,12 +77,25 @@ class FilterModule(object):
             primary = False
         )
 
-        cluster_names = []
-        cluster_primary_node = ""
+        # cluster_names = []
+        # cluster_primary_node = ""
+        node_information = {}
 
-        node_information = {x: v.get("ansible_default_ipv4", None).get("address", None) for x, v in hostvars.items() if v.get("ansible_default_ipv4", None).get("address", None) }
+        for x, v in hostvars.items():
+            if isinstance(v, Mapping):
+                v = dict(v)
 
-        display.v(f"- node_information: '{node_information}'")
+            display.vv(f"  - {x}")
+            _facts = v.get('ansible_facts')
+            # display.v(f"    ansible facts: {_facts}")
+            display.vv(f"    facts default_ipv4  : {_facts.get('default_ipv4')}")
+            display.vv(f"    facts default_ipv6  : {_facts.get('default_ipv6')}")
+            display.vv(f"    ansible default_ipv4: {v.get('ansible_default_ipv4')}")
+            display.vv(f"    ansible default_ipv6: {v.get('ansible_default_ipv6')}")
+
+            # display.v("------------------------------------------")
+            # display.v(f"    {json.dumps(v, indent=2, sort_keys=False)}")
+            # display.v("------------------------------------------")
 
         # self._galera_node_information(hostvars)
 
@@ -117,8 +133,12 @@ class FilterModule(object):
                     else:
                         primary = False
 
-                primary_node = [x for x,v in node_information.items() if v == primary_address][0]
-                replica_nodes = [x for x,v in node_information.items() if v != primary_address]
+                if isinstance(hostvars, Mapping):
+                    node_information = {x: v.get("ansible_default_ipv4", None).get("address", None) for x, v in hostvars.items() if v.get("ansible_default_ipv4", {}).get("address", None)}
+                    display.v(f"  node_information: '{node_information}'")
+
+                primary_node = [x for x, v in node_information.items() if v == primary_address][0]
+                replica_nodes = [x for x, v in node_information.items() if v != primary_address]
 
                 result = dict(
                     galera = True,
@@ -154,24 +174,24 @@ class FilterModule(object):
     def _galera_node_information(self, data):
         """
         """
-        display.v(f"_galera_node_information(data)")
+        display.v("_galera_node_information(data)")
         result = dict()
 
         for hostname, values in data.items():
-           display.v(f"- {hostname}")
-           display.v(f"  {len(values)}")
+            display.v(f"- {hostname}")
+            display.v(f"  {len(values)}")
 
-           # host_data = data.get(hostname)
-           #
-           # display.v(f"- {host_data}")
-           #
-           primary_address = values.get("ansible_default_ipv4", {}).get("address", None)
-           host_name = values.get("hostname", None)
+            # host_data = data.get(hostname)
+            #
+            # display.v(f"- {host_data}")
+            #
+            primary_address = values.get("ansible_default_ipv4", {}).get("address", None)
+            host_name = values.get("hostname", None)
 
-           if not host_name:
-               host_name = hostname
+            if not host_name:
+                host_name = hostname
 
-           display.v(f"- {primary_address} / {host_name}")
+            display.v(f"- {primary_address} / {host_name}")
 
         display.v(f"= {result}")
         return result
