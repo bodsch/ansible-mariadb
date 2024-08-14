@@ -286,7 +286,11 @@ mariadb_defaults_galera:
     # - gmcast.peer_timeout=PT10S
     # - pc.announce_timeout=PT10S
 
-_mariadb_galera_cluster: {}
+_mariadb_galera_cluster:
+  galera: False
+  primary: ""
+  cluster_primary_node: ""
+  cluster_replica_nodes: []
 
 # workaround
 _mysql_cnf_changed: {}
