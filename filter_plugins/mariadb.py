@@ -33,7 +33,7 @@ class FilterModule(object):
     def support_tls(self, data):
         """
         """
-        # display.v(f"support_tls({data})")
+        # display.vv(f"support_tls({data})")
 
         ssl_ca   = data.get("ssl-ca", None)
         ssl_cert = data.get("ssl-cert", None)
@@ -47,7 +47,7 @@ class FilterModule(object):
     def tls_directory(self, data):
         """
         """
-        # display.v(f"tls_directory({data})")
+        # display.vv(f"tls_directory({data})")
 
         directory = []
 
@@ -68,7 +68,7 @@ class FilterModule(object):
     def detect_galera(self, data, hostvars):
         """
         """
-        display.v(f"detect_galera({data}, hostvars)")
+        display.vv(f"detect_galera({data}, hostvars)")
         result = dict(
             galera = False,
             cluster_members = [],
@@ -87,15 +87,15 @@ class FilterModule(object):
 
             display.vv(f"  - {x}")
             _facts = v.get('ansible_facts')
-            # display.v(f"    ansible facts: {_facts}")
+            # display.vv(f"    ansible facts: {_facts}")
             display.vv(f"    facts default_ipv4  : {_facts.get('default_ipv4')}")
             display.vv(f"    facts default_ipv6  : {_facts.get('default_ipv6')}")
             display.vv(f"    ansible default_ipv4: {v.get('ansible_default_ipv4')}")
             display.vv(f"    ansible default_ipv6: {v.get('ansible_default_ipv6')}")
 
-            # display.v("------------------------------------------")
-            # display.v(f"    {json.dumps(v, indent=2, sort_keys=False)}")
-            # display.v("------------------------------------------")
+            # display.vv("------------------------------------------")
+            # display.vv(f"    {json.dumps(v, indent=2, sort_keys=False)}")
+            # display.vv("------------------------------------------")
 
         # self._galera_node_information(hostvars)
 
@@ -107,7 +107,7 @@ class FilterModule(object):
                 cluster_adress = data.get("wsrep_cluster_address", "")
                 bind_address = data.get("bind-address", "")
 
-                # display.v(f"- {cluster_adress}")
+                # display.vv(f"- {cluster_adress}")
 
                 pattern = re.compile(r"^gcomm://(?P<cluster_member>[0-9.,]+)$")
                 result = re.search(pattern, cluster_adress)
@@ -120,7 +120,7 @@ class FilterModule(object):
                 cluster_members = list(filter(None, cluster_members))
                 members_count = len(cluster_members)
 
-                display.v(f"- cluster_members: '{cluster_members}' : {members_count}")
+                display.vv(f"- cluster_members: '{cluster_members}' : {members_count}")
 
                 if members_count == 0:
                     primary = True
@@ -135,7 +135,7 @@ class FilterModule(object):
 
                 if isinstance(hostvars, Mapping):
                     node_information = {x: v.get("ansible_default_ipv4", None).get("address", None) for x, v in hostvars.items() if v.get("ansible_default_ipv4", {}).get("address", None)}
-                    display.v(f"  node_information: '{node_information}'")
+                    display.vv(f"  node_information: '{node_information}'")
 
                 primary_node = [x for x, v in node_information.items() if v == primary_address][0]
                 replica_nodes = [x for x, v in node_information.items() if v != primary_address]
@@ -148,7 +148,7 @@ class FilterModule(object):
                     primary = primary
                 )
 
-        # display.v(f"= {result}")
+        # display.vv(f"= {result}")
 
         return result
 
@@ -163,7 +163,7 @@ class FilterModule(object):
             output:
                 '10.29.0.10:,10.29.0.21:,10.29.0.22:'
         """
-        display.v(f"wsrep_cluster_address({data})")
+        display.vv(f"wsrep_cluster_address({data})")
         result = None
         result = [f"{x.get('address')}" for x in data]
 
@@ -174,16 +174,16 @@ class FilterModule(object):
     def _galera_node_information(self, data):
         """
         """
-        display.v("_galera_node_information(data)")
+        display.vv("_galera_node_information(data)")
         result = dict()
 
         for hostname, values in data.items():
-            display.v(f"- {hostname}")
-            display.v(f"  {len(values)}")
+            display.vv(f"- {hostname}")
+            display.vv(f"  {len(values)}")
 
             # host_data = data.get(hostname)
             #
-            # display.v(f"- {host_data}")
+            # display.vv(f"- {host_data}")
             #
             primary_address = values.get("ansible_default_ipv4", {}).get("address", None)
             host_name = values.get("hostname", None)
@@ -191,7 +191,7 @@ class FilterModule(object):
             if not host_name:
                 host_name = hostname
 
-            display.v(f"- {primary_address} / {host_name}")
+            display.vv(f"- {primary_address} / {host_name}")
 
-        display.v(f"= {result}")
+        display.vv(f"= {result}")
         return result
