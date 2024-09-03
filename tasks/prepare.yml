@@ -84,9 +84,9 @@
   when:
     - mariadb_config_galera is defined
     - mariadb_config_galera | bodsch.core.type == 'dict'
-    - mariadb_config_galera.node_addresses is defined
-    - mariadb_config_galera.node_addresses | bodsch.core.type == 'list'
-    - mariadb_config_galera.node_addresses | count > 0
+    - mariadb_galera.node_addresses is defined
+    - mariadb_galera.node_addresses | bodsch.core.type == 'list'
+    - mariadb_galera.node_addresses | count > 0
 
 - name: define mariadb_galera and mariadb_galera_primary
   ansible.builtin.set_fact:
