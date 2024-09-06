@@ -74,7 +74,7 @@ class FilterModule(object):
             cluster_members = [],
             cluster_primary_node = "",
             cluster_replica_nodes = [],
-            primary = False
+            # primary = False
         )
 
         # cluster_names = []
@@ -123,15 +123,15 @@ class FilterModule(object):
                 display.vv(f"- cluster_members: '{cluster_members}' : {members_count}")
 
                 if members_count == 0:
-                    primary = True
+                    # primary = True
                     primary_address = bind_address
                 else:
                     primary_address = cluster_members[0]
 
-                    if primary_address == bind_address:
-                        primary = True
-                    else:
-                        primary = False
+                    # if primary_address == bind_address:
+                    #     primary = True
+                    # else:
+                    #     primary = False
 
                 if isinstance(hostvars, Mapping):
                     node_information = {x: v.get("ansible_default_ipv4", None).get("address", None) for x, v in hostvars.items() if v.get("ansible_default_ipv4", {}).get("address", None)}
@@ -145,7 +145,7 @@ class FilterModule(object):
                     cluster_members = cluster_members,
                     cluster_primary_node = primary_node,
                     cluster_replica_nodes = replica_nodes,
-                    primary = primary
+                    # primary = primary
                 )
 
         # display.vv(f"= {result}")

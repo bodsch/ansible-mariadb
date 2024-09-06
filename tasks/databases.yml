@@ -2,7 +2,7 @@
 
 - name: ensure mariadb databases are present.
   when:
-    - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary)
+    - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary_node == ansible_hostname)
   run_once: "{{ 'true' if mariadb_galera_cluster else 'false' }}"
   community.mysql.mysql_db:
     name: "{{ item.name }}"

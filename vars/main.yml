@@ -288,7 +288,7 @@ mariadb_defaults_galera:
 
 _mariadb_galera_cluster:
   galera: False
-  primary: ""
+  # primary: ""
   cluster_primary_node: ""
   cluster_replica_nodes: []
 

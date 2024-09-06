@@ -2,7 +2,7 @@
 
 - name: restart galera secondary cluster nodes
   when:
-    - not mariadb_galera_primary
+    - mariadb_galera_primary_node != ansible_hostname
   block:
     - name: restart galera secondary cluster nodes ({{ item }})
       ansible.builtin.service:

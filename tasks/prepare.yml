@@ -71,7 +71,7 @@
     get_mime: false
   register: mysqld_binary_file
 
-- name: detect if mariadb installed
+- name: define mariadb_installed if mariadb installed
   ansible.builtin.set_fact:
     mariadb_installed: "{{ mysqld_binary_file.stat.exists }}"
   when:
@@ -81,6 +81,7 @@
 - name: detect galera cluster
   ansible.builtin.set_fact:
     _mariadb_galera_cluster: "{{ mariadb_config_galera | detect_galera(hostvars) }}"
+  run_once: true
   when:
     - mariadb_config_galera is defined
     - mariadb_config_galera | bodsch.core.type == 'dict'
@@ -88,10 +89,17 @@
     - mariadb_galera.node_addresses | bodsch.core.type == 'list'
     - mariadb_galera.node_addresses | count > 0
 
-- name: define mariadb_galera and mariadb_galera_primary
+- name: d
+  debug:
+    msg:
+      - "{{ _mariadb_galera_cluster }}"
+      - "{{ hostname | default('') }}"
+      - "{{ ansible_hostname | default('') }}"
+
+- name: define mariadb_galera and mariadb_galera_cluster
   ansible.builtin.set_fact:
     mariadb_galera_cluster: "{{ _mariadb_galera_cluster.galera }}"
-    mariadb_galera_primary: "{{ _mariadb_galera_cluster.primary }}"
+    # mariadb_galera_primary: "{{ _mariadb_galera_cluster.primary }}"
     mariadb_galera_primary_node: "{{ _mariadb_galera_cluster.cluster_primary_node }}"
     mariadb_galera_replica_nodes: "{{ _mariadb_galera_cluster.cluster_replica_nodes }}"
 

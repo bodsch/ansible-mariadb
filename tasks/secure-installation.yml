@@ -29,7 +29,7 @@
 
 - name: secure database (remove anonymous user, disallow remote root login, ...)
   when:
-    - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary)
+    - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary_node == ansible_hostname)
   mariadb_secure:
     disallow_anonymous_users: true
     disallow_test_database: true
