@@ -16,6 +16,10 @@
         collation: 'utf8_general_ci'
         encoding: 'utf8'
         state: present
+        login_user:  "{{ _mariadb_root_system_user.username }}"
+        login_password: "{{ _mariadb_root_system_user.password }}"
+        login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+        config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
 
     - name: create monitoring user
       community.mysql.mysql_user:
@@ -27,6 +31,10 @@
         append_privs: false
         encrypted: false
         update_password: on_create
+        login_user:  "{{ _mariadb_root_system_user.username }}"
+        login_password: "{{ _mariadb_root_system_user.password }}"
+        login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+        config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
       no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
 
     - name: create my.cnf file with password credentials

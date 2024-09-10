@@ -12,6 +12,10 @@
     state: "{{ item.state | default('present') }}"
     append_privs: "{{ item.append_privs | default('false') }}"
     encrypted: "{{ item.encrypted | default('true') }}"
+    login_user:  "{{ _mariadb_root_system_user.username }}"
+    login_password: "{{ _mariadb_root_system_user.password }}"
+    login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+    config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
   loop:
     '{{ mariadb_users }}'
   loop_control:

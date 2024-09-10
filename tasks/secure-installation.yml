@@ -1,15 +1,20 @@
 ---
 
+# - name: define root system userdata
+#   ansible.builtin.set_fact:
+#     _mariadb_root_system_user: "{{ mariadb_system_users | system_user('root') }}"
+
 - name: validate custom root password
   when:
-    - mariadb_root_password | length == 0
+    - not _mariadb_root_system_user.ignore | default('true')
+    - _mariadb_root_system_user.password | default('') | length == 0
   block:
     - name: warn if a custom root password is not specified
       ansible.builtin.fail:
         msg: |
           - WARNING -
           The MariaDB root password was left empty.
-          Please set a custom password with role variable 'mariadb_root_password'
+          Please set a custom password with role variable 'mariadb_system_users'
           to secure your database server!
       ignore_errors: true
 
@@ -19,18 +24,26 @@
         timeout: 10
 
 - name: set database root password
+  when:
+    - _mariadb_root_system_user.password | default('') | length > 0
+    - _mariadb_root_system_user.update
+    - not _mariadb_root_system_user.ignore | default('true')
   mariadb_root_password:
-    dba_root_username: "{{ mariadb_root_username }}"
-    dba_root_password: "{{ mariadb_root_password }}"
+    dba_root_username: "{{ _mariadb_root_system_user.username }}"
+    dba_root_password: "{{ _mariadb_root_system_user.password }}"
     dba_bind_address: "{{ mariadb_bind_address | default(omit) }}"
     dba_socket: "{{ mariadb_socket | default(omit) }}"
     dba_config_directory: "{{ mariadb_config_dir }}"
-    mycnf_file: "{{ mariadb_root_home }}/.my.cnf"
+    mycnf_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
 
 - name: secure database (remove anonymous user, disallow remote root login, ...)
   when:
     - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary_node == ansible_hostname)
   mariadb_secure:
+    dba_root_username: "{{ _mariadb_root_system_user.username }}"
+    dba_root_password: "{{ _mariadb_root_system_user.password }}"
+    mycnf_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
+    dba_socket: "{{ mariadb_socket | default(omit) }}"
     disallow_anonymous_users: true
     disallow_test_database: true
     disallow_remote_root_login: true

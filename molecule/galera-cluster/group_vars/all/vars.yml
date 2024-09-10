@@ -2,7 +2,14 @@
 
 # mariadb_use_external_repo: false
 
-mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+mariadb_system_users:
+  - username: root
+    password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+    home: /root
+    update: true
+    ignore: true
+
+# mariadb_root_password:
 
 mariadb_instances: "{{ groups['mariadb'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
 mariadb_hostnames: "{{ groups['mariadb'] | map('extract', hostname) | list }}"

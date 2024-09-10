@@ -59,6 +59,7 @@ class MariaDBSecure(object):
         self.disallow_remote_root_login = module.params.get("disallow_remote_root_login")
         self.dba_root_username = module.params.get("dba_root_username")
         self.dba_root_password = module.params.get("dba_root_password")
+        self.dba_socket = module.params.get("dba_socket")
         self.mycnf_file = module.params.get("mycnf_file")
 
         self.db_connect_timeout = 30
@@ -76,44 +77,53 @@ class MariaDBSecure(object):
         # args.append("status")
         #
         # rc, out, err = self._exec(args)
-
-        if self.disallow_remote_root_login:
-            state, error, error_message = self._remove_anonymous_users()
-
-            self.module.log(msg=" - disallow remote root login: {}".format(state))
-
-            if error:
-                return dict(
-                    failed=True,
-                    msg=error_message
-                )
-
-        if self.disallow_anonymous_users:
-            state, error, error_message = self._remove_remote_root_login()
-
-            self.module.log(msg=" - disallow anonymous users: {}".format(state))
-
-            if error:
-                return dict(
-                    failed=True,
-                    msg=error_message
-                )
-
-        if self.disallow_test_database:
-            state, error, error_message = self._remove_test_database()
-
-            self.module.log(msg=" - remove test database: {}".format(state))
-
-            if error:
-                return dict(
-                    failed=True,
-                    msg=error_message
-                )
-
         res = dict(
             changed=False,
             msg="all fine.",
         )
+
+        self.cursor, self.conn, error, message = self._mysql_connect()
+
+        if not error:
+
+            if self.disallow_remote_root_login:
+                state, error, error_message = self._remove_anonymous_users()
+
+                self.module.log(msg=f" - disallow remote root login: {state}")
+
+                if error:
+                    return dict(
+                        failed=True,
+                        msg=error_message
+                    )
+
+            if self.disallow_anonymous_users:
+                state, error, error_message = self._remove_remote_root_login()
+
+                self.module.log(msg=f" - disallow anonymous users: {state}")
+
+                if error:
+                    return dict(
+                        failed=True,
+                        msg=error_message
+                    )
+
+            if self.disallow_test_database:
+                state, error, error_message = self._remove_test_database()
+
+                self.module.log(msg=f" - remove test database: {state}")
+
+                if error:
+                    return dict(
+                        failed=True,
+                        msg=error_message
+                    )
+        else:
+            res = dict(
+                changed = False,
+                msg = message
+
+            )
 
         return res
 
@@ -219,7 +229,11 @@ class MariaDBSecure(object):
 
     def _mysql_connect(self):
         """
-
+            return:
+                cursor
+                conn
+                error
+                message
         """
         config = {}
 
@@ -232,10 +246,14 @@ class MariaDBSecure(object):
         # config file
         if self.dba_root_username is not None:
             config['user'] = self.dba_root_username
+
         if self.dba_root_password is not None:
             config['passwd'] = self.dba_root_password
 
-        # self.module.log(msg="config : {}".format(config))
+        if self.dba_socket is not None and os.path.exists(self.dba_socket):
+            config['unix_socket'] = self.dba_socket
+
+        # self.module.log(msg=f"config : {config}")
 
         if mysql_driver is None:
             self.module.fail_json(msg=mysql_driver_fail_msg)
@@ -246,9 +264,8 @@ class MariaDBSecure(object):
         except Exception as e:
             message = "unable to connect to database. "
             message += "check login_host, login_user and login_password are correct "
-            message += "or {0} has the credentials. "
-            message += "Exception message: {1}"
-            message = message.format(config_file, to_native(e))
+            message += f"or {config_file} has the credentials. "
+            message += f"Exception message: {to_native(e)}"
 
             self.module.log(msg=message)
 
@@ -268,15 +285,42 @@ class MariaDBSecure(object):
 
 def main():
     ''' ... '''
-    module = AnsibleModule(
-        argument_spec=dict(
-            disallow_anonymous_users=dict(required=False, type='bool'),
-            disallow_test_database=dict(required=False, type='bool'),
-            disallow_remote_root_login=dict(required=False, type='bool'),
-            # dba_root_username=dict(required=False, type='str'),
-            # dba_root_password=dict(required=False, type='str', no_log=True),
-            mycnf_file=dict(required=False, type="str", default="/root/.my.cnf"),
+
+    specs = dict(
+        disallow_anonymous_users=dict(
+            required=False,
+            type='bool'
         ),
+        disallow_test_database=dict(
+            required=False,
+            type='bool'
+        ),
+        disallow_remote_root_login=dict(
+            required=False,
+            type='bool'
+        ),
+        dba_root_username=dict(
+            required=False,
+            type='str'
+        ),
+        dba_root_password=dict(
+            required=False,
+            type='str',
+            no_log=True
+        ),
+        dba_socket=dict(
+            required=False,
+            type='str'
+        ),
+        mycnf_file=dict(
+            required=False,
+            type="str",
+            default="/root/.my.cnf"
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec=specs,
         supports_check_mode=False,
     )
 
@@ -285,7 +329,7 @@ def main():
     client = MariaDBSecure(module)
     result = client.run()
 
-    module.log(msg="= result: {}".format(result))
+    module.log(msg=f"= result: {result}")
     module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)

@@ -1,0 +1,25 @@
+# Changelog
+
+This file contains all significant changes to this Ansible Role.
+
+This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/).
+Versioning follows [Semantic Versioning](http://semver.org/).
+"GH-X" refers to the X'th issue/pull request on the Github project.
+
+## 2.6.0 - 2024-09-10
+
+There are quite a few breaking changes in this version, so update your playbooks!
+
+### Breaking changes
+
+- The variables `mariadb_root_home`, `mariadb_root_username`, `mariadb_root_password` and `mariadb_root_password_update` have been removed and replaced by the dictionary `mariadb_system_users`.
+- The setting of the root password can be prevented
+
+### Added
+
+- The filter `system_user` has been added and can separate a user from the dictionary `mariadb_system_users`.
+
+### Modified
+
+- `mariadb_monitoring` must now be explicitly activated
+- `mariadb_mysqltuner` must now be explicitly activated
