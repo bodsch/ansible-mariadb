@@ -301,6 +301,7 @@ class MariadbReplication():
 
         self.login_password = self.module.params.get("login_password")
         self.login_username = self.module.params.get("login_user")
+        self.login_unix_socket = self.module.params.get("login_unix_socket")
         self.mode = module.params.get("mode")
         self.primary_host = module.params.get("primary_host")
         self.primary_user = module.params.get("primary_user")
@@ -322,9 +323,10 @@ class MariadbReplication():
         self.ssl_key = module.params.get("client_key")
         self.ssl_ca = module.params.get("ca_cert")
         # check_hostname = module.params.get("check_hostname")
-        self.connect_timeout = module.params['connect_timeout']
-        self.config_file = module.params['config_file']
-        self.primary_delay = module.params['primary_delay']
+        self.connect_timeout = module.params.get('connect_timeout')
+        self.config_file = module.params.get('config_file')
+        self.primary_delay = module.params.get('primary_delay')
+
         if module.params.get("primary_use_gtid") == 'disabled':
             self.primary_use_gtid = 'no'
         else:
@@ -339,7 +341,7 @@ class MariadbReplication():
         if self.primary_use_gtid == 'replica_pos':
             self.primary_use_gtid = 'slave_pos'
 
-        module.log(msg="  mode: {}".format(self.mode))
+        # module.log(msg="  mode: {}".format(self.mode))
 
     def run(self):
         """
@@ -362,70 +364,30 @@ class MariadbReplication():
 
         self.prepare(cursor)
 
-        if self.mode in ('get_primary'):
+        if self.mode == 'get_primary':
             """
               get primary information
             """
             result = self.get_primary(cursor)
 
-        elif self.mode in ("get_replica"):
+        elif self.mode == "get_replica":
             """
               get replica state
             """
             result = self.get_replica(cursor)
 
-        elif self.mode in ("change_primary"):
+        elif self.mode == "change_primary":
             """
-
             """
-            chm = []
             result = {}
-            if self.primary_host is not None:
-                chm.append("MASTER_HOST='%s'" % self.primary_host)
-            if self.primary_user is not None:
-                chm.append("MASTER_USER='%s'" % self.primary_user)
-            if self.primary_password is not None:
-                chm.append("MASTER_PASSWORD='%s'" % self.primary_password)
-            if self.primary_port is not None:
-                chm.append("MASTER_PORT=%s" % self.primary_port)
-            if self.primary_connect_retry is not None:
-                chm.append("MASTER_CONNECT_RETRY=%s" % self.primary_connect_retry)
-            if self.primary_log_file is not None:
-                chm.append("MASTER_LOG_FILE='%s'" % self.primary_log_file)
-            if self.primary_log_pos is not None:
-                chm.append("MASTER_LOG_POS=%s" % self.primary_log_pos)
-            if self.primary_delay is not None:
-                chm.append("MASTER_DELAY=%s" % self.primary_delay)
-            if self.relay_log_file is not None:
-                chm.append("RELAY_LOG_FILE='%s'" % self.relay_log_file)
-            if self.relay_log_pos is not None:
-                chm.append("RELAY_LOG_POS=%s" % self.relay_log_pos)
-            if self.primary_ssl:
-                chm.append("MASTER_SSL=1")
-            if self.primary_ssl_ca is not None:
-                chm.append("MASTER_SSL_CA='%s'" % self.primary_ssl_ca)
-            if self.primary_ssl_capath is not None:
-                chm.append("MASTER_SSL_CAPATH='%s'" % self.primary_ssl_capath)
-            if self.primary_ssl_cert is not None:
-                chm.append("MASTER_SSL_CERT='%s'" % self.primary_ssl_cert)
-            if self.primary_ssl_key is not None:
-                chm.append("MASTER_SSL_KEY='%s'" % self.primary_ssl_key)
-            if self.primary_ssl_cipher is not None:
-                chm.append("MASTER_SSL_CIPHER='%s'" % self.primary_ssl_cipher)
-            if self.primary_auto_position:
-                chm.append("MASTER_AUTO_POSITION=1")
-            if self.primary_use_gtid is not None:
-                chm.append("MASTER_USE_GTID=%s" % self.primary_use_gtid)
-
-            self.module.log(msg="  chm: {}".format(chm))
 
             try:
-                self.change_primary(cursor, chm)
+                self.change_primary(cursor)
             except mysql_driver.Warning as e:
                 result['warning'] = to_native(e)
             except Exception as e:
                 self.module.fail_json(
-                    msg='{}. Query == CHANGE MASTER TO {}'.format(to_native(e), chm))
+                    msg=f"{to_native(e)}. Query == CHANGE MASTER TO ...")
 
             result['changed'] = True
 
@@ -532,7 +494,7 @@ class MariadbReplication():
 
         version = cursor.fetchone()["version"].lower()
 
-        self.module.log(msg="- version: {}".format(LooseVersion(version)))
+        self.module.log(f"- version: {LooseVersion(version)}")
 
         if LooseVersion(version) >= LooseVersion('10.5.1'):  # or LooseVersion(result) >= LooseVersion('8.0.22'):
             # self.primary_term = 'PRIMARY'
@@ -542,8 +504,9 @@ class MariadbReplication():
 
     def get_primary(self, cursor):
         """
-
         """
+        self.module.log("get_primary()")
+
         result = dict()
 
         # if self.mode == 'getmaster':
@@ -554,9 +517,9 @@ class MariadbReplication():
         # TODO: when it's available to change on MySQL's side,
         # change MASTER to PRIMARY using the approach from
         # get_replica_status() function. Same for other functions.
-        query = "SHOW {} STATUS".format(self.primary_term)
+        query = f"SHOW {self.primary_term} STATUS"
 
-        self.module.log(msg="- query: {}".format(query))
+        self.module.log(msg=f"- query: {query}")
 
         cursor.execute(query)
         primary_status = cursor.fetchone()
@@ -582,19 +545,20 @@ class MariadbReplication():
 
     def get_replica(self, cursor):
         """
-
         """
+        self.module.log("get_replica()")
+
         result = dict()
 
-        query = "SHOW {} STATUS".format(self.replica_term)
+        query = f"SHOW {self.replica_term} STATUS"
 
         if self.connection_name:
-            query = "SHOW {} '{}' STATUS".format(self.replica_term, self.connection_name)
+            query = f"SHOW {self.replica_term} '{self.connection_name}' STATUS"
 
         if self.channel:
-            query += " FOR CHANNEL '{}'".format(self.channel)
+            query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg="- query: {}".format(query))
+        self.module.log(msg=f"- query: {query}")
 
         cursor.execute(query)
         replica_status = cursor.fetchone()
@@ -758,18 +722,60 @@ class MariadbReplication():
 
         return started
 
-    def change_primary(self, cursor, chm):
+    def change_primary(self, cursor):
         """
         """
-        query = 'CHANGE MASTER TO {}'.format(','.join(chm))
+        chm = []
+        if self.primary_host is not None:
+            chm.append(f"MASTER_HOST='{self.primary_host}'")
+        if self.primary_user is not None:
+            chm.append(f"MASTER_USER='{self.primary_user}'")
+        if self.primary_password is not None:
+            chm.append(f"MASTER_PASSWORD='{self.primary_password}'")
+        if self.primary_port is not None:
+            chm.append(f"MASTER_PORT={self.primary_port}")
+        if self.primary_connect_retry is not None:
+            chm.append(f"MASTER_CONNECT_RETRY={self.primary_connect_retry}")
+        if self.primary_log_file is not None:
+            chm.append(f"MASTER_LOG_FILE='{self.primary_log_file}'")
+        if self.primary_log_pos is not None:
+            chm.append(f"MASTER_LOG_POS={self.primary_log_pos}")
+        if self.primary_delay is not None:
+            chm.append(f"MASTER_DELAY={self.primary_delay}")
+        if self.relay_log_file is not None:
+            chm.append(f"RELAY_LOG_FILE='{self.relay_log_file}'")
+        if self.relay_log_pos is not None:
+            chm.append(f"RELAY_LOG_POS={self.relay_log_pos}")
+        if self.primary_ssl:
+            chm.append("MASTER_SSL=1")
+        if self.primary_ssl_ca is not None:
+            chm.append(f"MASTER_SSL_CA='{self.primary_ssl_ca}'")
+        if self.primary_ssl_capath is not None:
+            chm.append(f"MASTER_SSL_CAPATH='{self.primary_ssl_capath}'")
+        if self.primary_ssl_cert is not None:
+            chm.append(f"MASTER_SSL_CERT='{self.primary_ssl_cert}'")
+        if self.primary_ssl_key is not None:
+            chm.append(f"MASTER_SSL_KEY='{self.primary_ssl_key}'")
+        if self.primary_ssl_cipher is not None:
+            chm.append(f"MASTER_SSL_CIPHER='{self.primary_ssl_cipher}'")
+        if self.primary_auto_position:
+            chm.append("MASTER_AUTO_POSITION=1")
+        if self.primary_use_gtid is not None:
+            chm.append(f"MASTER_USE_GTID={self.primary_use_gtid}")
+
+        self.module.log(msg=f"  chm: {chm}")
+
+        comma_chm = ','.join(chm)
+
+        query = f"CHANGE MASTER TO {comma_chm}"
 
         if self.connection_name:
-            query = "CHANGE MASTER '{}' TO {}".format(self.connection_name, ','.join(chm))
+            query = f"CHANGE MASTER '{self.connection_name}' TO {comma_chm}"
 
         if self.channel:
-            query += " FOR CHANNEL '{}'".format(self.channel)
+            query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg="- query: {}".format(query))
+        self.module.log(msg=f"- query: {query}")
 
         self.executed_queries.append(query)
         cursor.execute(query)
@@ -792,7 +798,10 @@ class MariadbReplication():
         if self.login_password is not None:
             config['passwd'] = self.login_password
 
-        # self.module.log(msg="config : {}".format(config))
+        if self.login_unix_socket is not None and os.path.exists(self.login_unix_socket):
+            config['unix_socket'] = self.login_unix_socket
+
+        # self.module.log(msg=f"config : {config}")
 
         if mysql_driver is None:
             self.module.fail_json(msg=mysql_driver_fail_msg)
@@ -803,9 +812,8 @@ class MariadbReplication():
         except Exception as e:
             message = "unable to connect to database. "
             message += "check login_host, login_user and login_password are correct "
-            message += "or {0} has the credentials. "
-            message += "Exception message: {1}"
-            message = message.format(config_file, to_native(e))
+            message += f"or {config_file} has the credentials. "
+            message += f"Exception message: {to_native(e)}"
 
             self.module.log(msg=message)
 

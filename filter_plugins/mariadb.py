@@ -34,9 +34,9 @@ class FilterModule(object):
         """
         # display.vv(f"support_tls({data})")
 
-        ssl_ca   = data.get("ssl-ca", None)
+        ssl_ca = data.get("ssl-ca", None)
         ssl_cert = data.get("ssl-cert", None)
-        ssl_key  = data.get("ssl-key", None)
+        ssl_key = data.get("ssl-key", None)
 
         if ssl_ca and ssl_cert and ssl_key:
             return True
@@ -50,9 +50,9 @@ class FilterModule(object):
 
         directory = []
 
-        ssl_ca   = data.get("ssl-ca", None)
+        ssl_ca = data.get("ssl-ca", None)
         ssl_cert = data.get("ssl-cert", None)
-        ssl_key  = data.get("ssl-key", None)
+        ssl_key = data.get("ssl-key", None)
 
         if ssl_ca and ssl_cert and ssl_key:
             directory.append(os.path.dirname(ssl_ca))
@@ -69,10 +69,10 @@ class FilterModule(object):
         """
         display.vv(f"detect_galera({data}, hostvars)")
         result = dict(
-            galera = False,
-            cluster_members = [],
-            cluster_primary_node = "",
-            cluster_replica_nodes = [],
+            galera=False,
+            cluster_members=[],
+            cluster_primary_node="",
+            cluster_replica_nodes=[],
             # primary = False
         )
 
@@ -140,10 +140,10 @@ class FilterModule(object):
                 replica_nodes = [x for x, v in node_information.items() if v != primary_address]
 
                 result = dict(
-                    galera = True,
-                    cluster_members = cluster_members,
-                    cluster_primary_node = primary_node,
-                    cluster_replica_nodes = replica_nodes,
+                    galera=True,
+                    cluster_members=cluster_members,
+                    cluster_primary_node=primary_node,
+                    cluster_replica_nodes=replica_nodes,
                     # primary = primary
                 )
 

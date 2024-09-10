@@ -21,6 +21,10 @@
     encrypted: "{{ mariadb_replication.user.encrypted | default('true') }}"
     update_password: always
     state: present
+    login_user:  "{{ _mariadb_root_system_user.username }}"
+    login_password: "{{ _mariadb_root_system_user.password }}"
+    login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+    config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
   run_once: true
   register: create_replication_user
   loop:
@@ -28,7 +32,7 @@
   loop_control:
     label: "{{ mariadb_replication.user.name }}@{{ item | default('%') }},
         password encypted: {{ mariadb_replication.user.encrypted | default('true') }}"
-  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+  # no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
   when:
     - mariadb_replication.role == 'primary'
     - mariadb_replication.primary is defined
@@ -42,6 +46,10 @@
 - name: check replica replication status
   mariadb_replication:
     mode: get_replica
+    login_user:  "{{ _mariadb_root_system_user.username }}"
+    login_password: "{{ _mariadb_root_system_user.password }}"
+    login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+    config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
   ignore_errors: true
   register: state_of_replica
   # no_log: true
@@ -52,6 +60,10 @@
   delegate_to: "{{ mariadb_replication.primary }}"
   mariadb_replication:
     mode: get_primary
+    login_user:  "{{ _mariadb_root_system_user.username }}"
+    login_password: "{{ _mariadb_root_system_user.password }}"
+    login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+    config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
   register: state_of_primary
   when:
     - mariadb_replication.role == 'replica'
@@ -65,6 +77,10 @@
     primary_password: "{{ mariadb_replication.user.password }}"
     primary_log_file: "{{ state_of_primary.File }}"
     primary_log_pos: "{{ state_of_primary.Position }}"
+    login_user:  "{{ _mariadb_root_system_user.username }}"
+    login_password: "{{ _mariadb_root_system_user.password }}"
+    login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+    config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
   # failed_when: true
   no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
   register: configure_replication_on_replica
@@ -83,6 +99,10 @@
 - name: start replication
   mariadb_replication:
     mode: start_replica
+    login_user:  "{{ _mariadb_root_system_user.username }}"
+    login_password: "{{ _mariadb_root_system_user.password }}"
+    login_unix_socket: "{{ mariadb_socket | default(omit) }}"
+    config_file: "{{ _mariadb_root_system_user.home | default('/root') }}/.my.cnf"
   register: start_replication
   when:
     - (state_of_replica.Is_Replica is defined and not state_of_replica.Is_Replica) or

@@ -1,6 +1,11 @@
 ---
 
-mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+mariadb_system_users:
+  - username: root
+    password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+    home: /root
+    update: true
+    ignore: true
 
 mariadb_databases:
   - name: molecule
@@ -28,7 +33,6 @@ mariadb_config_client:
   ## Allow only TLS encrypted connections
   ## ssl-verify-server-cert: on
 
-
 mariadb_config_mysqld:
   bind-address: 127.0.0.1
   socket: "{{ mariadb_socket }}"
@@ -45,5 +49,5 @@ mariadb_config_mysqld:
   ## ..when MariaDB is compiled with OpenSSL:
   ssl-cipher: TLSv1.2
   ## ..when MariaDB is compiled with YaSSL (default in Debian):
-  ssl:
+  ssl: true
   tls_version: TLSv1.2,TLSv1.3

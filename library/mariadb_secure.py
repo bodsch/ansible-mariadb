@@ -120,8 +120,8 @@ class MariaDBSecure(object):
                     )
         else:
             res = dict(
-                changed = False,
-                msg = message
+                changed=False,
+                msg=message
 
             )
 
