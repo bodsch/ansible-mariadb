@@ -111,8 +111,9 @@ class MariaDBRootPassword(object):
             args.append("--host")
             args.append(self.dba_bind_address)
 
-        args.append("password")
-        args.append(self.dba_root_password)
+        if self.dba_root_password:
+            args.append("password")
+            args.append(self.dba_root_password)
 
         self.module.log(msg=f" - args: {args}")
 

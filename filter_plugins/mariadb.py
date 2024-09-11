@@ -6,7 +6,7 @@ __metaclass__ = type
 
 import os
 import re
-import json
+# import json
 from ansible.utils.display import Display
 from ansible.module_utils.common._collections_compat import Mapping
 
@@ -25,9 +25,8 @@ class FilterModule(object):
             'support_tls': self.support_tls,
             'tls_directory': self.tls_directory,
             'detect_galera': self.detect_galera,
-            'wsrep_cluster_address': self.wsrep_cluster_address
-
-            # 'galera_node_information': self.galera_node_information,
+            'wsrep_cluster_address': self.wsrep_cluster_address,
+            'system_user': self.system_user,
         }
 
     def support_tls(self, data):
@@ -35,9 +34,9 @@ class FilterModule(object):
         """
         # display.vv(f"support_tls({data})")
 
-        ssl_ca   = data.get("ssl-ca", None)
+        ssl_ca = data.get("ssl-ca", None)
         ssl_cert = data.get("ssl-cert", None)
-        ssl_key  = data.get("ssl-key", None)
+        ssl_key = data.get("ssl-key", None)
 
         if ssl_ca and ssl_cert and ssl_key:
             return True
@@ -51,9 +50,9 @@ class FilterModule(object):
 
         directory = []
 
-        ssl_ca   = data.get("ssl-ca", None)
+        ssl_ca = data.get("ssl-ca", None)
         ssl_cert = data.get("ssl-cert", None)
-        ssl_key  = data.get("ssl-key", None)
+        ssl_key = data.get("ssl-key", None)
 
         if ssl_ca and ssl_cert and ssl_key:
             directory.append(os.path.dirname(ssl_ca))
@@ -70,10 +69,10 @@ class FilterModule(object):
         """
         display.vv(f"detect_galera({data}, hostvars)")
         result = dict(
-            galera = False,
-            cluster_members = [],
-            cluster_primary_node = "",
-            cluster_replica_nodes = [],
+            galera=False,
+            cluster_members=[],
+            cluster_primary_node="",
+            cluster_replica_nodes=[],
             # primary = False
         )
 
@@ -141,10 +140,10 @@ class FilterModule(object):
                 replica_nodes = [x for x, v in node_information.items() if v != primary_address]
 
                 result = dict(
-                    galera = True,
-                    cluster_members = cluster_members,
-                    cluster_primary_node = primary_node,
-                    cluster_replica_nodes = replica_nodes,
+                    galera=True,
+                    cluster_members=cluster_members,
+                    cluster_primary_node=primary_node,
+                    cluster_replica_nodes=replica_nodes,
                     # primary = primary
                 )
 
@@ -194,4 +193,16 @@ class FilterModule(object):
             display.vv(f"- {primary_address} / {host_name}")
 
         display.vv(f"= {result}")
+        return result
+
+    def system_user(self, data, username):
+        """ """
+        display.vv(f"system_user({data}, {username})")
+
+        result = [x for x in data if x.get('username') == username]
+        if len(result) == 1:
+            result = result[0]
+
+        display.vv(f"= {result}")
+
         return result

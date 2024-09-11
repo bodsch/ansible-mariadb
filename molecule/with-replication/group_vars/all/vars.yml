@@ -1,10 +1,13 @@
 ---
 
-# mariadb_use_external_repo: false
-
-mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
-
 mariadb_instances: "{{ groups['replica'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+
+mariadb_system_users:
+  - username: root
+    password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+    home: /root
+    update: true
+    ignore: false
 
 mariadb_databases:
   - name: molecule
@@ -55,5 +58,7 @@ mariadb_replication:
     # The password must not be longer than 32 characters!
     password: "vkxHlCVMHAEtEFkEB9pspPB3N"
     encrypted: false
+    priv:
+      "*.*": "REPLICATION MASTER ADMIN,REPLICATION SLAVE ADMIN,REPLICATION SLAVE,REPLICATION CLIENT,REPLICA MONITOR,BINLOG MONITOR,BINLOG REPLAY"
 
 ...

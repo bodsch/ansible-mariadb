@@ -86,9 +86,9 @@ class MariadbDataDirectories(object):
             self.module.log(msg="  Directory not copied. Error: {}".format(e))
 
         return dict(
-            changed = True,
-            failed = False,
-            msg = "directory {} synced to {}".format(self.source, self.destination)
+            changed=True,
+            failed=False,
+            msg="directory {} synced to {}".format(self.source, self.destination)
         )
 
 # ===========================================
@@ -98,11 +98,11 @@ class MariadbDataDirectories(object):
 
 def main():
     module = AnsibleModule(
-        argument_spec = dict(
+        argument_spec=dict(
             source=dict(required=False, type='path', default='/var/lib/mysql'),
             destination=dict(required=True, type='path'),
         ),
-        supports_check_mode = False,
+        supports_check_mode=False,
     )
 
     helper = MariadbDataDirectories(module)

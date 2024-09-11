@@ -48,6 +48,30 @@ ansible-galaxy collection install --requirements-file collections.yml
 mariadb_datadir: /var/lib/mysql
 ```
 
+### create system users
+
+To create a `.my.cnf` on an instance, `mariadb_system_users` can be used.
+
+If no password is set, the associated task is skipped.
+
+
+| variable   | description |
+| :---       | :-----      |
+| `username` | The user name for administrative access. |
+| `password` | If no password is set, the associated task is skipped. |
+| `home`     | The home directory under which a `.my.cnf` is created. |
+| `update`   | Should the password be updated. |
+| `ignore`   | If the entire process is to be ignored, `ignore` must be set to `true`. |
+
+```yaml
+mariadb_system_users:
+  - username: root
+    password: ""
+    home: /root
+    update: true
+    ignore: true
+```
+
 ### create databases
 
 ```yaml
@@ -57,7 +81,7 @@ mariadb_databases:
     encoding: utf8
 ```
 
-### create users
+### create database users
 
 ```yaml
 mariadb_users:
@@ -179,21 +203,19 @@ mariadb_version: 10.4
 mariadb_debian_repo: "http://mirror.netcologne.de/mariadb/repo"
 
 mariadb_monitoring:
-  enabled: true
+  enabled: false
   system_user: "nobody"
   username: 'monitoring'
   password: '8WOMmRWWYHPR'
 
-mariadb_mysqltuner: true
+mariadb_mysqltuner: false
 
-# The default root user installed by mysql - almost always root
-mariadb_root_home: /root
-mariadb_root_username: root
-mariadb_root_password: root
-
-# Set this to `true` to forcibly update the root password.
-mariadb_root_password_update: true
-mariadb_user_password_update: false
+mariadb_system_users:
+  - username: root
+    password: ""
+    home: /root
+    update: true
+    ignore: true
 
 mariadb_enabled_on_startup: true
 

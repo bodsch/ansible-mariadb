@@ -96,6 +96,10 @@
       - "{{ hostname | default('') }}"
       - "{{ ansible_hostname | default('') }}"
 
+- name: define root system userdata
+  ansible.builtin.set_fact:
+    _mariadb_root_system_user: "{{ mariadb_system_users | system_user('root') }}"
+
 - name: define mariadb_galera and mariadb_galera_cluster
   ansible.builtin.set_fact:
     mariadb_galera_cluster: "{{ _mariadb_galera_cluster.galera }}"

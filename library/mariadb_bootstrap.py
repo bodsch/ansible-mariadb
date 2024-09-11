@@ -156,7 +156,7 @@ class MariadbBootstrap(object):
 
 def main():
     module = AnsibleModule(
-        argument_spec = dict(
+        argument_spec=dict(
             datadir=dict(required=False, type='path', default='/var/lib/mysql'),
             basedir=dict(required=False, type='path', default='/usr'),
             user=dict(required=False, type='str', default='mysql'),
@@ -166,7 +166,7 @@ def main():
             skip_name_resolve=dict(required=False, type='bool'),
             skip_test_db=dict(required=False, type='bool'),
         ),
-        supports_check_mode = False,
+        supports_check_mode=False,
     )
 
     helper = MariadbBootstrap(module)

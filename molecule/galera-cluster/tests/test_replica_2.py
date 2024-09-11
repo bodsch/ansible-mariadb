@@ -69,7 +69,7 @@ def get_vars(host):
     ansible_vars.update(molecule_vars)
 
     # print(pp_json(ansible_vars))
-    _ = ansible_vars.get("mariadb_config_galera",{}).pop("wsrep_cluster_address")
+    _ = ansible_vars.get("mariadb_config_galera", {}).pop("wsrep_cluster_address")
 
     templar = Templar(loader=DataLoader(), variables=ansible_vars)
     result = templar.template(ansible_vars, fail_on_undefined=False)

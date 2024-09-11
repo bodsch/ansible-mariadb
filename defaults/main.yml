@@ -7,7 +7,7 @@ mariadb_version: 10.6
 mariadb_debian_repo: https://mirror.netcologne.de/mariadb/repo
 
 mariadb_monitoring:
-  enabled: true
+  enabled: false
   system_user: "nobody"
   username: 'monitoring'
   password: '8WOMmRWWYHPR'
@@ -15,13 +15,19 @@ mariadb_monitoring:
 mariadb_mysqltuner: false
 
 # The default root user installed by mysql - almost always root
-mariadb_root_home: /root
-mariadb_root_username: root
-mariadb_root_password: root
+# mariadb_root_home: /root
+# mariadb_root_username: root
+# mariadb_root_password: root
+#
+# # Set this to `true` to forcibly update the root password.
+# mariadb_root_password_update: true
 
-# Set this to `true` to forcibly update the root password.
-mariadb_root_password_update: true
-mariadb_user_password_update: false
+mariadb_system_users:
+  - username: root
+    password: ""
+    home: /root
+    update: true
+    ignore: true
 
 mariadb_enabled_on_startup: true
 

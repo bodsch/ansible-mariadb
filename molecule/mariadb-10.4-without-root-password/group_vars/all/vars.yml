@@ -3,7 +3,12 @@
 mariadb_use_external_repo: true
 mariadb_version: 10.4
 
-mariadb_root_password: ""
+mariadb_system_users:
+  - username: root
+    password: ""
+    home: /root
+    update: true
+    ignore: true
 
 mariadb_monitoring:
   enabled: false
