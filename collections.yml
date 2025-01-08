@@ -3,3 +3,4 @@
 collections:
   - name: bodsch.core
     version: "=>1.1.0"
+  - name: community.mysql

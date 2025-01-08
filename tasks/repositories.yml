@@ -13,8 +13,8 @@
             url: https://mariadb.org/mariadb_release_signing_key.asc
             state: present
           register: apt_key
-          changed_when: apt_key.rc != 0
-          failed_when: apt_key.rc != 0
+          changed_when: apt_key.changed
+          failed_when: apt_key.failed
 
         - name: install mariadb repositories for debian based
           ansible.builtin.template:
@@ -24,8 +24,8 @@
             owner: root
             group: root
           register: apt_repo
-          changed_when: apt_repo.rc != 0
-          failed_when: apt_repo.rc != 0
+          changed_when: apt_repo.changed
+          failed_when: apt_repo.failed
 
         - name: clean apt cache   # noqa command-instead-of-module
           ansible.builtin.command: |

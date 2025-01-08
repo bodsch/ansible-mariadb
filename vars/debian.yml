@@ -9,7 +9,7 @@ mariadb_dependencies:
 mariadb_packages:
   - libmariadb-dev
   - mariadb-server
-  - python3-mysqldb
+  # - python3-mysqldb
   - python3-pymysql
 
 mariadb_build_packages:

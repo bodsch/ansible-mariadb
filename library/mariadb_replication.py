@@ -15,20 +15,10 @@ import warnings
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
 from ansible.module_utils.mysql import (
-    mysql_driver_fail_msg, mysql_common_argument_spec
+    mysql_driver,
+    mysql_driver_fail_msg,
+    mysql_common_argument_spec
 )
-
-try:
-    import pymysql as mysql_driver
-    _mysql_cursor_param = 'cursor'
-except ImportError:
-    try:
-        import MySQLdb as mysql_driver
-#        import MySQLdb.cursors
-        _mysql_cursor_param = 'cursorclass'
-    except ImportError:
-        mysql_driver = None
-
 from ansible.module_utils._text import to_native
 from distutils.version import LooseVersion
 
@@ -345,7 +335,6 @@ class MariadbReplication():
 
     def run(self):
         """
-
         """
         result = dict(failed=True)
 
@@ -488,24 +477,31 @@ class MariadbReplication():
 
     def prepare(self, cursor):
         """
-
         """
         cursor.execute("SELECT VERSION() as version")
 
-        version = cursor.fetchone()["version"].lower()
+        curser_fetched = cursor.fetchone()
 
-        self.module.log(f"- version: {LooseVersion(version)}")
+        if curser_fetched is not None:
+            # self.module.log(f"- cursor: {curser_fetched} ({type(curser_fetched)})")
 
-        if LooseVersion(version) >= LooseVersion('10.5.1'):  # or LooseVersion(result) >= LooseVersion('8.0.22'):
-            # self.primary_term = 'PRIMARY'
-            self.replica_term = 'REPLICA'
-            if self.primary_use_gtid == 'slave_pos':
-                self.primary_use_gtid = 'replica_pos'
+            if isinstance(curser_fetched, dict):
+                version = curser_fetched["version"].lower()
+            else:
+                version = curser_fetched[0].lower()
+
+            # self.module.log(f"- version: {LooseVersion(version)}")
+
+            if LooseVersion(version) >= LooseVersion('10.5.1'):  # or LooseVersion(result) >= LooseVersion('8.0.22'):
+                # self.primary_term = 'PRIMARY'
+                self.replica_term = 'REPLICA'
+                if self.primary_use_gtid == 'slave_pos':
+                    self.primary_use_gtid = 'replica_pos'
 
     def get_primary(self, cursor):
         """
         """
-        self.module.log("get_primary()")
+        # self.module.log("get_primary()")
 
         result = dict()
 
@@ -519,7 +515,7 @@ class MariadbReplication():
         # get_replica_status() function. Same for other functions.
         query = f"SHOW {self.primary_term} STATUS"
 
-        self.module.log(msg=f"- query: {query}")
+        # self.module.log(msg=f"- query: {query}")
 
         cursor.execute(query)
         primary_status = cursor.fetchone()
@@ -546,7 +542,7 @@ class MariadbReplication():
     def get_replica(self, cursor):
         """
         """
-        self.module.log("get_replica()")
+        # self.module.log("get_replica()")
 
         result = dict()
 
@@ -558,7 +554,7 @@ class MariadbReplication():
         if self.channel:
             query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg=f"- query: {query}")
+        # self.module.log(msg=f"- query: {query}")
 
         cursor.execute(query)
         replica_status = cursor.fetchone()
@@ -587,27 +583,27 @@ class MariadbReplication():
     def stop_replica(self, cursor):
         """
         """
-        query = 'STOP {}'.format(self.replica_term)
+        query = f'STOP {self.replica_term}'
 
         if self.connection_name:
-            query = "STOP {} '{}'".format(self.replica_term, self.connection_name)
+            query = f"STOP {self.replica_term} '{self.connection_name}'"
 
         if self.channel:
-            query += " FOR CHANNEL '{}'".format(self.channel)
+            query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg="- query: {}".format(query))
+        # self.module.log(msg="- query: {}".format(query))
 
         try:
             self.executed_queries.append(query)
             cursor.execute(query)
             stopped = True
         except mysql_driver.Warning as e:
-            self.module.log(msg="WARNING: {}".format(to_native(e)))
+            self.module.log(msg=f"WARNING: {to_native(e)}")
             stopped = False
         except Exception as e:
             if self.fail_on_error:
                 self.module.fail_json(
-                    msg="STOP REPLICA failed: {}".format(to_native(e))
+                    msg=f"STOP REPLICA failed: {to_native(e)}"
                 )
             stopped = False
 
@@ -616,27 +612,27 @@ class MariadbReplication():
     def reset_replica(self, cursor):
         """
         """
-        query = 'RESET {}'.format(self.replica_term)
+        query = f'RESET {self.replica_term}'
 
         if self.connection_name:
-            query = "RESET {} '{}'".format(self.replica_term, self.connection_name)
+            query = f"RESET {self.replica_term} '{self.connection_name}'"
 
         if self.channel:
-            query += " FOR CHANNEL '{}'".format(self.channel)
+            query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg="- query: {}".format(query))
+        # self.module.log(msg="- query: {}".format(query))
 
         try:
             self.executed_queries.append(query)
             cursor.execute(query)
             reset = True
         except mysql_driver.Warning as e:
-            self.module.log(msg="WARNING: {}".format(to_native(e)))
+            self.module.log(msg=f"WARNING: {to_native(e)}")
             reset = False
         except Exception as e:
             if self.fail_on_error:
                 self.module.fail_json(
-                    msg="RESET REPLICA failed: {}".format(to_native(e))
+                    msg=f"RESET REPLICA failed: {to_native(e)}"
                 )
             reset = False
 
@@ -645,27 +641,27 @@ class MariadbReplication():
     def reset_replica_all(self, cursor):
         """
         """
-        query = 'RESET {} ALL'.format(self.replica_term)
+        query = f'RESET {self.replica_term} ALL'
 
         if self.connection_name:
-            query = "RESET {} '{}' ALL".format(self.replica_term, self.connection_name)
+            query = f"RESET {self.replica_term} '{self.connection_name}' ALL"
 
         if self.channel:
-            query += " FOR CHANNEL '{}'".format(self.channel)
+            query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg="- query: {}".format(query))
+        # self.module.log(msg="- query: {}".format(query))
 
         try:
             self.executed_queries.append(query)
             cursor.execute(query)
             reset = True
         except mysql_driver.Warning as e:
-            self.module.log(msg="WARNING: {}".format(to_native(e)))
+            self.module.log(msg=f"WARNING: {to_native(e)}")
             reset = False
         except Exception as e:
             if self.fail_on_error:
                 self.module.fail_json(
-                    msg="RESET REPLICA ALL failed: {}".format(to_native(e))
+                    msg=f"RESET REPLICA ALL failed: {to_native(e)}"
                 )
             reset = False
 
@@ -676,19 +672,19 @@ class MariadbReplication():
         """
         query = 'RESET MASTER'
 
-        self.module.log(msg="- query: {}".format(query))
+        # self.module.log(msg="- query: {}".format(query))
 
         try:
             self.executed_queries.append(query)
             cursor.execute(query)
             reset = True
         except mysql_driver.Warning as e:
-            self.module.log(msg="WARNING: {}".format(to_native(e)))
+            self.module.log(msg=f"WARNING: {to_native(e)}")
             reset = False
         except Exception as e:
             if self.fail_on_error:
                 self.module.fail_json(
-                    msg="RESET MASTER failed: {}".format(to_native(e))
+                    msg=f"RESET MASTER failed: {to_native(e)}"
                 )
             reset = False
         return reset
@@ -696,27 +692,27 @@ class MariadbReplication():
     def start_replica(self, cursor):
         """
         """
-        query = 'START {}'.format(self.replica_term)
+        query = f'START {self.replica_term}'
 
         if self.connection_name:
-            query = "START {} '{}'".format(self.replica_term, self.connection_name)
+            query = f"START {self.replica_term} '{self.connection_name}'"
 
         if self.channel:
-            query += " FOR CHANNEL '{}'".format(self.channel)
+            query += f" FOR CHANNEL '{self.channel}'"
 
-        self.module.log(msg="- query: {}".format(query))
+        # self.module.log(msg="- query: {}".format(query))
 
         try:
             self.executed_queries.append(query)
             cursor.execute(query)
             started = True
         except mysql_driver.Warning as e:
-            self.module.log(msg="WARNING: {}".format(to_native(e)))
+            self.module.log(msg=f"WARNING: {to_native(e)}")
             started = False
         except Exception as e:
             if self.fail_on_error:
                 self.module.fail_json(
-                    msg="START REPLICA failed: {}".format(to_native(e))
+                    msg=f"START REPLICA failed: {to_native(e)}"
                 )
             started = False
 
@@ -782,8 +778,9 @@ class MariadbReplication():
 
     def _mysql_connect(self):
         """
-
         """
+        _mysql_cursor_param = 'cursor'
+
         config = {}
 
         config_file = self.config_file
