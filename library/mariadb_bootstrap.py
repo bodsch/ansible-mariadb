@@ -149,23 +149,50 @@ class MariadbBootstrap(object):
 
         return result
 
-# ===========================================
-# Module execution.
-#
-
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            datadir=dict(required=False, type='path', default='/var/lib/mysql'),
-            basedir=dict(required=False, type='path', default='/usr'),
-            user=dict(required=False, type='str', default='mysql'),
-            force=dict(required=False, type='bool'),
-            no_defaults=dict(required=False, type='bool'),
-            skip_auth_anonymous_user=dict(required=False, type='bool'),
-            skip_name_resolve=dict(required=False, type='bool'),
-            skip_test_db=dict(required=False, type='bool'),
+    """
+    """
+    specs = dict(
+        datadir=dict(
+            required=False,
+            type='path',
+            default='/var/lib/mysql'
         ),
+        basedir=dict(
+            required=False,
+            type='path',
+            default='/usr'
+        ),
+        user=dict(
+            required=False,
+            type='str',
+            default='mysql'
+        ),
+        force=dict(
+            required=False,
+            type='bool'
+        ),
+        no_defaults=dict(
+            required=False,
+            type='bool'
+        ),
+        skip_auth_anonymous_user=dict(
+            required=False,
+            type='bool'
+        ),
+        skip_name_resolve=dict(
+            required=False,
+            type='bool'
+        ),
+        skip_test_db=dict(
+            required=False,
+            type='bool'
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec=specs,
         supports_check_mode=False,
     )
 

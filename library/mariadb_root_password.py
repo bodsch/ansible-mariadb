@@ -228,10 +228,6 @@ class MariaDBRootPassword(object):
         return password_hash.hexdigest()
 
 
-# ---------------------------------------------------------------------------------------
-# Module execution.
-#
-
 def main():
     """
     """

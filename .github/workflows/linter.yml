@@ -24,7 +24,9 @@ on:
     paths:
       - "!Makefile"
       - "!README.md"
-      - "tasks/**"
+      - 'library/*.py'
+      - 'filter_plugins/*.py'
+      - '.config/pycodestyle.cfg'
   pull_request:
     branches:
       - 'main'
@@ -33,24 +35,39 @@ on:
     paths:
       - "!Makefile"
       - "!README.md"
-      - "tasks/**"
+      - 'library/*.py'
+      - 'filter_plugins/*.py'
+      - '.config/pycodestyle.cfg'
 
 jobs:
-  lint:
-    name: linting
+  pycodestyle:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+
     steps:
-      - name: 🛎 Checkout
+      - name: Check out the codebase.
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
 
-      - name: lint
-        uses: docker://ghcr.io/github/super-linter:slim-v4
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GH_REGISTRY_TOKEN }}
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_ANSIBLE: true
-          # VALIDATE_MARKDOWN: true
-          VALIDATE_YAML: true
+      - name: 🐍 set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python_version }}"
 
+      - name: Install test dependencies.
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pycodestyle
+
+      - name: Lint code.
+        run: |
+          pycodestyle library/ --config=.config/pycodestyle.cfg --statistics --count --exclude=test_*.py
+          pycodestyle filter_plugins/ --config=.config/pycodestyle.cfg --statistics --count --exclude=test_*.py
 ...

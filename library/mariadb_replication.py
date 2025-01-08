@@ -835,8 +835,10 @@ class MariadbReplication():
 
 
 def main():
-    argument_spec = mysql_common_argument_spec()
-    argument_spec.update(
+    """
+    """
+    specs = mysql_common_argument_spec()
+    specs.update(
         mode=dict(
             type='str',
             default='get_replica', choices=[
@@ -875,20 +877,21 @@ def main():
         channel=dict(type='str'),
         fail_on_error=dict(type='bool', default=False),
     )
+
     module = AnsibleModule(
-        argument_spec=argument_spec,
+        argument_spec=specs,
         mutually_exclusive=[
             ['connection_name', 'channel']
         ],
     )
 
-    module.log(msg="-------------------------------------------------------------")
+    # module.log(msg="-------------------------------------------------------------")
 
     client = MariadbReplication(module)
     result = client.run()
 
     # module.log(msg="= result: {}".format(result))
-    module.log(msg="-------------------------------------------------------------")
+    # module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 

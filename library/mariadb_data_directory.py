@@ -91,17 +91,24 @@ class MariadbDataDirectories(object):
             msg="directory {} synced to {}".format(self.source, self.destination)
         )
 
-# ===========================================
-# Module execution.
-#
-
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            source=dict(required=False, type='path', default='/var/lib/mysql'),
-            destination=dict(required=True, type='path'),
+    """
+    """
+    specs = dict(
+        source=dict(
+            required=False,
+            type='path',
+            default='/var/lib/mysql'
         ),
+        destination=dict(
+            required=True,
+            type='path'
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec=specs,
         supports_check_mode=False,
     )
 

@@ -279,13 +279,9 @@ class MariaDBSecure(object):
         return cp
 
 
-# ---------------------------------------------------------------------------------------
-# Module execution.
-#
-
 def main():
-    ''' ... '''
-
+    """
+    """
     specs = dict(
         disallow_anonymous_users=dict(
             required=False,
@@ -324,13 +320,13 @@ def main():
         supports_check_mode=False,
     )
 
-    module.log(msg="-------------------------------------------------------------")
+    # module.log(msg="-------------------------------------------------------------")
 
     client = MariaDBSecure(module)
     result = client.run()
 
     module.log(msg=f"= result: {result}")
-    module.log(msg="-------------------------------------------------------------")
+    # module.log(msg="-------------------------------------------------------------")
 
     module.exit_json(**result)
 
