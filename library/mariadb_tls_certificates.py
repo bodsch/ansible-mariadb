@@ -217,33 +217,32 @@ class MariadbDataDirectories(object):
         return _hash.hexdigest()
 
 
-# ===========================================
-# Module execution.
-#
-
-
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            source=dict(
-                required=True,
-                type='dict',
-            ),
-            destination=dict(
-                required=True,
-                type='path'
-            ),
-            owner=dict(
-                required=False,
-                type='str',
-                default="mysql"
-            ),
-            group=dict(
-                required=False,
-                type='str',
-                default="mysql"
-            ),
+    """
+    """
+    specs = dict(
+        source=dict(
+            required=True,
+            type='dict',
         ),
+        destination=dict(
+            required=True,
+            type='path'
+        ),
+        owner=dict(
+            required=False,
+            type='str',
+            default="mysql"
+        ),
+        group=dict(
+            required=False,
+            type='str',
+            default="mysql"
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec=specs,
         supports_check_mode=False,
     )
 
