@@ -6,8 +6,7 @@
 - name: reconfigure
   when:
     - _mysql_cnf_changed is defined
-    - _mysql_cnf_changed.changed is defined
-    - not _mysql_cnf_changed.changed | bool
+    - _mysql_cnf_changed.changed | default('false') | bool
   block:
 
     - name: informations about config changes

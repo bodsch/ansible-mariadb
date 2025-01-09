@@ -20,9 +20,13 @@
 
 - name: databases
   ansible.builtin.include_tasks: databases.yml
+  when:
+    - mariadb_databases | default([]) | count > 0
 
 - name: users
   ansible.builtin.include_tasks: users.yml
+  when:
+    - mariadb_users | default([]) | count > 0
 
 - name: replication
   ansible.builtin.include_tasks: replication.yml

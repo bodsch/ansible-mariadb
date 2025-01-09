@@ -14,12 +14,22 @@ mariadb_databases:
   - name: molecule
     collation: utf8mb4_bin
     encoding: utf8mb4
+  - name: test
+    state: absent
+    collation: utf8mb4_bin
+    encoding: utf8mb4
 
 mariadb_users:
   - name: molecule
     host: '%'
     password: molecule
     priv: "molecule.*:ALL"
+    encrypted: false
+  - name: test
+    state: absent
+    host: '%'
+    password: test
+    priv: "test.*:ALL"
     encrypted: false
 
 mariadb_config_mysqld:
