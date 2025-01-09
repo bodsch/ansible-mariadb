@@ -1,6 +1,6 @@
 ---
 
-- name: ensure mariadb databases are present.
+- name: create or remove mariadb databases
   when:
     - not mariadb_galera_cluster or (mariadb_galera_cluster and mariadb_galera_primary_node == ansible_hostname)
   run_once: "{{ 'true' if mariadb_galera_cluster else 'false' }}"
