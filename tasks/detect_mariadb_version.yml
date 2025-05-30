@@ -5,6 +5,7 @@
     state: available
     package_name: "{{ mariadb_server }}"
     repository: "{{ 'MariaDB' if ansible_os_family | lower == 'redhat' and mariadb_use_external_repo else '' }}"
+  check_mode: false
   register: package_version
 
 - name: define mariadb version
