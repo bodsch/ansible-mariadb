@@ -6,6 +6,10 @@ Installs and configure a mariadb on varoius linux systems.
 
 Implement also an monitoring user with own table.
 
+> This role is currently being migrated to a [collection](https://github.com/bodsch/ansible-collection-database).
+> Please submit issues and pull requests against this collection!
+
+---
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-mariadb/main.yml?branch=main)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-mariadb)][issues]
